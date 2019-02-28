@@ -1,92 +1,70 @@
-import _    from '@caiena/lodash-ext'
-import Enum from '@caiena/enum'
+import _                     from '@caiena/lodash-ext'
+import { writablePropNames } from './meta'
+import mixin                 from './mixin'
+import Attributable          from './mixins/attributable'
+import Validatable           from './mixins/validatable'
 
 
-function defineAttr(attrName, prototype) {
-  Object.defineProperty(prototype, attrName, {
-    get() {
-      return this.$attrs[attrName]
-    },
-    set(value) {
-      return this.$attrs[attrName] = value
-    }
-    // configurable: false,
-    // enumerable:   true
-  })
+class Base {
+  static get attrs()    { return [] }
+  static get virtuals() { return [] }
+  static get enums()    { return {} }
 }
 
-function defineEnum(enumName, prototype) {
-  Object.defineProperty(prototype, enumName, {
-    get() {
-      return this.$attrs[enumName]
-    },
-    set(value) {
-      // ensures setting the key as attr value
-      let key = this.constructor.enums[enumName].key(value)
-      return this.$attrs[enumName] = key
-    }
-    // configurable: false,
-    // enumerable:   true
-  })
-}
+class Model extends mixin(Base, [Attributable, Validatable]) {
+  // using "props" as name to make it explicit that we'll set any enumerable "property" in the instance
+  // (JavaScript land - getOwnPropertyDescriptor() and prototype)
+  constructor(props = {}, { undefs = true } = {}) {
+    super()
 
+    let propNames = writablePropNames(this)
+    let sanitizedProps = _.pick(props, propNames)
 
-
-
-// decorator style
-function model(Class) {
-  const meta = {
-    class: {
-      enums: null
-    },
-  }
-
-
-  // TODO: sanity check?
-  // if (!(Class.prototype instanceof Base)) {
-  //   throw 'invalid model class.'
-  // }
-
-  // TODO: sanity check?
-  // - avoid clash of attrs, enums and virtuals "prop names"
-
-  class ModelClass extends Class {
-    // overriding enums, transforming objects to structured Enums
-    static get enums() {
-      if (meta.class.enums) return meta.class.enums
-
-      return meta.class.enums = _.reduce(super.enums, (result, enumeration, name) => {
-        // converting object to structured Enum
-        result[name] = new Enum(enumeration)
-
-        return result
+    if (undefs) {
+      // start all props with undefined, allowing them to be observed (rxjs, Vue, ...)
+      let undefProps = _.reduce(propNames, (undefProps, name) => {
+        undefProps[name] = undefined
+        return undefProps
       }, {})
+
+      // adding undefs if not defined yet
+      // _.defaults(sanitizedProps, undefProps)
+      // XXX: using _.merge() here to keep properties names sorted
+      sanitizedProps = _.merge(undefProps, sanitizedProps)
     }
+
+    // set props, one-by-one
+    _.each(sanitizedProps, (value, name) => {
+      this[name] = value
+    })
   }
-  // keeping class name
-  Object.defineProperty(ModelClass, 'name', { value: Class.name })
 
+  toJSON({ pick = [], omit = [], virtuals = false, undefs = false } = {}) {
+    let json = _.clone(this.$attrs)
 
-  // handling enums first then attrs, avoiding overrides
-  // defining enums get/set properties
-  _.each(ModelClass.enums, (enumeration, enumName) => {
-    // TODO: should it be _.hasIn(), including inherited props?
-    if (!_.has(ModelClass.prototype, enumName)) {
-      defineEnum(enumName, ModelClass.prototype)
+    if (!undefs) {
+      json = _.pickBy(json, (val, key) => !_.isUndefined(val))
     }
-  })
 
-  // defining attrs get/set properties
-  _.each(ModelClass.attrs, (attrName) => {
-    // TODO: should it be _.hasIn(), including inherited props?
-    if (!_.has(ModelClass.prototype, attrName)) {
-      defineAttr(attrName, ModelClass.prototype)
+    if (virtuals) {
+      _.merge(json, _.pick(this, this.constructor.virtuals))
     }
-  })
 
+    if (_.present(omit)) {
+      json = _.omit(json, omit)
+    }
 
-  return ModelClass
+    if (_.present(pick)) {
+      json = _.pick(json, pick)
+    }
+
+    return json
+  }
+
+  $serialize(...args) {
+    return this.toJSON(...args)
+  }
 }
 
 
-export default model
+export default Model

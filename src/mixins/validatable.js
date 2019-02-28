@@ -3,18 +3,6 @@ import validate from 'validate.js'
 import '../validators/register'
 
 
-// TODO: remove this class
-class ValidationError extends Error {
-  constructor(errors) {
-    super('validation error')
-    Error.captureStackTrace(this, this.constructor) // Creates the this.stack getter
-
-    this.name = 'ValidationError'
-    this.errors = errors
-  }
-}
-
-
 function Validatable(Class) {
   const meta = {
     instance: {
@@ -32,6 +20,7 @@ function Validatable(Class) {
 
       // adapting api to .then(success, error) to .then(success).catch(error)
       return new Promise((resolve, reject) => {
+        // TODO: use this instead of this.$props
         validate.async(this.$props, constraints)
           .then(
             function success(attributes) {
@@ -57,15 +46,8 @@ function Validatable(Class) {
     }
   }
 
-  // TODO: probably not needed, because mixins are used like:
-  // class MyClass extends Mixin(BaseClass)
-  // -> so MyClass will always be named MyClass :)
-  // XXX: ensuring the class name stays untouched
-  // Object.defineProperty(ValidatableClass, 'name', { value: Class.name })
-
   return ValidatableClass
 }
 
 
 export default Validatable
-export { Validatable, ValidationError }
