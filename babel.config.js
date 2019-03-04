@@ -17,5 +17,7 @@ module.exports = {
     ]
   ],
 
-  "sourceMaps": true
+  // @see https://github.com/Microsoft/vscode/issues/5728#issuecomment-340219041
+  "sourceMaps": "inline",
+  "retainLines": true
 }

@@ -13,7 +13,7 @@ function defineAttr(obj, attrName) {
     set(value) {
       return this.$attrs[attrName] = value
     },
-    configurable: false,
+    configurable: true,
     enumerable:   true
   })
 }
@@ -37,7 +37,7 @@ function defineEnum(obj, enumName, enumeration) {
       let key = this.constructor.$enums[enumName].key(value)
       return this.$attrs[enumName] = key
     },
-    configurable: false,
+    configurable: true,
     enumerable:   true
   })
 }
@@ -57,6 +57,12 @@ function Attributable(Class) {
       // handling enums first then attrs, avoiding overrides
       // defining enums get/set properties
       _.each(klass.enums, (enumeration, enumName) => {
+        // sanity check!
+        // enum must be defined in attrs list as well
+        if (!_.includes(klass.attrs, enumName)) {
+          throw new Error(`enum "${enumName}" is not listed as an attribute in model ${klass.name}`)
+        }
+
         // TODO: should it be _.hasIn(), including inherited props?
         if (!_.has(this, enumName)) {
           defineEnum(this, enumName, enumeration)
@@ -78,7 +84,14 @@ function Attributable(Class) {
     }
 
     set $attrs(attrs) {
-      return _.merge(this.$$attrs, attrs)
+      // TODO: remove old code
+      // return _.merge(this.$$attrs, attrs)
+
+      // set props, one-by-one, using setter method
+      let sanitizedAttrs = _.pick(attrs, this.constructor.attrs)
+      _.each(sanitizedAttrs, (value, name) => {
+        this[name] = value
+      })
     }
 
     // TODO: remove it?

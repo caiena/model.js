@@ -10,7 +10,8 @@ export default [
     output: {
       name: 'model',
       file: pkg.browser,
-      format: 'umd'
+      format: 'umd',
+      sourcemap: true
     },
     plugins: [
       resolve(), // so Rollup can find dependencies (e.g. `lodash`)
@@ -31,8 +32,8 @@ export default [
     input: 'src/index.js',
     external: ['@caiena/lodash-ext'],
     output: [
-      { file: pkg.main, format: 'cjs' },
-      { file: pkg.module, format: 'es' }
+      { file: pkg.main, format: 'cjs', sourcemap: true },
+      { file: pkg.module, format: 'es', sourcemap: true }
     ],
     plugins: [
       babel({

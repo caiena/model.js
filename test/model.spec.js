@@ -2,60 +2,11 @@ import _     from '@caiena/lodash-ext'
 import Enum  from '@caiena/enum'
 import Model from '../src/model'
 
+// support models
+import User  from './support/models/user'
+import Admin from './support/models/admin'
 
 describe('model', () => {
-
-  class User extends Model {
-    static get attrs() {
-      return ['id', 'name', 'disabledAt']
-    }
-
-    static get virtuals() {
-      return ['disabled']
-    }
-
-    static get enums() {
-      return {
-        status: { failure: -1, scheduled: 0, success: 1 }
-      }
-    }
-
-    static get constraints() {
-      return {
-        name: { presence: true }
-      }
-    }
-
-    get disabled() {
-      return _.present(this.disabledAt)
-    }
-  }
-
-
-  class Admin extends User {
-    static get attrs() {
-      return _.chain(super.attrs)
-        .concat(['area'])
-        .uniq()
-        .value()
-    }
-
-    static get constraints() {
-      return _.merge({}, super.constraints, {
-        area: { presence: true }
-      })
-    }
-
-    constructor(...args) {
-      super(...args)
-
-      // default value
-      if (this.$blank('status')) {
-        this.status = 'success'
-      }
-    }
-  }
-
 
   describe('instantiating', () => {
     it('allows defining the attributes, defining get/set properties on instances', () => {
@@ -78,6 +29,24 @@ describe('model', () => {
       let user = new User({ name: 'Forkbomb', status: -1 })
 
       expect(user.status).to.equal('failure')
+    })
+  })
+
+
+  describe('attributes', () => {
+    it('allows setting multiple attributes at once', () => {
+      let user = new User({ name: 'First man' })
+      user.$attrs = {
+        id: 1,
+        status: 'success'
+      }
+
+      expect(user.toJSON()).to.deep.equal({
+        id: 1,
+        name: 'First man',
+        status: 'success'
+      })
+
     })
   })
 
@@ -122,6 +91,22 @@ describe('model', () => {
         status: 'success',
         area: 'Universe'
       })
+    })
+
+    it.only('allows overriding attr setter', () => {
+      let admin = new Admin({ name: 'Mesmerize' })
+
+      expect(admin.name).to.equal('admin:Mesmerize')
+    })
+
+    it('allows overriding virtual attributes', async () => {
+      let admin = new Admin({ name: 'John Paul Getty' })
+      expect(admin.disabled).to.be.false
+
+      admin.status = 'failure'
+      expect(admin.disabled).to.be.true
+
+      expect(admin.toJSON({ virtuals: true })).to.containSubset({ disabled: true })
     })
   })
 

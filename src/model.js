@@ -6,9 +6,9 @@ import Validatable           from './mixins/validatable'
 
 
 class Base {
-  static get attrs()    { return [] }
-  static get virtuals() { return [] }
-  static get enums()    { return {} }
+  static get attrs()     { return [] }
+  static get enums()     { return {} }
+  static get virtuals()  { return [] }
 }
 
 class Model extends mixin(Base, [Attributable, Validatable]) {
@@ -16,6 +16,7 @@ class Model extends mixin(Base, [Attributable, Validatable]) {
   // (JavaScript land - getOwnPropertyDescriptor() and prototype)
   constructor(props = {}, { undefs = true } = {}) {
     super()
+    this.$init(...arguments) // allowing metaprogramming
 
     let propNames = writablePropNames(this)
     let sanitizedProps = _.pick(props, propNames)
@@ -33,10 +34,15 @@ class Model extends mixin(Base, [Attributable, Validatable]) {
       sanitizedProps = _.merge(undefProps, sanitizedProps)
     }
 
-    // set props, one-by-one
+    // set props, one-by-one, using setter method
     _.each(sanitizedProps, (value, name) => {
       this[name] = value
     })
+
+  }
+
+  $init() {
+    // override it in subclasses
   }
 
   toJSON({ pick = [], omit = [], virtuals = false, undefs = false } = {}) {
