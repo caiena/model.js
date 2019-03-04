@@ -1,7 +1,8 @@
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import babel from 'rollup-plugin-babel';
-import pkg from './package.json';
+import localResolve from 'rollup-plugin-local-resolve'
+import resolve from 'rollup-plugin-node-resolve'
+import commonjs from 'rollup-plugin-commonjs'
+import babel from 'rollup-plugin-babel'
+import pkg from './package.json'
 
 export default [
   // browser-friendly UMD build
@@ -30,15 +31,16 @@ export default [
   // `file` and `format` for each target)
   {
     input: 'src/index.js',
-    external: ['@caiena/lodash-ext'],
+    external: ['@caiena/lodash-ext', 'moment'],
     output: [
-      { file: pkg.main, format: 'cjs', sourcemap: true },
-      { file: pkg.module, format: 'es', sourcemap: true }
+      { file: pkg.main,   format: 'cjs', sourcemap: true },
+      { file: pkg.module, format: 'es',  sourcemap: true }
     ],
     plugins: [
       babel({
         exclude: ['node_modules/**']
-      })
+      }),
+      localResolve() // allowing import of index.js files from directory name
     ]
   }
 ];

@@ -5,41 +5,38 @@ import { defineInternalProp, writablePropNames } from '../meta'
 
 
 
-function defineAttr(obj, attrName) {
-  Object.defineProperty(obj, attrName, {
-    get() {
+function defineAttr(obj, attrName, { get = null, set = null } = {}) {
+  if (!get) {
+    get = function get() {
       return this.$attrs[attrName]
-    },
-    set(value) {
+    }
+  }
+
+  if (!set) {
+    set = function set(value) {
       return this.$attrs[attrName] = value
-    },
+    }
+  }
+
+  Object.defineProperty(obj, attrName, {
+    get,
+    set,
     configurable: true,
     enumerable:   true
   })
 }
 
-function defineEnum(obj, enumName, enumeration) {
-  const _enum = new Enum(enumeration)
-  let Class = obj.constructor
-
-  if (!_.has(Class, '$enums'))
-    defineInternalProp(Class, '$enums', {})
-
-  if (!_.has(Class.$enums[enumName]))
-    Class.$enums[enumName] = new Enum(enumeration)
-
-  Object.defineProperty(obj, enumName, {
-    get() {
-      return this.$attrs[enumName]
-    },
-    set(value) {
+function defineEnum(obj, enumName, { get = null, set = null } = {}) {
+  // custom setter for enums
+  if (!set) {
+    set = function set(value) {
       // ensures setting the key as attr value
       let key = this.constructor.$enums[enumName].key(value)
       return this.$attrs[enumName] = key
-    },
-    configurable: true,
-    enumerable:   true
-  })
+    }
+  }
+
+  defineAttr(obj, enumName, { get, set })
 }
 
 
@@ -47,6 +44,20 @@ function defineEnum(obj, enumName, enumeration) {
 function Attributable(Class) {
 
   class AttributableClass extends Class {
+
+    // lazy evaluated $enums, using @caiena/enum
+    static get $enums() {
+      return this.$$enums = this.$$enums || _.reduce(this.enums, (result, enumeration, enumName) => {
+        if (enumeration instanceof Enum) {
+          result[enumName] = enumeration
+        } else {
+          result[enumName] = new Enum(enumeration)
+        }
+
+        return result
+      }, {})
+    }
+
     constructor(...args) {
       super(...args)
 
@@ -63,17 +74,29 @@ function Attributable(Class) {
           throw new Error(`enum "${enumName}" is not listed as an attribute in model ${klass.name}`)
         }
 
-        // TODO: should it be _.hasIn(), including inherited props?
         if (!_.has(this, enumName)) {
-          defineEnum(this, enumName, enumeration)
+          // first, check if it is defined in prototype
+          if (_.hasIn(this, enumName)) {
+            let _proto = Object.getPrototypeOf(this)
+            let _descr = Object.getOwnPropertyDescriptor(_proto, enumName)
+            defineEnum(this, enumName, { get: _descr.get, set: _descr.set })
+          } else {
+            defineEnum(this, enumName)
+          }
         }
       })
 
       // defining attrs get/set properties
       _.each(klass.attrs, (attrName) => {
-        // TODO: should it be _.hasIn(), including inherited props?
         if (!_.has(this, attrName)) {
-          defineAttr(this, attrName)
+          // first, check if it is defined in prototype
+          if (_.hasIn(this, attrName)) {
+            let _proto = Object.getPrototypeOf(this)
+            let _descr = Object.getOwnPropertyDescriptor(_proto, attrName)
+            defineAttr(this, attrName, { get: _descr.get, set: _descr.set })
+          } else {
+            defineAttr(this, attrName)
+          }
         }
       })
     }

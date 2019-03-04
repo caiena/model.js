@@ -1,5 +1,7 @@
-// import Decorator from './decorator'
-import model     from './model'
+import Model from './model'
+import mixin from './mixin'
 
-
-export default model
+export {
+  Model,
+  mixin
+}

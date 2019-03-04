@@ -18,25 +18,22 @@ class Admin extends User {
 
   // do not use constructor()
   // if you need extra functionality, use $init()
-  $init(props, options) {
+  $init() {
     // default value
-    if (!_.has(props, 'status')) { // no value provided
+    if (this.$blank('status')) {
       this.status = 'success'
     }
-
-    // overriding attr setter
-    Object.defineProperty(this, 'name', {
-      get() { return this.$attrs['name'] },
-      set(val) { return this.$attrs['name'] = _.blank(val) ? val : `admin:${val}` },
-      configurable: true,
-      enumerable:   true
-    })
   }
 
 
   // overriding virtual getter
   get disabled() {
-    return super.disabled || this.status == 'failure'
+    return super.disabled || this.status === 'failure'
+  }
+
+  // overriding attr setter
+  set name(val) {
+    this.$attrs.name = _.blank(val) ? val : `[admin] ${val}`
   }
 }
 

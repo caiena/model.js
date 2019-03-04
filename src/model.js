@@ -16,7 +16,6 @@ class Model extends mixin(Base, [Attributable, Validatable]) {
   // (JavaScript land - getOwnPropertyDescriptor() and prototype)
   constructor(props = {}, { undefs = true } = {}) {
     super()
-    this.$init(...arguments) // allowing metaprogramming
 
     let propNames = writablePropNames(this)
     let sanitizedProps = _.pick(props, propNames)
@@ -39,6 +38,7 @@ class Model extends mixin(Base, [Attributable, Validatable]) {
       this[name] = value
     })
 
+    this.$init() // hook for user land
   }
 
   $init() {

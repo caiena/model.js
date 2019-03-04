@@ -1,0 +1,492 @@
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+require('core-js/modules/es6.date.to-json');
+var _ = _interopDefault(require('@caiena/lodash-ext'));
+require('core-js/modules/es6.array.sort');
+require('core-js/modules/es6.string.starts-with');
+require('core-js/modules/es7.array.includes');
+require('core-js/modules/es6.string.includes');
+require('core-js/modules/es6.function.name');
+var Enum = _interopDefault(require('@caiena/enum'));
+require('core-js/modules/es6.promise');
+require('regenerator-runtime/runtime');
+var validate = _interopDefault(require('validate.js'));
+var moment = _interopDefault(require('moment'));
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+    var info = gen[key](arg);
+    var value = info.value;
+  } catch (error) {
+    reject(error);
+    return;
+  }
+
+  if (info.done) {
+    resolve(value);
+  } else {
+    Promise.resolve(value).then(_next, _throw);
+  }
+}
+
+function _asyncToGenerator(fn) {
+  return function () {
+    var self = this,
+        args = arguments;
+    return new Promise(function (resolve, reject) {
+      var gen = fn.apply(self, args);
+
+      function _next(value) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+      }
+
+      function _throw(err) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+      }
+
+      _next(undefined);
+    });
+  };
+}
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if ("value" in descriptor) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+
+  return _assertThisInitialized(self);
+}
+
+function defineInternalProp(obj, prop, value) {
+  Object.defineProperty(obj, prop, {
+    enumerable: false,
+    writable: true,
+    configurable: true,
+    value: value });
+
+}
+
+
+// checks for property in instance or its prototype
+function writableProp(instance, name) {
+  // avoiding reserved props (e.g. constructor) or names starting with $ - model.js "meta" props
+  if (_.includes(['constructor'], name) || _.startsWith(name, '$')) return false;
+
+  var descriptor = null;
+
+  if (instance.hasOwnProperty(name)) {
+    descriptor = Object.getOwnPropertyDescriptor(instance, name);
+  } else {
+    // falling back to prototype
+    var prototype = Object.getPrototypeOf(instance);
+    descriptor = Object.getOwnPropertyDescriptor(prototype, name);
+  }
+
+  return !!descriptor.set || descriptor.writable === true;
+}
+
+
+// checks for property in instance or its prototype
+function writablePropNames(instance) {
+  var prototype = Object.getPrototypeOf(instance);
+  var propNames = _.chain(Object.getOwnPropertyNames(instance)).
+  concat(Object.getOwnPropertyNames(prototype)).
+  uniq().
+  value().
+  sort();
+
+  return _.filter(propNames, function (name) {return writableProp(instance, name);});
+}
+
+// @see https://github.com/Vincit/objection.js/blob/2f7dd232aec1b1b3d880d10e75b169af2554ea91/lib/utils/mixin.js
+
+
+function mixin(Class, mixins) {
+  return mixins.reduce(function (MixedClass, Mixin) {return Mixin(MixedClass);}, Class);
+}
+
+function defineAttr(obj, attrName) {var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},_ref$get = _ref.get,get = _ref$get === void 0 ? null : _ref$get,_ref$set = _ref.set,set = _ref$set === void 0 ? null : _ref$set;
+  if (!get) {
+    get = function get() {
+      return this.$attrs[attrName];
+    };
+  }
+
+  if (!set) {
+    set = function set(value) {
+      return this.$attrs[attrName] = value;
+    };
+  }
+
+  Object.defineProperty(obj, attrName, {
+    get: get,
+    set: set,
+    configurable: true,
+    enumerable: true });
+
+}
+
+function defineEnum(obj, enumName) {var _ref2 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},_ref2$get = _ref2.get,get = _ref2$get === void 0 ? null : _ref2$get,_ref2$set = _ref2.set,set = _ref2$set === void 0 ? null : _ref2$set;
+  // custom setter for enums
+  if (!set) {
+    set = function set(value) {
+      // ensures setting the key as attr value
+      var key = this.constructor.$enums[enumName].key(value);
+      return this.$attrs[enumName] = key;
+    };
+  }
+
+  defineAttr(obj, enumName, { get: get, set: set });
+}
+
+
+
+function Attributable(Class) {var
+
+  AttributableClass = /*#__PURE__*/function (_Class) {_inherits(AttributableClass, _Class);_createClass(AttributableClass, null, [{ key: "$enums",
+
+      // lazy evaluated $enums, using @caiena/enum
+      get: function get() {
+        return this.$$enums = this.$$enums || _.reduce(this.enums, function (result, enumeration, enumName) {
+          if (enumeration instanceof Enum) {
+            result[enumName] = enumeration;
+          } else {
+            result[enumName] = new Enum(enumeration);
+          }
+
+          return result;
+        }, {});
+      } }]);
+
+    function AttributableClass() {var _getPrototypeOf2;var _this;_classCallCheck(this, AttributableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
+      _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(AttributableClass)).call.apply(_getPrototypeOf2, [this].concat(args)));
+
+      var klass = _this.constructor;
+
+      defineInternalProp(_assertThisInitialized(_assertThisInitialized(_this)), '$$attrs', {});
+
+      // handling enums first then attrs, avoiding overrides
+      // defining enums get/set properties
+      _.each(klass.enums, function (enumeration, enumName) {
+        // sanity check!
+        // enum must be defined in attrs list as well
+        if (!_.includes(klass.attrs, enumName)) {
+          throw new Error("enum \"".concat(enumName, "\" is not listed as an attribute in model ").concat(klass.name));
+        }
+
+        if (!_.has(_assertThisInitialized(_assertThisInitialized(_this)), enumName)) {
+          // first, check if it is defined in prototype
+          if (_.hasIn(_assertThisInitialized(_assertThisInitialized(_this)), enumName)) {
+            var _proto = Object.getPrototypeOf(_assertThisInitialized(_assertThisInitialized(_this)));
+            var _descr = Object.getOwnPropertyDescriptor(_proto, enumName);
+            defineEnum(_assertThisInitialized(_assertThisInitialized(_this)), enumName, { get: _descr.get, set: _descr.set });
+          } else {
+            defineEnum(_assertThisInitialized(_assertThisInitialized(_this)), enumName);
+          }
+        }
+      });
+
+      // defining attrs get/set properties
+      _.each(klass.attrs, function (attrName) {
+        if (!_.has(_assertThisInitialized(_assertThisInitialized(_this)), attrName)) {
+          // first, check if it is defined in prototype
+          if (_.hasIn(_assertThisInitialized(_assertThisInitialized(_this)), attrName)) {
+            var _proto = Object.getPrototypeOf(_assertThisInitialized(_assertThisInitialized(_this)));
+            var _descr = Object.getOwnPropertyDescriptor(_proto, attrName);
+            defineAttr(_assertThisInitialized(_assertThisInitialized(_this)), attrName, { get: _descr.get, set: _descr.set });
+          } else {
+            defineAttr(_assertThisInitialized(_assertThisInitialized(_this)), attrName);
+          }
+        }
+      });return _this;
+    }_createClass(AttributableClass, [{ key: "$blank", value: function $blank(
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      attrNameOrPath) {
+        return _.blank(this.$get(attrNameOrPath));
+      } }, { key: "$get", value: function $get(
+
+      attrNameOrPath) {
+        return _.get(this, attrNameOrPath);
+      } }, { key: "$has", value: function $has(
+
+      attrNameOrPath) {
+        // TODO: should it be _.hasIn(), to include inherited properties?
+        return _.has(this, attrNameOrPath);
+      } }, { key: "$pick", value: function $pick()
+
+      {for (var _len2 = arguments.length, attrNamesOrPathes = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {attrNamesOrPathes[_key2] = arguments[_key2];}
+        return _.pick.apply(_, [this].concat(attrNamesOrPathes));
+      } }, { key: "$present", value: function $present(
+
+      attrNameOrPath) {
+        return _.present(this.$get(attrNameOrPath));
+      } }, { key: "$set", value: function $set(
+
+      attrNameOrPath, value) {
+        return _.set(this, attrNameOrPath, value);
+      } }, { key: "$attrs", get: function get() {// XXX: $attrs and $$attrs will be confusing...
+        return this.$$attrs;}, set: function set(attrs) {var _this2 = this; // TODO: remove old code
+        // return _.merge(this.$$attrs, attrs)
+        // set props, one-by-one, using setter method
+        var sanitizedAttrs = _.pick(attrs, this.constructor.attrs);_.each(sanitizedAttrs, function (value, name) {_this2[name] = value;});} // TODO: remove it?
+    }, { key: "$props", get: function get() {var _this3 = this;var instance = this;var proto = Object.getPrototypeOf(this);var propNames = _.chain(Object.getOwnPropertyNames(proto)).concat(Object.getOwnPropertyNames(instance)).filter(function (name) {return !(_.includes(['constructor'], name) || _.startsWith(name, '$'));}).uniq().value().sort();return _.reduce(propNames, function (props, propName) {props[propName] = _this3[propName];return props;}, {});} }]);return AttributableClass;}(Class);return AttributableClass;}
+
+// @see https://validatejs.org/#validators-datetime
+
+
+// Before using it we must add the parse and format functions
+// Here is a sample implementation using moment.js
+validate.extend(validate.validators.datetime, {
+  // The value is guaranteed not to be null or undefined but otherwise it
+  // could be anything.
+  parse: function parse(value, options) {
+    // return +moment.utc(value)
+    return moment.utc(value);
+  },
+  // Input is a unix timestamp
+  format: function format(value, options) {
+    var format = options.dateOnly ? 'YYYY-MM-DD' : 'YYYY-MM-DD hh:mm:ss';
+    return moment.utc(value).format(format);
+  } });
+
+
+
+validate.validators.datetime;
+
+// XXX overwriting presence validator.
+//
+function presence(value, options, key, attrs) {
+  var opts = _.merge({}, this.options, options);
+
+  if (_.blank(value)) {
+    return opts.message || this.message || "can't be blank";
+  }
+
+  // returning nothing means "is valid"
+}
+
+validate.validators.presence = presence;
+
+// register all custom validators
+
+function Validatable(Class) {
+  var meta = {
+    instance: {
+      $errors: {} } };var
+
+
+
+  ValidatableClass = /*#__PURE__*/function (_Class) {_inherits(ValidatableClass, _Class);function ValidatableClass() {_classCallCheck(this, ValidatableClass);return _possibleConstructorReturn(this, _getPrototypeOf(ValidatableClass).apply(this, arguments));}_createClass(ValidatableClass, [{ key: "$validate", value: function () {var _$validate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {var _this = this;var constraints;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:
+
+
+
+
+
+                  constraints = this.constructor.constraints;
+
+                  // adapting api to .then(success, error) to .then(success).catch(error)
+                  return _context.abrupt("return", new Promise(function (resolve, reject) {
+                    // - cleanAttributes: false - to tell validatejs not to delete empty or without constraint attributes
+                    // @see https://validatejs.org/#validate-async
+                    //   > Besides accepting all options as the non async validation function it also accepts
+                    //   > two additional options; cleanAttributes which, unless false, makes validate.async
+                    //   > call validate.cleanAttributes before resolving the promise (...)
+                    // @see https://validatejs.org/#utilities-clean-attributes
+                    validate.async(_this, constraints, { cleanAttributes: false }).
+                    then(
+                    function success(attributes) {
+                      // reset errors
+                      meta.instance.$errors = {};
+                      resolve(true);
+                    },
+
+                    function error(errors) {
+                      if (errors instanceof Error) {
+                        // runtime Error. Just throw it
+                        // reset errors
+                        meta.instance.$errors = {};
+                        reject(errors);
+                      } else {
+                        // validation error.
+                        // assign to $errors
+                        meta.instance.$errors = errors;
+                        resolve(false);
+                      }
+                    });
+                  }));case 2:case "end":return _context.stop();}}}, _callee, this);}));function $validate() {return _$validate.apply(this, arguments);}return $validate;}() }, { key: "$errors", get: function get() {return meta.instance.$errors;} }]);return ValidatableClass;}(Class);
+
+
+
+  return ValidatableClass;
+}
+
+var
+
+
+Base = /*#__PURE__*/function () {function Base() {_classCallCheck(this, Base);}_createClass(Base, null, [{ key: "attrs", get: function get()
+    {return [];} }, { key: "enums", get: function get()
+    {return {};} }, { key: "virtuals", get: function get()
+    {return [];} }]);return Base;}();var
+
+
+Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);
+  // using "props" as name to make it explicit that we'll set any enumerable "property" in the instance
+  // (JavaScript land - getOwnPropertyDescriptor() and prototype)
+  function Model() {var _this;var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},_ref$undefs = _ref.undefs,undefs = _ref$undefs === void 0 ? true : _ref$undefs;_classCallCheck(this, Model);
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Model).call(this));
+
+    var propNames = writablePropNames(_assertThisInitialized(_assertThisInitialized(_this)));
+    var sanitizedProps = _.pick(props, propNames);
+
+    if (undefs) {
+      // start all props with undefined, allowing them to be observed (rxjs, Vue, ...)
+      var undefProps = _.reduce(propNames, function (undefProps, name) {
+        undefProps[name] = undefined;
+        return undefProps;
+      }, {});
+
+      // adding undefs if not defined yet
+      // _.defaults(sanitizedProps, undefProps)
+      // XXX: using _.merge() here to keep properties names sorted
+      sanitizedProps = _.merge(undefProps, sanitizedProps);
+    }
+
+    // set props, one-by-one, using setter method
+    _.each(sanitizedProps, function (value, name) {
+      _this[name] = value;
+    });
+
+    _this.$init(); // hook for user land
+    return _this;}_createClass(Model, [{ key: "$init", value: function $init()
+
+    {
+      // override it in subclasses
+    } }, { key: "toJSON", value: function toJSON()
+
+    {var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref2$pick = _ref2.pick,pick = _ref2$pick === void 0 ? [] : _ref2$pick,_ref2$omit = _ref2.omit,omit = _ref2$omit === void 0 ? [] : _ref2$omit,_ref2$virtuals = _ref2.virtuals,virtuals = _ref2$virtuals === void 0 ? false : _ref2$virtuals,_ref2$undefs = _ref2.undefs,undefs = _ref2$undefs === void 0 ? false : _ref2$undefs;
+      var json = _.clone(this.$attrs);
+
+      if (!undefs) {
+        json = _.pickBy(json, function (val, key) {return !_.isUndefined(val);});
+      }
+
+      if (virtuals) {
+        _.merge(json, _.pick(this, this.constructor.virtuals));
+      }
+
+      if (_.present(omit)) {
+        json = _.omit(json, omit);
+      }
+
+      if (_.present(pick)) {
+        json = _.pick(json, pick);
+      }
+
+      return json;
+    } }, { key: "$serialize", value: function $serialize()
+
+    {
+      return this.toJSON.apply(this, arguments);
+    } }]);return Model;}(mixin(Base, [Attributable, Validatable]));
+
+exports.Model = Model;
+exports.mixin = mixin;
+//# sourceMappingURL=model.cjs.js.map

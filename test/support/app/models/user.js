@@ -1,5 +1,5 @@
 import _     from '@caiena/lodash-ext'
-import Model from '../../../src/model'
+import Model from '../../../../src/model'
 
 
 class User extends Model {
@@ -8,7 +8,7 @@ class User extends Model {
   }
 
   static get virtuals() {
-    return ['disabled', 'shortname']
+    return ['disabled']
   }
 
   static get enums() {
@@ -19,19 +19,13 @@ class User extends Model {
 
   static get constraints() {
     return {
-      name: { presence: true }
+      name:   { presence: true },
+      status: { inclusion: this.$enums.status.keys }
     }
   }
 
   get disabled() {
     return _.present(this.disabledAt)
-  }
-
-  get shortname() {
-    if (this.$blank('name')) return ''
-
-    let names = this.name.split(/\s+/)
-    return names.length > 1 ? `${names[0]} ${names.pop()}` : `${names[0]}`
   }
 }
 

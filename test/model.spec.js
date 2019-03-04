@@ -3,8 +3,9 @@ import Enum  from '@caiena/enum'
 import Model from '../src/model'
 
 // support models
-import User  from './support/models/user'
-import Admin from './support/models/admin'
+import User  from './support/app/models/user'
+import Admin from './support/app/models/admin'
+
 
 describe('model', () => {
 
@@ -29,6 +30,7 @@ describe('model', () => {
       let user = new User({ name: 'Forkbomb', status: -1 })
 
       expect(user.status).to.equal('failure')
+      expect(User.$enums.status.key(user.status)).to.equal('failure')
     })
   })
 
@@ -85,7 +87,7 @@ describe('model', () => {
 
       expect(admin.toJSON({ virtuals: true, undefs: true })).to.deep.equal({
         id: undefined,
-        name: 'Chuck Norris',
+        name: '[admin] Chuck Norris',
         disabledAt: '3500-01-01',
         disabled: true,
         status: 'success',
@@ -93,10 +95,10 @@ describe('model', () => {
       })
     })
 
-    it.only('allows overriding attr setter', () => {
+    it('allows overriding attr setter', () => {
       let admin = new Admin({ name: 'Mesmerize' })
 
-      expect(admin.name).to.equal('admin:Mesmerize')
+      expect(admin.name).to.equal('[admin] Mesmerize')
     })
 
     it('allows overriding virtual attributes', async () => {

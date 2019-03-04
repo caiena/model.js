@@ -6,4 +6,5 @@ function mixin(Class, mixins) {
   return mixins.reduce((MixedClass, Mixin) => Mixin(MixedClass), Class)
 }
 
+
 export default mixin

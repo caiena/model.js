@@ -1,6 +1,6 @@
 import _        from '@caiena/lodash-ext'
 import validate from 'validate.js'
-import '../validators/register'
+import _validators from '../validators'
 
 
 function Validatable(Class) {
@@ -20,8 +20,13 @@ function Validatable(Class) {
 
       // adapting api to .then(success, error) to .then(success).catch(error)
       return new Promise((resolve, reject) => {
-        // TODO: use this instead of this.$props
-        validate.async(this.$props, constraints)
+        // - cleanAttributes: false - to tell validatejs not to delete empty or without constraint attributes
+        // @see https://validatejs.org/#validate-async
+        //   > Besides accepting all options as the non async validation function it also accepts
+        //   > two additional options; cleanAttributes which, unless false, makes validate.async
+        //   > call validate.cleanAttributes before resolving the promise (...)
+        // @see https://validatejs.org/#utilities-clean-attributes
+        validate.async(this, constraints, { cleanAttributes: false})
           .then(
             function success(attributes) {
               // reset errors
