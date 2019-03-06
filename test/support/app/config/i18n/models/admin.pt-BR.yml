@@ -1,0 +1,18 @@
+---
+
+pt-BR:
+  models:
+    admin:
+      one: Administrador
+      other: Administradores
+      attributes:
+        id: ID
+        name: Nome
+        area: Área
+        status: Situação
+        disabledAt: Desabilitado em
+      enums:
+        status:
+          failure: Falha
+          scheduled: Agendado
+          success: Concluído

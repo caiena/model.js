@@ -7,6 +7,7 @@
   "browser": "dist/model.umd.js",
   "dependencies": {
     "@caiena/enum": "file://Users/pedro/src/enum.js",
+    "@caiena/i18n": "file://Users/pedro/src/i18n.js",
     "@caiena/lodash-ext": "^0.4.0",
     "moment": "^2.24.0",
     "validate.js": "^0.12.0"
@@ -21,6 +22,8 @@
     "chai-change": "^2.1.2",
     "chai-datetime": "^1.5.0",
     "chai-subset": "^1.6.0",
+    "glob": "^7.1.3",
+    "js-yaml": "^3.12.2",
     "mocha": "^6.0.0",
     "node-watch": "^0.6.0",
     "pryjs": "^1.0.3",

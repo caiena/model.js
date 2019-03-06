@@ -1,0 +1,18 @@
+---
+
+en-US:
+  models:
+    admin:
+      one: Administrator
+      other: Administrators
+      attributes:
+        id: ID
+        name: Name
+        area: Area
+        status: Status
+        disabledAt: Disabled at
+      enums:
+        status:
+          failure: Failure
+          scheduled: Scheduled
+          success: Complete

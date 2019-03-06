@@ -2,6 +2,7 @@ import _                     from '@caiena/lodash-ext'
 import { writablePropNames } from './meta'
 import mixin                 from './mixin'
 import Attributable          from './mixins/attributable'
+import Translatable          from './mixins/translatable'
 import Validatable           from './mixins/validatable'
 
 
@@ -11,7 +12,7 @@ class Base {
   static get virtuals()  { return [] }
 }
 
-class Model extends mixin(Base, [Attributable, Validatable]) {
+class Model extends mixin(Base, [Attributable, Translatable, Validatable]) {
   // using "props" as name to make it explicit that we'll set any enumerable "property" in the instance
   // (JavaScript land - getOwnPropertyDescriptor() and prototype)
   constructor(props = {}, { undefs = true } = {}) {

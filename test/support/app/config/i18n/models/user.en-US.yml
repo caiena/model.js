@@ -1,0 +1,17 @@
+---
+
+en-US:
+  models:
+    user:
+      one: User
+      other: Users
+      attributes:
+        id: ID
+        name: Name
+        status: Status
+        disabledAt: Disabled at
+      enums:
+        status:
+          failure: Failure
+          scheduled: Scheduled
+          success: Complete

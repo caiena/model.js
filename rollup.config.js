@@ -31,7 +31,7 @@ export default [
   // `file` and `format` for each target)
   {
     input: 'src/index.js',
-    external: ['@caiena/lodash-ext', 'moment'],
+    external: ['@caiena/lodash-ext', '@caiena/i18n', 'moment'],
     output: [
       { file: pkg.main,   format: 'cjs', sourcemap: true },
       { file: pkg.module, format: 'es',  sourcemap: true }
