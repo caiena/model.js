@@ -31,6 +31,7 @@ describe('model', () => {
 
       expect(user.status).to.equal('failure')
       expect(User.$enums.status.key(user.status)).to.equal('failure')
+      expect(user.$enumValue('status')).to.equal(-1)
     })
   })
 

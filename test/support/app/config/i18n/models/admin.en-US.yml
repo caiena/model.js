@@ -3,14 +3,17 @@
 en-US:
   models:
     admin:
+      zero: Administrator
       one: Administrator
       other: Administrators
+
       attributes:
         id: ID
         name: Name
         area: Area
         status: Status
         disabledAt: Disabled at
+
       enums:
         status:
           failure: Failure

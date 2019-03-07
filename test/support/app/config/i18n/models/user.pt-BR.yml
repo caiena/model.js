@@ -3,13 +3,16 @@
 pt-BR:
   models:
     user:
+      zero: Usuário
       one: Usuário
       other: Usuários
+
       attributes:
         id: ID
         name: Nome
         status: Situação
         disabledAt: Desabilitado em
+
       enums:
         status:
           failure: Falha

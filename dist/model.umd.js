@@ -18298,313 +18298,23 @@
 	  }
 	});
 
-	var _global$1 = createCommonjsModule(function (module) {
-	// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-	var global = module.exports = typeof window != 'undefined' && window.Math == Math
-	  ? window : typeof self != 'undefined' && self.Math == Math ? self
-	  // eslint-disable-next-line no-new-func
-	  : Function('return this')();
-	if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
-	});
-
-	var _core$1 = createCommonjsModule(function (module) {
-	var core = module.exports = { version: '2.6.4' };
-	if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
-	});
-	var _core_1$1 = _core$1.version;
-
-	var _isObject$1 = function (it) {
-	  return typeof it === 'object' ? it !== null : typeof it === 'function';
-	};
-
-	var _anObject$1 = function (it) {
-	  if (!_isObject$1(it)) throw TypeError(it + ' is not an object!');
-	  return it;
-	};
-
-	var _fails$1 = function (exec) {
-	  try {
-	    return !!exec();
-	  } catch (e) {
-	    return true;
-	  }
-	};
-
-	// Thank's IE8 for his funny defineProperty
-	var _descriptors$1 = !_fails$1(function () {
-	  return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
-	});
-
-	var document$2 = _global$1.document;
-	// typeof document.createElement is 'object' in old IE
-	var is$1 = _isObject$1(document$2) && _isObject$1(document$2.createElement);
-	var _domCreate$1 = function (it) {
-	  return is$1 ? document$2.createElement(it) : {};
-	};
-
-	var _ie8DomDefine$1 = !_descriptors$1 && !_fails$1(function () {
-	  return Object.defineProperty(_domCreate$1('div'), 'a', { get: function () { return 7; } }).a != 7;
-	});
-
-	// 7.1.1 ToPrimitive(input [, PreferredType])
-
-	// instead of the ES6 spec version, we didn't implement @@toPrimitive case
-	// and the second argument - flag - preferred type is a string
-	var _toPrimitive$2 = function (it, S) {
-	  if (!_isObject$1(it)) return it;
-	  var fn, val;
-	  if (S && typeof (fn = it.toString) == 'function' && !_isObject$1(val = fn.call(it))) return val;
-	  if (typeof (fn = it.valueOf) == 'function' && !_isObject$1(val = fn.call(it))) return val;
-	  if (!S && typeof (fn = it.toString) == 'function' && !_isObject$1(val = fn.call(it))) return val;
-	  throw TypeError("Can't convert object to primitive value");
-	};
-
-	var dP$2 = Object.defineProperty;
-
-	var f$1 = _descriptors$1 ? Object.defineProperty : function defineProperty(O, P, Attributes) {
-	  _anObject$1(O);
-	  P = _toPrimitive$2(P, true);
-	  _anObject$1(Attributes);
-	  if (_ie8DomDefine$1) try {
-	    return dP$2(O, P, Attributes);
-	  } catch (e) { /* empty */ }
-	  if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported!');
-	  if ('value' in Attributes) O[P] = Attributes.value;
-	  return O;
-	};
-
-	var _objectDp$1 = {
-		f: f$1
-	};
-
-	var _propertyDesc$1 = function (bitmap, value) {
-	  return {
-	    enumerable: !(bitmap & 1),
-	    configurable: !(bitmap & 2),
-	    writable: !(bitmap & 4),
-	    value: value
-	  };
-	};
-
-	var _hide$1 = _descriptors$1 ? function (object, key, value) {
-	  return _objectDp$1.f(object, key, _propertyDesc$1(1, value));
-	} : function (object, key, value) {
-	  object[key] = value;
-	  return object;
-	};
-
-	var hasOwnProperty$1 = {}.hasOwnProperty;
-	var _has$1 = function (it, key) {
-	  return hasOwnProperty$1.call(it, key);
-	};
-
-	var id$2 = 0;
-	var px$1 = Math.random();
-	var _uid$1 = function (key) {
-	  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id$2 + px$1).toString(36));
-	};
-
-	var _library$1 = false;
-
-	var _shared$1 = createCommonjsModule(function (module) {
-	var SHARED = '__core-js_shared__';
-	var store = _global$1[SHARED] || (_global$1[SHARED] = {});
-
-	(module.exports = function (key, value) {
-	  return store[key] || (store[key] = value !== undefined ? value : {});
-	})('versions', []).push({
-	  version: _core$1.version,
-	  mode: _library$1 ? 'pure' : 'global',
-	  copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
-	});
-	});
-
-	var _functionToString$1 = _shared$1('native-function-to-string', Function.toString);
-
-	var _redefine$1 = createCommonjsModule(function (module) {
-	var SRC = _uid$1('src');
-
-	var TO_STRING = 'toString';
-	var TPL = ('' + _functionToString$1).split(TO_STRING);
-
-	_core$1.inspectSource = function (it) {
-	  return _functionToString$1.call(it);
-	};
-
-	(module.exports = function (O, key, val, safe) {
-	  var isFunction = typeof val == 'function';
-	  if (isFunction) _has$1(val, 'name') || _hide$1(val, 'name', key);
-	  if (O[key] === val) return;
-	  if (isFunction) _has$1(val, SRC) || _hide$1(val, SRC, O[key] ? '' + O[key] : TPL.join(String(key)));
-	  if (O === _global$1) {
-	    O[key] = val;
-	  } else if (!safe) {
-	    delete O[key];
-	    _hide$1(O, key, val);
-	  } else if (O[key]) {
-	    O[key] = val;
-	  } else {
-	    _hide$1(O, key, val);
-	  }
-	// add fake Function#toString for correct work wrapped methods / constructors with methods like LoDash isNative
-	})(Function.prototype, TO_STRING, function toString() {
-	  return typeof this == 'function' && this[SRC] || _functionToString$1.call(this);
-	});
-	});
-
-	var _aFunction$1 = function (it) {
-	  if (typeof it != 'function') throw TypeError(it + ' is not a function!');
-	  return it;
-	};
-
-	// optional / simple context binding
-
-	var _ctx$1 = function (fn, that, length) {
-	  _aFunction$1(fn);
-	  if (that === undefined) return fn;
-	  switch (length) {
-	    case 1: return function (a) {
-	      return fn.call(that, a);
-	    };
-	    case 2: return function (a, b) {
-	      return fn.call(that, a, b);
-	    };
-	    case 3: return function (a, b, c) {
-	      return fn.call(that, a, b, c);
-	    };
-	  }
-	  return function (/* ...args */) {
-	    return fn.apply(that, arguments);
-	  };
-	};
-
-	var PROTOTYPE$1 = 'prototype';
-
-	var $export$1 = function (type, name, source) {
-	  var IS_FORCED = type & $export$1.F;
-	  var IS_GLOBAL = type & $export$1.G;
-	  var IS_STATIC = type & $export$1.S;
-	  var IS_PROTO = type & $export$1.P;
-	  var IS_BIND = type & $export$1.B;
-	  var target = IS_GLOBAL ? _global$1 : IS_STATIC ? _global$1[name] || (_global$1[name] = {}) : (_global$1[name] || {})[PROTOTYPE$1];
-	  var exports = IS_GLOBAL ? _core$1 : _core$1[name] || (_core$1[name] = {});
-	  var expProto = exports[PROTOTYPE$1] || (exports[PROTOTYPE$1] = {});
-	  var key, own, out, exp;
-	  if (IS_GLOBAL) source = name;
-	  for (key in source) {
-	    // contains in native
-	    own = !IS_FORCED && target && target[key] !== undefined;
-	    // export native or passed
-	    out = (own ? target : source)[key];
-	    // bind timers to global for call from export context
-	    exp = IS_BIND && own ? _ctx$1(out, _global$1) : IS_PROTO && typeof out == 'function' ? _ctx$1(Function.call, out) : out;
-	    // extend global
-	    if (target) _redefine$1(target, key, out, type & $export$1.U);
-	    // export
-	    if (exports[key] != out) _hide$1(exports, key, exp);
-	    if (IS_PROTO && expProto[key] != out) expProto[key] = out;
-	  }
-	};
-	_global$1.core = _core$1;
-	// type bitmap
-	$export$1.F = 1;   // forced
-	$export$1.G = 2;   // global
-	$export$1.S = 4;   // static
-	$export$1.P = 8;   // proto
-	$export$1.B = 16;  // bind
-	$export$1.W = 32;  // wrap
-	$export$1.U = 64;  // safe
-	$export$1.R = 128; // real proto method for `library`
-	var _export$1 = $export$1;
-
-	var toString$1 = {}.toString;
-
-	var _cof$1 = function (it) {
-	  return toString$1.call(it).slice(8, -1);
-	};
-
-	// fallback for non-array-like ES3 and non-enumerable old V8 strings
-
-	// eslint-disable-next-line no-prototype-builtins
-	var _iobject$1 = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
-	  return _cof$1(it) == 'String' ? it.split('') : Object(it);
-	};
-
-	// 7.2.1 RequireObjectCoercible(argument)
-	var _defined$1 = function (it) {
-	  if (it == undefined) throw TypeError("Can't call method on  " + it);
-	  return it;
-	};
-
-	// to indexed object, toObject with fallback for non-array-like ES3 strings
-
-
-	var _toIobject$1 = function (it) {
-	  return _iobject$1(_defined$1(it));
-	};
-
-	// 7.1.4 ToInteger
-	var ceil$1 = Math.ceil;
-	var floor$2 = Math.floor;
-	var _toInteger$1 = function (it) {
-	  return isNaN(it = +it) ? 0 : (it > 0 ? floor$2 : ceil$1)(it);
-	};
-
-	// 7.1.15 ToLength
-
-	var min$3 = Math.min;
-	var _toLength$1 = function (it) {
-	  return it > 0 ? min$3(_toInteger$1(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
-	};
-
-	var max$2 = Math.max;
-	var min$4 = Math.min;
-	var _toAbsoluteIndex$1 = function (index, length) {
-	  index = _toInteger$1(index);
-	  return index < 0 ? max$2(index + length, 0) : min$4(index, length);
-	};
-
-	// false -> Array#indexOf
-	// true  -> Array#includes
-
-
-
-	var _arrayIncludes$1 = function (IS_INCLUDES) {
-	  return function ($this, el, fromIndex) {
-	    var O = _toIobject$1($this);
-	    var length = _toLength$1(O.length);
-	    var index = _toAbsoluteIndex$1(fromIndex, length);
-	    var value;
-	    // Array#includes uses SameValueZero equality algorithm
-	    // eslint-disable-next-line no-self-compare
-	    if (IS_INCLUDES && el != el) while (length > index) {
-	      value = O[index++];
-	      // eslint-disable-next-line no-self-compare
-	      if (value != value) return true;
-	    // Array#indexOf ignores holes, Array#includes - not
-	    } else for (;length > index; index++) if (IS_INCLUDES || index in O) {
-	      if (O[index] === el) return IS_INCLUDES || index || 0;
-	    } return !IS_INCLUDES && -1;
-	  };
-	};
-
-	var shared = _shared$1('keys');
+	var shared = _shared('keys');
 
 	var _sharedKey = function (key) {
-	  return shared[key] || (shared[key] = _uid$1(key));
+	  return shared[key] || (shared[key] = _uid(key));
 	};
 
-	var arrayIndexOf = _arrayIncludes$1(false);
+	var arrayIndexOf = _arrayIncludes(false);
 	var IE_PROTO = _sharedKey('IE_PROTO');
 
 	var _objectKeysInternal = function (object, names) {
-	  var O = _toIobject$1(object);
+	  var O = _toIobject(object);
 	  var i = 0;
 	  var result = [];
 	  var key;
-	  for (key in O) if (key != IE_PROTO) _has$1(O, key) && result.push(key);
+	  for (key in O) if (key != IE_PROTO) _has(O, key) && result.push(key);
 	  // Don't enum bug & hidden keys
-	  while (names.length > i) if (_has$1(O, key = names[i++])) {
+	  while (names.length > i) if (_has(O, key = names[i++])) {
 	    ~arrayIndexOf(result, key) || result.push(key);
 	  }
 	  return result;
@@ -18623,16 +18333,16 @@
 	  return _objectKeysInternal(O, _enumBugKeys);
 	};
 
-	var f$2 = {}.propertyIsEnumerable;
+	var f$1 = {}.propertyIsEnumerable;
 
 	var _objectPie = {
-		f: f$2
+		f: f$1
 	};
 
 	var isEnum = _objectPie.f;
 	var _objectToArray = function (isEntries) {
 	  return function (it) {
-	    var O = _toIobject$1(it);
+	    var O = _toIobject(it);
 	    var keys = _objectKeys(O);
 	    var length = keys.length;
 	    var i = 0;
@@ -18648,33 +18358,11 @@
 
 	var $values = _objectToArray(false);
 
-	_export$1(_export$1.S, 'Object', {
+	_export(_export.S, 'Object', {
 	  values: function values(it) {
 	    return $values(it);
 	  }
 	});
-
-	var _wks$1 = createCommonjsModule(function (module) {
-	var store = _shared$1('wks');
-
-	var Symbol = _global$1.Symbol;
-	var USE_SYMBOL = typeof Symbol == 'function';
-
-	var $exports = module.exports = function (name) {
-	  return store[name] || (store[name] =
-	    USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : _uid$1)('Symbol.' + name));
-	};
-
-	$exports.store = store;
-	});
-
-	// 22.1.3.31 Array.prototype[@@unscopables]
-	var UNSCOPABLES$1 = _wks$1('unscopables');
-	var ArrayProto$1 = Array.prototype;
-	if (ArrayProto$1[UNSCOPABLES$1] == undefined) _hide$1(ArrayProto$1, UNSCOPABLES$1, {});
-	var _addToUnscopables$1 = function (key) {
-	  ArrayProto$1[UNSCOPABLES$1][key] = true;
-	};
 
 	var _iterStep = function (done, value) {
 	  return { value: value, done: !!done };
@@ -18682,18 +18370,18 @@
 
 	var _iterators = {};
 
-	var _objectDps = _descriptors$1 ? Object.defineProperties : function defineProperties(O, Properties) {
-	  _anObject$1(O);
+	var _objectDps = _descriptors ? Object.defineProperties : function defineProperties(O, Properties) {
+	  _anObject(O);
 	  var keys = _objectKeys(Properties);
 	  var length = keys.length;
 	  var i = 0;
 	  var P;
-	  while (length > i) _objectDp$1.f(O, P = keys[i++], Properties[P]);
+	  while (length > i) _objectDp.f(O, P = keys[i++], Properties[P]);
 	  return O;
 	};
 
-	var document$3 = _global$1.document;
-	var _html = document$3 && document$3.documentElement;
+	var document$2 = _global.document;
+	var _html = document$2 && document$2.documentElement;
 
 	// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
 
@@ -18701,12 +18389,12 @@
 
 	var IE_PROTO$1 = _sharedKey('IE_PROTO');
 	var Empty = function () { /* empty */ };
-	var PROTOTYPE$2 = 'prototype';
+	var PROTOTYPE$1 = 'prototype';
 
 	// Create object with fake `null` prototype: use iframe Object with cleared prototype
 	var createDict = function () {
 	  // Thrash, waste and sodomy: IE GC bug
-	  var iframe = _domCreate$1('iframe');
+	  var iframe = _domCreate('iframe');
 	  var i = _enumBugKeys.length;
 	  var lt = '<';
 	  var gt = '>';
@@ -18721,44 +18409,38 @@
 	  iframeDocument.write(lt + 'script' + gt + 'document.F=Object' + lt + '/script' + gt);
 	  iframeDocument.close();
 	  createDict = iframeDocument.F;
-	  while (i--) delete createDict[PROTOTYPE$2][_enumBugKeys[i]];
+	  while (i--) delete createDict[PROTOTYPE$1][_enumBugKeys[i]];
 	  return createDict();
 	};
 
 	var _objectCreate = Object.create || function create(O, Properties) {
 	  var result;
 	  if (O !== null) {
-	    Empty[PROTOTYPE$2] = _anObject$1(O);
+	    Empty[PROTOTYPE$1] = _anObject(O);
 	    result = new Empty();
-	    Empty[PROTOTYPE$2] = null;
+	    Empty[PROTOTYPE$1] = null;
 	    // add "__proto__" for Object.getPrototypeOf polyfill
 	    result[IE_PROTO$1] = O;
 	  } else result = createDict();
 	  return Properties === undefined ? result : _objectDps(result, Properties);
 	};
 
-	var def = _objectDp$1.f;
+	var def = _objectDp.f;
 
-	var TAG$1 = _wks$1('toStringTag');
+	var TAG$1 = _wks('toStringTag');
 
 	var _setToStringTag = function (it, tag, stat) {
-	  if (it && !_has$1(it = stat ? it : it.prototype, TAG$1)) def(it, TAG$1, { configurable: true, value: tag });
+	  if (it && !_has(it = stat ? it : it.prototype, TAG$1)) def(it, TAG$1, { configurable: true, value: tag });
 	};
 
 	var IteratorPrototype = {};
 
 	// 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-	_hide$1(IteratorPrototype, _wks$1('iterator'), function () { return this; });
+	_hide(IteratorPrototype, _wks('iterator'), function () { return this; });
 
 	var _iterCreate = function (Constructor, NAME, next) {
-	  Constructor.prototype = _objectCreate(IteratorPrototype, { next: _propertyDesc$1(1, next) });
+	  Constructor.prototype = _objectCreate(IteratorPrototype, { next: _propertyDesc(1, next) });
 	  _setToStringTag(Constructor, NAME + ' Iterator');
-	};
-
-	// 7.1.13 ToObject(argument)
-
-	var _toObject$1 = function (it) {
-	  return Object(_defined$1(it));
 	};
 
 	// 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
@@ -18768,14 +18450,14 @@
 	var ObjectProto = Object.prototype;
 
 	var _objectGpo = Object.getPrototypeOf || function (O) {
-	  O = _toObject$1(O);
-	  if (_has$1(O, IE_PROTO$2)) return O[IE_PROTO$2];
+	  O = _toObject(O);
+	  if (_has(O, IE_PROTO$2)) return O[IE_PROTO$2];
 	  if (typeof O.constructor == 'function' && O instanceof O.constructor) {
 	    return O.constructor.prototype;
 	  } return O instanceof Object ? ObjectProto : null;
 	};
 
-	var ITERATOR = _wks$1('iterator');
+	var ITERATOR = _wks('iterator');
 	var BUGGY = !([].keys && 'next' in [].keys()); // Safari has buggy iterators w/o `next`
 	var FF_ITERATOR = '@@iterator';
 	var KEYS = 'keys';
@@ -18808,7 +18490,7 @@
 	      // Set @@toStringTag to native iterators
 	      _setToStringTag(IteratorPrototype, TAG, true);
 	      // fix for some old engines
-	      if (!_library$1 && typeof IteratorPrototype[ITERATOR] != 'function') _hide$1(IteratorPrototype, ITERATOR, returnThis);
+	      if (typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
 	    }
 	  }
 	  // fix Array#{values, @@iterator}.name in V8 / FF
@@ -18817,8 +18499,8 @@
 	    $default = function values() { return $native.call(this); };
 	  }
 	  // Define iterator
-	  if ((!_library$1 || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
-	    _hide$1(proto, ITERATOR, $default);
+	  if (BUGGY || VALUES_BUG || !proto[ITERATOR]) {
+	    _hide(proto, ITERATOR, $default);
 	  }
 	  // Plug for library
 	  _iterators[NAME] = $default;
@@ -18830,8 +18512,8 @@
 	      entries: $entries
 	    };
 	    if (FORCED) for (key in methods) {
-	      if (!(key in proto)) _redefine$1(proto, key, methods[key]);
-	    } else _export$1(_export$1.P + _export$1.F * (BUGGY || VALUES_BUG), NAME, methods);
+	      if (!(key in proto)) _redefine(proto, key, methods[key]);
+	    } else _export(_export.P + _export.F * (BUGGY || VALUES_BUG), NAME, methods);
 	  }
 	  return methods;
 	};
@@ -18841,7 +18523,7 @@
 	// 22.1.3.29 Array.prototype.values()
 	// 22.1.3.30 Array.prototype[@@iterator]()
 	var es6_array_iterator = _iterDefine(Array, 'Array', function (iterated, kind) {
-	  this._t = _toIobject$1(iterated); // target
+	  this._t = _toIobject(iterated); // target
 	  this._i = 0;                   // next index
 	  this._k = kind;                // kind
 	// 22.1.5.2.1 %ArrayIteratorPrototype%.next()
@@ -18861,12 +18543,12 @@
 	// argumentsList[@@iterator] is %ArrayProto_values% (9.4.4.6, 9.4.4.7)
 	_iterators.Arguments = _iterators.Array;
 
-	_addToUnscopables$1('keys');
-	_addToUnscopables$1('values');
-	_addToUnscopables$1('entries');
+	_addToUnscopables('keys');
+	_addToUnscopables('values');
+	_addToUnscopables('entries');
 
-	var ITERATOR$1 = _wks$1('iterator');
-	var TO_STRING_TAG = _wks$1('toStringTag');
+	var ITERATOR$1 = _wks('iterator');
+	var TO_STRING_TAG = _wks('toStringTag');
 	var ArrayValues = _iterators.Array;
 
 	var DOMIterables = {
@@ -18906,14 +18588,14 @@
 	for (var collections = _objectKeys(DOMIterables), i = 0; i < collections.length; i++) {
 	  var NAME$1 = collections[i];
 	  var explicit = DOMIterables[NAME$1];
-	  var Collection = _global$1[NAME$1];
+	  var Collection = _global[NAME$1];
 	  var proto = Collection && Collection.prototype;
 	  var key;
 	  if (proto) {
-	    if (!proto[ITERATOR$1]) _hide$1(proto, ITERATOR$1, ArrayValues);
-	    if (!proto[TO_STRING_TAG]) _hide$1(proto, TO_STRING_TAG, NAME$1);
+	    if (!proto[ITERATOR$1]) _hide(proto, ITERATOR$1, ArrayValues);
+	    if (!proto[TO_STRING_TAG]) _hide(proto, TO_STRING_TAG, NAME$1);
 	    _iterators[NAME$1] = ArrayValues;
-	    if (explicit) for (key in es6_array_iterator) if (!proto[key]) _redefine$1(proto, key, es6_array_iterator[key], true);
+	    if (explicit) for (key in es6_array_iterator) if (!proto[key]) _redefine(proto, key, es6_array_iterator[key], true);
 	  }
 	}
 
@@ -18922,10 +18604,10 @@
 
 
 	var _objectSap = function (KEY, exec) {
-	  var fn = (_core$1.Object || {})[KEY] || Object[KEY];
+	  var fn = (_core.Object || {})[KEY] || Object[KEY];
 	  var exp = {};
 	  exp[KEY] = exec(fn);
-	  _export$1(_export$1.S + _export$1.F * _fails$1(function () { fn(1); }), 'Object', exp);
+	  _export(_export.S + _export.F * _fails(function () { fn(1); }), 'Object', exp);
 	};
 
 	// 19.1.2.14 Object.keys(O)
@@ -18934,20 +18616,20 @@
 
 	_objectSap('keys', function () {
 	  return function keys(it) {
-	    return _objectKeys(_toObject$1(it));
+	    return _objectKeys(_toObject(it));
 	  };
 	});
 
 	var _meta = createCommonjsModule(function (module) {
-	var META = _uid$1('meta');
+	var META = _uid('meta');
 
 
-	var setDesc = _objectDp$1.f;
+	var setDesc = _objectDp.f;
 	var id = 0;
 	var isExtensible = Object.isExtensible || function () {
 	  return true;
 	};
-	var FREEZE = !_fails$1(function () {
+	var FREEZE = !_fails(function () {
 	  return isExtensible(Object.preventExtensions({}));
 	});
 	var setMeta = function (it) {
@@ -18958,8 +18640,8 @@
 	};
 	var fastKey = function (it, create) {
 	  // return primitive with prefix
-	  if (!_isObject$1(it)) return typeof it == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
-	  if (!_has$1(it, META)) {
+	  if (!_isObject(it)) return typeof it == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
+	  if (!_has(it, META)) {
 	    // can't set metadata to uncaught frozen object
 	    if (!isExtensible(it)) return 'F';
 	    // not necessary to add metadata
@@ -18970,7 +18652,7 @@
 	  } return it[META].i;
 	};
 	var getWeak = function (it, create) {
-	  if (!_has$1(it, META)) {
+	  if (!_has(it, META)) {
 	    // can't set metadata to uncaught frozen object
 	    if (!isExtensible(it)) return true;
 	    // not necessary to add metadata
@@ -18982,7 +18664,7 @@
 	};
 	// add metadata on freeze-family methods calling
 	var onFreeze = function (it) {
-	  if (FREEZE && meta.NEED && isExtensible(it) && !_has$1(it, META)) setMeta(it);
+	  if (FREEZE && meta.NEED && isExtensible(it) && !_has(it, META)) setMeta(it);
 	  return it;
 	};
 	var meta = module.exports = {
@@ -19005,7 +18687,7 @@
 
 	_objectSap('freeze', function ($freeze) {
 	  return function freeze(it) {
-	    return $freeze && _isObject$1(it) ? $freeze(meta(it)) : it;
+	    return $freeze && _isObject(it) ? $freeze(meta(it)) : it;
 	  };
 	});
 
@@ -19282,6 +18964,10 @@
 
 	      attrNameOrPath) {
 	        return lodashExt.blank(this.$get(attrNameOrPath));
+	      } }, { key: "$enumValue", value: function $enumValue(
+
+	      enumName) {
+	        return this.constructor.$enums[enumName].value(this[enumName]);
 	      } }, { key: "$get", value: function $get(
 
 	      attrNameOrPath) {
@@ -19310,6 +18996,1204 @@
 	        var sanitizedAttrs = lodashExt.pick(attrs, this.constructor.attrs);lodashExt.each(sanitizedAttrs, function (value, name) {_this2[name] = value;});} // TODO: remove it?
 	    }, { key: "$props", get: function get() {var _this3 = this;var instance = this;var proto = Object.getPrototypeOf(this);var propNames = lodashExt.chain(Object.getOwnPropertyNames(proto)).concat(Object.getOwnPropertyNames(instance)).filter(function (name) {return !(lodashExt.includes(['constructor'], name) || lodashExt.startsWith(name, '$'));}).uniq().value().sort();return lodashExt.reduce(propNames, function (props, propName) {props[propName] = _this3[propName];return props;}, {});} }]);return AttributableClass;}(Class);return AttributableClass;}
 
+	var i18n = createCommonjsModule(function (module) {
+	(function (root, factory) {
+	  if (module.exports) {
+	    // Node. Does not work with strict CommonJS, but
+	    // only CommonJS-like environments that support module.exports,
+	    // like Node.
+	    module.exports = factory(root);
+	  } else {
+	    // Browser globals (root is window)
+	    root.I18n = factory(root);
+	  }
+	}(commonjsGlobal, function(global) {
+
+	  // Use previously defined object if exists in current scope
+	  var I18n = global && global.I18n || {};
+
+	  // Just cache the Array#slice function.
+	  var slice = Array.prototype.slice;
+
+	  // Apply number padding.
+	  var padding = function(number) {
+	    return ("0" + number.toString()).substr(-2);
+	  };
+
+	  // Improved toFixed number rounding function with support for unprecise floating points
+	  // JavaScript's standard toFixed function does not round certain numbers correctly (for example 0.105 with precision 2).
+	  var toFixed = function(number, precision) {
+	    return decimalAdjust('round', number, -precision).toFixed(precision);
+	  };
+
+	  // Is a given variable an object?
+	  // Borrowed from Underscore.js
+	  var isObject = function(obj) {
+	    var type = typeof obj;
+	    return type === 'function' || type === 'object'
+	  };
+
+	  var isFunction = function(func) {
+	    var type = typeof func;
+	    return type === 'function'
+	  };
+
+	  // Check if value is different than undefined and null;
+	  var isSet = function(value) {
+	    return typeof(value) !== 'undefined' && value !== null;
+	  };
+
+	  // Is a given value an array?
+	  // Borrowed from Underscore.js
+	  var isArray = function(val) {
+	    if (Array.isArray) {
+	      return Array.isArray(val);
+	    }
+	    return Object.prototype.toString.call(val) === '[object Array]';
+	  };
+
+	  var isString = function(val) {
+	    return typeof val === 'string' || Object.prototype.toString.call(val) === '[object String]';
+	  };
+
+	  var isNumber = function(val) {
+	    return typeof val === 'number' || Object.prototype.toString.call(val) === '[object Number]';
+	  };
+
+	  var isBoolean = function(val) {
+	    return val === true || val === false;
+	  };
+
+	  var isNull = function(val) {
+	    return val === null;
+	  };
+
+	  var decimalAdjust = function(type, value, exp) {
+	    // If the exp is undefined or zero...
+	    if (typeof exp === 'undefined' || +exp === 0) {
+	      return Math[type](value);
+	    }
+	    value = +value;
+	    exp = +exp;
+	    // If the value is not a number or the exp is not an integer...
+	    if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
+	      return NaN;
+	    }
+	    // Shift
+	    value = value.toString().split('e');
+	    value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
+	    // Shift back
+	    value = value.toString().split('e');
+	    return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
+	  };
+
+	  var lazyEvaluate = function(message, scope) {
+	    if (isFunction(message)) {
+	      return message(scope);
+	    } else {
+	      return message;
+	    }
+	  };
+
+	  var merge = function (dest, obj) {
+	    var key, value;
+	    for (key in obj) if (obj.hasOwnProperty(key)) {
+	      value = obj[key];
+	      if (isString(value) || isNumber(value) || isBoolean(value) || isArray(value) || isNull(value)) {
+	        dest[key] = value;
+	      } else {
+	        if (dest[key] == null) dest[key] = {};
+	        merge(dest[key], value);
+	      }
+	    }
+	    return dest;
+	  };
+
+	  // Set default days/months translations.
+	  var DATE = {
+	      day_names: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+	    , abbr_day_names: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+	    , month_names: [null, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+	    , abbr_month_names: [null, "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+	    , meridian: ["AM", "PM"]
+	  };
+
+	  // Set default number format.
+	  var NUMBER_FORMAT = {
+	      precision: 3
+	    , separator: "."
+	    , delimiter: ","
+	    , strip_insignificant_zeros: false
+	  };
+
+	  // Set default currency format.
+	  var CURRENCY_FORMAT = {
+	      unit: "$"
+	    , precision: 2
+	    , format: "%u%n"
+	    , sign_first: true
+	    , delimiter: ","
+	    , separator: "."
+	  };
+
+	  // Set default percentage format.
+	  var PERCENTAGE_FORMAT = {
+	      unit: "%"
+	    , precision: 3
+	    , format: "%n%u"
+	    , separator: "."
+	    , delimiter: ""
+	  };
+
+	  // Set default size units.
+	  var SIZE_UNITS = [null, "kb", "mb", "gb", "tb"];
+
+	  // Other default options
+	  var DEFAULT_OPTIONS = {
+	    // Set default locale. This locale will be used when fallback is enabled and
+	    // the translation doesn't exist in a particular locale.
+	      defaultLocale: "en"
+	    // Set the current locale to `en`.
+	    , locale: "en"
+	    // Set the translation key separator.
+	    , defaultSeparator: "."
+	    // Set the placeholder format. Accepts `{{placeholder}}` and `%{placeholder}`.
+	    , placeholder: /(?:\{\{|%\{)(.*?)(?:\}\}?)/gm
+	    // Set if engine should fallback to the default locale when a translation
+	    // is missing.
+	    , fallbacks: false
+	    // Set the default translation object.
+	    , translations: {}
+	    // Set missing translation behavior. 'message' will display a message
+	    // that the translation is missing, 'guess' will try to guess the string
+	    , missingBehaviour: 'message'
+	    // if you use missingBehaviour with 'message', but want to know that the
+	    // string is actually missing for testing purposes, you can prefix the
+	    // guessed string by setting the value here. By default, no prefix!
+	    , missingTranslationPrefix: ''
+	  };
+
+	  // Set default locale. This locale will be used when fallback is enabled and
+	  // the translation doesn't exist in a particular locale.
+	  I18n.reset = function() {
+	    var key;
+	    for (key in DEFAULT_OPTIONS) {
+	      this[key] = DEFAULT_OPTIONS[key];
+	    }
+	  };
+
+	  // Much like `reset`, but only assign options if not already assigned
+	  I18n.initializeOptions = function() {
+	    var key;
+	    for (key in DEFAULT_OPTIONS) if (!isSet(this[key])) {
+	      this[key] = DEFAULT_OPTIONS[key];
+	    }
+	  };
+	  I18n.initializeOptions();
+
+	  // Return a list of all locales that must be tried before returning the
+	  // missing translation message. By default, this will consider the inline option,
+	  // current locale and fallback locale.
+	  //
+	  //     I18n.locales.get("de-DE");
+	  //     // ["de-DE", "de", "en"]
+	  //
+	  // You can define custom rules for any locale. Just make sure you return a array
+	  // containing all locales.
+	  //
+	  //     // Default the Wookie locale to English.
+	  //     I18n.locales["wk"] = function(locale) {
+	  //       return ["en"];
+	  //     };
+	  //
+	  I18n.locales = {};
+
+	  // Retrieve locales based on inline locale, current locale or default to
+	  // I18n's detection.
+	  I18n.locales.get = function(locale) {
+	    var result = this[locale] || this[I18n.locale] || this["default"];
+
+	    if (isFunction(result)) {
+	      result = result(locale);
+	    }
+
+	    if (isArray(result) === false) {
+	      result = [result];
+	    }
+
+	    return result;
+	  };
+
+	  // The default locale list.
+	  I18n.locales["default"] = function(locale) {
+	    var locales = []
+	      , list = []
+	    ;
+
+	    // Handle the inline locale option that can be provided to
+	    // the `I18n.t` options.
+	    if (locale) {
+	      locales.push(locale);
+	    }
+
+	    // Add the current locale to the list.
+	    if (!locale && I18n.locale) {
+	      locales.push(I18n.locale);
+	    }
+
+	    // Add the default locale if fallback strategy is enabled.
+	    if (I18n.fallbacks && I18n.defaultLocale) {
+	      locales.push(I18n.defaultLocale);
+	    }
+
+	    // Locale code format 1:
+	    // According to RFC4646 (http://www.ietf.org/rfc/rfc4646.txt)
+	    // language codes for Traditional Chinese should be `zh-Hant`
+	    //
+	    // But due to backward compatibility
+	    // We use older version of IETF language tag
+	    // @see http://www.w3.org/TR/html401/struct/dirlang.html
+	    // @see http://en.wikipedia.org/wiki/IETF_language_tag
+	    //
+	    // Format: `language-code = primary-code ( "-" subcode )*`
+	    //
+	    // primary-code uses ISO639-1
+	    // @see http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+	    // @see http://www.iso.org/iso/home/standards/language_codes.htm
+	    //
+	    // subcode uses ISO 3166-1 alpha-2
+	    // @see http://en.wikipedia.org/wiki/ISO_3166
+	    // @see http://www.iso.org/iso/country_codes.htm
+	    //
+	    // @note
+	    //   subcode can be in upper case or lower case
+	    //   defining it in upper case is a convention only
+
+
+	    // Locale code format 2:
+	    // Format: `code = primary-code ( "-" region-code )*`
+	    // primary-code uses ISO 639-1
+	    // script-code uses ISO 15924
+	    // region-code uses ISO 3166-1 alpha-2
+	    // Example: zh-Hant-TW, en-HK, zh-Hant-CN
+	    //
+	    // It is similar to RFC4646 (or actually the same),
+	    // but seems to be limited to language, script, region
+
+	    // Compute each locale with its country code.
+	    // So this will return an array containing
+	    // `de-DE` and `de`
+	    // or
+	    // `zh-hans-tw`, `zh-hans`, `zh`
+	    // locales.
+	    locales.forEach(function(locale) {
+	      var localeParts = locale.split("-");
+	      var firstFallback = null;
+	      var secondFallback = null;
+	      if (localeParts.length === 3) {
+	        firstFallback = [
+	          localeParts[0],
+	          localeParts[1]
+	        ].join("-");
+	        secondFallback = localeParts[0];
+	      }
+	      else if (localeParts.length === 2) {
+	        firstFallback = localeParts[0];
+	      }
+
+	      if (list.indexOf(locale) === -1) {
+	        list.push(locale);
+	      }
+
+	      if (! I18n.fallbacks) {
+	        return;
+	      }
+
+	      [
+	        firstFallback,
+	        secondFallback
+	      ].forEach(function(nullableFallbackLocale) {
+	        // We don't want null values
+	        if (typeof nullableFallbackLocale === "undefined") { return; }
+	        if (nullableFallbackLocale === null) { return; }
+	        // We don't want duplicate values
+	        //
+	        // Comparing with `locale` first is faster than
+	        // checking whether value's presence in the list
+	        if (nullableFallbackLocale === locale) { return; }
+	        if (list.indexOf(nullableFallbackLocale) !== -1) { return; }
+
+	        list.push(nullableFallbackLocale);
+	      });
+	    });
+
+	    // No locales set? English it is.
+	    if (!locales.length) {
+	      locales.push("en");
+	    }
+
+	    return list;
+	  };
+
+	  // Hold pluralization rules.
+	  I18n.pluralization = {};
+
+	  // Return the pluralizer for a specific locale.
+	  // If no specify locale is found, then I18n's default will be used.
+	  I18n.pluralization.get = function(locale) {
+	    return this[locale] || this[I18n.locale] || this["default"];
+	  };
+
+	  // The default pluralizer rule.
+	  // It detects the `zero`, `one`, and `other` scopes.
+	  I18n.pluralization["default"] = function(count) {
+	    switch (count) {
+	      case 0: return ["zero", "other"];
+	      case 1: return ["one"];
+	      default: return ["other"];
+	    }
+	  };
+
+	  // Return current locale. If no locale has been set, then
+	  // the current locale will be the default locale.
+	  I18n.currentLocale = function() {
+	    return this.locale || this.defaultLocale;
+	  };
+
+	  // Check if value is different than undefined and null;
+	  I18n.isSet = isSet;
+
+	  // Find and process the translation using the provided scope and options.
+	  // This is used internally by some functions and should not be used as an
+	  // public API.
+	  I18n.lookup = function(scope, options) {
+	    options = options || {};
+
+	    var locales = this.locales.get(options.locale).slice()
+	      , locale
+	      , scopes
+	      , fullScope
+	      , translations
+	    ;
+
+	    fullScope = this.getFullScope(scope, options);
+
+	    while (locales.length) {
+	      locale = locales.shift();
+	      scopes = fullScope.split(this.defaultSeparator);
+	      translations = this.translations[locale];
+
+	      if (!translations) {
+	        continue;
+	      }
+	      while (scopes.length) {
+	        translations = translations[scopes.shift()];
+
+	        if (translations === undefined || translations === null) {
+	          break;
+	        }
+	      }
+
+	      if (translations !== undefined && translations !== null) {
+	        return translations;
+	      }
+	    }
+
+	    if (isSet(options.defaultValue)) {
+	      return lazyEvaluate(options.defaultValue, scope);
+	    }
+	  };
+
+	  // lookup pluralization rule key into translations
+	  I18n.pluralizationLookupWithoutFallback = function(count, locale, translations) {
+	    var pluralizer = this.pluralization.get(locale)
+	      , pluralizerKeys = pluralizer(count)
+	      , pluralizerKey
+	      , message;
+
+	    if (isObject(translations)) {
+	      while (pluralizerKeys.length) {
+	        pluralizerKey = pluralizerKeys.shift();
+	        if (isSet(translations[pluralizerKey])) {
+	          message = translations[pluralizerKey];
+	          break;
+	        }
+	      }
+	    }
+
+	    return message;
+	  };
+
+	  // Lookup dedicated to pluralization
+	  I18n.pluralizationLookup = function(count, scope, options) {
+	    options = options || {};
+	    var locales = this.locales.get(options.locale).slice()
+	      , locale
+	      , scopes
+	      , translations
+	      , message
+	    ;
+	    scope = this.getFullScope(scope, options);
+
+	    while (locales.length) {
+	      locale = locales.shift();
+	      scopes = scope.split(this.defaultSeparator);
+	      translations = this.translations[locale];
+
+	      if (!translations) {
+	        continue;
+	      }
+
+	      while (scopes.length) {
+	        translations = translations[scopes.shift()];
+	        if (!isObject(translations)) {
+	          break;
+	        }
+	        if (scopes.length === 0) {
+	          message = this.pluralizationLookupWithoutFallback(count, locale, translations);
+	        }
+	      }
+	      if (typeof message !== "undefined" && message !== null) {
+	        break;
+	      }
+	    }
+
+	    if (typeof message === "undefined" || message === null) {
+	      if (isSet(options.defaultValue)) {
+	        if (isObject(options.defaultValue)) {
+	          message = this.pluralizationLookupWithoutFallback(count, options.locale, options.defaultValue);
+	        } else {
+	          message = options.defaultValue;
+	        }
+	        translations = options.defaultValue;
+	      }
+	    }
+
+	    return { message: message, translations: translations };
+	  };
+
+	  // Rails changed the way the meridian is stored.
+	  // It started with `date.meridian` returning an array,
+	  // then it switched to `time.am` and `time.pm`.
+	  // This function abstracts this difference and returns
+	  // the correct meridian or the default value when none is provided.
+	  I18n.meridian = function() {
+	    var time = this.lookup("time");
+	    var date = this.lookup("date");
+
+	    if (time && time.am && time.pm) {
+	      return [time.am, time.pm];
+	    } else if (date && date.meridian) {
+	      return date.meridian;
+	    } else {
+	      return DATE.meridian;
+	    }
+	  };
+
+	  // Merge serveral hash options, checking if value is set before
+	  // overwriting any value. The precedence is from left to right.
+	  //
+	  //     I18n.prepareOptions({name: "John Doe"}, {name: "Mary Doe", role: "user"});
+	  //     #=> {name: "John Doe", role: "user"}
+	  //
+	  I18n.prepareOptions = function() {
+	    var args = slice.call(arguments)
+	      , options = {}
+	      , subject
+	    ;
+
+	    while (args.length) {
+	      subject = args.shift();
+
+	      if (typeof(subject) != "object") {
+	        continue;
+	      }
+
+	      for (var attr in subject) {
+	        if (!subject.hasOwnProperty(attr)) {
+	          continue;
+	        }
+
+	        if (isSet(options[attr])) {
+	          continue;
+	        }
+
+	        options[attr] = subject[attr];
+	      }
+	    }
+
+	    return options;
+	  };
+
+	  // Generate a list of translation options for default fallbacks.
+	  // `defaultValue` is also deleted from options as it is returned as part of
+	  // the translationOptions array.
+	  I18n.createTranslationOptions = function(scope, options) {
+	    var translationOptions = [{scope: scope}];
+
+	    // Defaults should be an array of hashes containing either
+	    // fallback scopes or messages
+	    if (isSet(options.defaults)) {
+	      translationOptions = translationOptions.concat(options.defaults);
+	    }
+
+	    // Maintain support for defaultValue. Since it is always a message
+	    // insert it in to the translation options as such.
+	    if (isSet(options.defaultValue)) {
+	      translationOptions.push({ message: options.defaultValue });
+	    }
+
+	    return translationOptions;
+	  };
+
+	  // Translate the given scope with the provided options.
+	  I18n.translate = function(scope, options) {
+	    options = options || {};
+
+	    var translationOptions = this.createTranslationOptions(scope, options);
+
+	    var translation;
+	    var usedScope = scope;
+
+	    var optionsWithoutDefault = this.prepareOptions(options);
+	    delete optionsWithoutDefault.defaultValue;
+
+	    // Iterate through the translation options until a translation
+	    // or message is found.
+	    var translationFound =
+	      translationOptions.some(function(translationOption) {
+	        if (isSet(translationOption.scope)) {
+	          usedScope = translationOption.scope;
+	          translation = this.lookup(usedScope, optionsWithoutDefault);
+	        } else if (isSet(translationOption.message)) {
+	          translation = lazyEvaluate(translationOption.message, scope);
+	        }
+
+	        if (translation !== undefined && translation !== null) {
+	          return true;
+	        }
+	      }, this);
+
+	    if (!translationFound) {
+	      return this.missingTranslation(scope, options);
+	    }
+
+	    if (typeof(translation) === "string") {
+	      translation = this.interpolate(translation, options);
+	    } else if (isArray(translation)) {
+	      translation = translation.map(function(t) {
+	        return (typeof(t) === "string" ? this.interpolate(t, options) : t);
+	      }, this);
+	    } else if (isObject(translation) && isSet(options.count)) {
+	      translation = this.pluralize(options.count, usedScope, options);
+	    }
+
+	    return translation;
+	  };
+
+	  // This function interpolates the all variables in the given message.
+	  I18n.interpolate = function(message, options) {
+	    if (message === null) {
+	      return message;
+	    }
+
+	    options = options || {};
+	    var matches = message.match(this.placeholder)
+	      , placeholder
+	      , value
+	      , name
+	      , regex
+	    ;
+
+	    if (!matches) {
+	      return message;
+	    }
+
+	    while (matches.length) {
+	      placeholder = matches.shift();
+	      name = placeholder.replace(this.placeholder, "$1");
+
+	      if (isSet(options[name])) {
+	        value = options[name].toString().replace(/\$/gm, "_#$#_");
+	      } else if (name in options) {
+	        value = this.nullPlaceholder(placeholder, message, options);
+	      } else {
+	        value = this.missingPlaceholder(placeholder, message, options);
+	      }
+
+	      regex = new RegExp(placeholder.replace(/{/gm, "\\{").replace(/}/gm, "\\}"));
+	      message = message.replace(regex, value);
+	    }
+
+	    return message.replace(/_#\$#_/g, "$");
+	  };
+
+	  // Pluralize the given scope using the `count` value.
+	  // The pluralized translation may have other placeholders,
+	  // which will be retrieved from `options`.
+	  I18n.pluralize = function(count, scope, options) {
+	    options = this.prepareOptions({count: String(count)}, options);
+	    var pluralizer, result;
+
+	    result = this.pluralizationLookup(count, scope, options);
+	    if (typeof result.translations === "undefined" || result.translations == null) {
+	      return this.missingTranslation(scope, options);
+	    }
+
+	    if (typeof result.message !== "undefined" && result.message != null) {
+	      return this.interpolate(result.message, options);
+	    }
+	    else {
+	      pluralizer = this.pluralization.get(options.locale);
+	      return this.missingTranslation(scope + '.' + pluralizer(count)[0], options);
+	    }
+	  };
+
+	  // Return a missing translation message for the given parameters.
+	  I18n.missingTranslation = function(scope, options) {
+	    //guess intended string
+	    if(this.missingBehaviour === 'guess'){
+	      //get only the last portion of the scope
+	      var s = scope.split('.').slice(-1)[0];
+	      //replace underscore with space && camelcase with space and lowercase letter
+	      return (this.missingTranslationPrefix.length > 0 ? this.missingTranslationPrefix : '') +
+	          s.replace('_',' ').replace(/([a-z])([A-Z])/g,
+	          function(match, p1, p2) {return p1 + ' ' + p2.toLowerCase()} );
+	    }
+
+	    var localeForTranslation = (options != null && options.locale != null) ? options.locale : this.currentLocale();
+	    var fullScope           = this.getFullScope(scope, options);
+	    var fullScopeWithLocale = [localeForTranslation, fullScope].join(this.defaultSeparator);
+
+	    return '[missing "' + fullScopeWithLocale + '" translation]';
+	  };
+
+	  // Return a missing placeholder message for given parameters
+	  I18n.missingPlaceholder = function(placeholder, message, options) {
+	    return "[missing " + placeholder + " value]";
+	  };
+
+	  I18n.nullPlaceholder = function() {
+	    return I18n.missingPlaceholder.apply(I18n, arguments);
+	  };
+
+	  // Format number using localization rules.
+	  // The options will be retrieved from the `number.format` scope.
+	  // If this isn't present, then the following options will be used:
+	  //
+	  // - `precision`: `3`
+	  // - `separator`: `"."`
+	  // - `delimiter`: `","`
+	  // - `strip_insignificant_zeros`: `false`
+	  //
+	  // You can also override these options by providing the `options` argument.
+	  //
+	  I18n.toNumber = function(number, options) {
+	    options = this.prepareOptions(
+	        options
+	      , this.lookup("number.format")
+	      , NUMBER_FORMAT
+	    );
+
+	    var negative = number < 0
+	      , string = toFixed(Math.abs(number), options.precision).toString()
+	      , parts = string.split(".")
+	      , precision
+	      , buffer = []
+	      , formattedNumber
+	      , format = options.format || "%n"
+	      , sign = negative ? "-" : ""
+	    ;
+
+	    number = parts[0];
+	    precision = parts[1];
+
+	    while (number.length > 0) {
+	      buffer.unshift(number.substr(Math.max(0, number.length - 3), 3));
+	      number = number.substr(0, number.length -3);
+	    }
+
+	    formattedNumber = buffer.join(options.delimiter);
+
+	    if (options.strip_insignificant_zeros && precision) {
+	      precision = precision.replace(/0+$/, "");
+	    }
+
+	    if (options.precision > 0 && precision) {
+	      formattedNumber += options.separator + precision;
+	    }
+
+	    if (options.sign_first) {
+	      format = "%s" + format;
+	    }
+	    else {
+	      format = format.replace("%n", "%s%n");
+	    }
+
+	    formattedNumber = format
+	      .replace("%u", options.unit)
+	      .replace("%n", formattedNumber)
+	      .replace("%s", sign)
+	    ;
+
+	    return formattedNumber;
+	  };
+
+	  // Format currency with localization rules.
+	  // The options will be retrieved from the `number.currency.format` and
+	  // `number.format` scopes, in that order.
+	  //
+	  // Any missing option will be retrieved from the `I18n.toNumber` defaults and
+	  // the following options:
+	  //
+	  // - `unit`: `"$"`
+	  // - `precision`: `2`
+	  // - `format`: `"%u%n"`
+	  // - `delimiter`: `","`
+	  // - `separator`: `"."`
+	  //
+	  // You can also override these options by providing the `options` argument.
+	  //
+	  I18n.toCurrency = function(number, options) {
+	    options = this.prepareOptions(
+	        options
+	      , this.lookup("number.currency.format")
+	      , this.lookup("number.format")
+	      , CURRENCY_FORMAT
+	    );
+
+	    return this.toNumber(number, options);
+	  };
+
+	  // Localize several values.
+	  // You can provide the following scopes: `currency`, `number`, or `percentage`.
+	  // If you provide a scope that matches the `/^(date|time)/` regular expression
+	  // then the `value` will be converted by using the `I18n.toTime` function.
+	  //
+	  // It will default to the value's `toString` function.
+	  //
+	  I18n.localize = function(scope, value, options) {
+	    options || (options = {});
+
+	    switch (scope) {
+	      case "currency":
+	        return this.toCurrency(value);
+	      case "number":
+	        scope = this.lookup("number.format");
+	        return this.toNumber(value, scope);
+	      case "percentage":
+	        return this.toPercentage(value);
+	      default:
+	        var localizedValue;
+
+	        if (scope.match(/^(date|time)/)) {
+	          localizedValue = this.toTime(scope, value);
+	        } else {
+	          localizedValue = value.toString();
+	        }
+
+	        return this.interpolate(localizedValue, options);
+	    }
+	  };
+
+	  // Parse a given `date` string into a JavaScript Date object.
+	  // This function is time zone aware.
+	  //
+	  // The following string formats are recognized:
+	  //
+	  //    yyyy-mm-dd
+	  //    yyyy-mm-dd[ T]hh:mm::ss
+	  //    yyyy-mm-dd[ T]hh:mm::ss
+	  //    yyyy-mm-dd[ T]hh:mm::ssZ
+	  //    yyyy-mm-dd[ T]hh:mm::ss+0000
+	  //    yyyy-mm-dd[ T]hh:mm::ss+00:00
+	  //    yyyy-mm-dd[ T]hh:mm::ss.123Z
+	  //
+	  I18n.parseDate = function(date) {
+	    var matches, convertedDate, fraction;
+	    // we have a date, so just return it.
+	    if (typeof(date) == "object") {
+	      return date;
+	    }
+
+	    matches = date.toString().match(/(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}):(\d{2})([\.,]\d{1,3})?)?(Z|\+00:?00)?/);
+
+	    if (matches) {
+	      for (var i = 1; i <= 6; i++) {
+	        matches[i] = parseInt(matches[i], 10) || 0;
+	      }
+
+	      // month starts on 0
+	      matches[2] -= 1;
+
+	      fraction = matches[7] ? 1000 * ("0" + matches[7]) : null;
+
+	      if (matches[8]) {
+	        convertedDate = new Date(Date.UTC(matches[1], matches[2], matches[3], matches[4], matches[5], matches[6], fraction));
+	      } else {
+	        convertedDate = new Date(matches[1], matches[2], matches[3], matches[4], matches[5], matches[6], fraction);
+	      }
+	    } else if (typeof(date) == "number") {
+	      // UNIX timestamp
+	      convertedDate = new Date();
+	      convertedDate.setTime(date);
+	    } else if (date.match(/([A-Z][a-z]{2}) ([A-Z][a-z]{2}) (\d+) (\d+:\d+:\d+) ([+-]\d+) (\d+)/)) {
+	      // This format `Wed Jul 20 13:03:39 +0000 2011` is parsed by
+	      // webkit/firefox, but not by IE, so we must parse it manually.
+	      convertedDate = new Date();
+	      convertedDate.setTime(Date.parse([
+	        RegExp.$1, RegExp.$2, RegExp.$3, RegExp.$6, RegExp.$4, RegExp.$5
+	      ].join(" ")));
+	    } else if (date.match(/\d+ \d+:\d+:\d+ [+-]\d+ \d+/)) {
+	      // a valid javascript format with timezone info
+	      convertedDate = new Date();
+	      convertedDate.setTime(Date.parse(date));
+	    } else {
+	      // an arbitrary javascript string
+	      convertedDate = new Date();
+	      convertedDate.setTime(Date.parse(date));
+	    }
+
+	    return convertedDate;
+	  };
+
+	  // Formats time according to the directives in the given format string.
+	  // The directives begins with a percent (%) character. Any text not listed as a
+	  // directive will be passed through to the output string.
+	  //
+	  // The accepted formats are:
+	  //
+	  //     %a  - The abbreviated weekday name (Sun)
+	  //     %A  - The full weekday name (Sunday)
+	  //     %b  - The abbreviated month name (Jan)
+	  //     %B  - The full month name (January)
+	  //     %c  - The preferred local date and time representation
+	  //     %d  - Day of the month (01..31)
+	  //     %-d - Day of the month (1..31)
+	  //     %H  - Hour of the day, 24-hour clock (00..23)
+	  //     %-H - Hour of the day, 24-hour clock (0..23)
+	  //     %I  - Hour of the day, 12-hour clock (01..12)
+	  //     %-I - Hour of the day, 12-hour clock (1..12)
+	  //     %m  - Month of the year (01..12)
+	  //     %-m - Month of the year (1..12)
+	  //     %M  - Minute of the hour (00..59)
+	  //     %-M - Minute of the hour (0..59)
+	  //     %p  - Meridian indicator (AM  or  PM)
+	  //     %S  - Second of the minute (00..60)
+	  //     %-S - Second of the minute (0..60)
+	  //     %w  - Day of the week (Sunday is 0, 0..6)
+	  //     %y  - Year without a century (00..99)
+	  //     %-y - Year without a century (0..99)
+	  //     %Y  - Year with century
+	  //     %z  - Timezone offset (+0545)
+	  //
+	  I18n.strftime = function(date, format) {
+	    var options = this.lookup("date")
+	      , meridianOptions = I18n.meridian()
+	    ;
+
+	    if (!options) {
+	      options = {};
+	    }
+
+	    options = this.prepareOptions(options, DATE);
+
+	    if (isNaN(date.getTime())) {
+	      throw new Error('I18n.strftime() requires a valid date object, but received an invalid date.');
+	    }
+
+	    var weekDay = date.getDay()
+	      , day = date.getDate()
+	      , year = date.getFullYear()
+	      , month = date.getMonth() + 1
+	      , hour = date.getHours()
+	      , hour12 = hour
+	      , meridian = hour > 11 ? 1 : 0
+	      , secs = date.getSeconds()
+	      , mins = date.getMinutes()
+	      , offset = date.getTimezoneOffset()
+	      , absOffsetHours = Math.floor(Math.abs(offset / 60))
+	      , absOffsetMinutes = Math.abs(offset) - (absOffsetHours * 60)
+	      , timezoneoffset = (offset > 0 ? "-" : "+") +
+	          (absOffsetHours.toString().length < 2 ? "0" + absOffsetHours : absOffsetHours) +
+	          (absOffsetMinutes.toString().length < 2 ? "0" + absOffsetMinutes : absOffsetMinutes)
+	    ;
+
+	    if (hour12 > 12) {
+	      hour12 = hour12 - 12;
+	    } else if (hour12 === 0) {
+	      hour12 = 12;
+	    }
+
+	    format = format.replace("%a", options.abbr_day_names[weekDay]);
+	    format = format.replace("%A", options.day_names[weekDay]);
+	    format = format.replace("%b", options.abbr_month_names[month]);
+	    format = format.replace("%B", options.month_names[month]);
+	    format = format.replace("%d", padding(day));
+	    format = format.replace("%e", day);
+	    format = format.replace("%-d", day);
+	    format = format.replace("%H", padding(hour));
+	    format = format.replace("%-H", hour);
+	    format = format.replace("%I", padding(hour12));
+	    format = format.replace("%-I", hour12);
+	    format = format.replace("%m", padding(month));
+	    format = format.replace("%-m", month);
+	    format = format.replace("%M", padding(mins));
+	    format = format.replace("%-M", mins);
+	    format = format.replace("%p", meridianOptions[meridian]);
+	    format = format.replace("%S", padding(secs));
+	    format = format.replace("%-S", secs);
+	    format = format.replace("%w", weekDay);
+	    format = format.replace("%y", padding(year));
+	    format = format.replace("%-y", padding(year).replace(/^0+/, ""));
+	    format = format.replace("%Y", year);
+	    format = format.replace("%z", timezoneoffset);
+
+	    return format;
+	  };
+
+	  // Convert the given dateString into a formatted date.
+	  I18n.toTime = function(scope, dateString) {
+	    var date = this.parseDate(dateString)
+	      , format = this.lookup(scope)
+	    ;
+
+	    if (date.toString().match(/invalid/i)) {
+	      return date.toString();
+	    }
+
+	    if (!format) {
+	      return date.toString();
+	    }
+
+	    return this.strftime(date, format);
+	  };
+
+	  // Convert a number into a formatted percentage value.
+	  I18n.toPercentage = function(number, options) {
+	    options = this.prepareOptions(
+	        options
+	      , this.lookup("number.percentage.format")
+	      , this.lookup("number.format")
+	      , PERCENTAGE_FORMAT
+	    );
+
+	    return this.toNumber(number, options);
+	  };
+
+	  // Convert a number into a readable size representation.
+	  I18n.toHumanSize = function(number, options) {
+	    var kb = 1024
+	      , size = number
+	      , iterations = 0
+	      , unit
+	      , precision
+	    ;
+
+	    while (size >= kb && iterations < 4) {
+	      size = size / kb;
+	      iterations += 1;
+	    }
+
+	    if (iterations === 0) {
+	      unit = this.t("number.human.storage_units.units.byte", {count: size});
+	      precision = 0;
+	    } else {
+	      unit = this.t("number.human.storage_units.units." + SIZE_UNITS[iterations]);
+	      precision = (size - Math.floor(size) === 0) ? 0 : 1;
+	    }
+
+	    options = this.prepareOptions(
+	        options
+	      , {unit: unit, precision: precision, format: "%n%u", delimiter: ""}
+	    );
+
+	    return this.toNumber(size, options);
+	  };
+
+	  I18n.getFullScope = function(scope, options) {
+	    options = options || {};
+
+	    // Deal with the scope as an array.
+	    if (isArray(scope)) {
+	      scope = scope.join(this.defaultSeparator);
+	    }
+
+	    // Deal with the scope option provided through the second argument.
+	    //
+	    //    I18n.t('hello', {scope: 'greetings'});
+	    //
+	    if (options.scope) {
+	      scope = [options.scope, scope].join(this.defaultSeparator);
+	    }
+
+	    return scope;
+	  };
+	  /**
+	   * Merge obj1 with obj2 (shallow merge), without modifying inputs
+	   * @param {Object} obj1
+	   * @param {Object} obj2
+	   * @returns {Object} Merged values of obj1 and obj2
+	   *
+	   * In order to support ES3, `Object.prototype.hasOwnProperty.call` is used
+	   * Idea is from:
+	   * https://stackoverflow.com/questions/8157700/object-has-no-hasownproperty-method-i-e-its-undefined-ie8
+	   */
+	  I18n.extend = function ( obj1, obj2 ) {
+	    if (typeof(obj1) === "undefined" && typeof(obj2) === "undefined") {
+	      return {};
+	    }
+	    return merge(obj1, obj2);
+	  };
+
+	  // Set aliases, so we can save some typing.
+	  I18n.t = I18n.translate;
+	  I18n.l = I18n.localize;
+	  I18n.p = I18n.pluralize;
+
+	  return I18n;
+	}));
+	});
+
+	function mixin$1(obj, mixins) {
+	  return mixins.reduce(function (mixedObj, mixinFn) {return mixinFn(mixedObj);}, obj);
+	}
+
+	function Sentence(i18n$$1) {
+
+	  /**
+	                          * Concatenates multiple words (strings) building a sentence with connectors (',' or 'and')
+	                          *
+	                          * @param  {Array}  values        words (strings) to be concatenated as a sentence
+	                          * @return {String}               the resulting sentence
+	                          */
+	  i18n$$1.toSentence = function toSentence(values) {
+	    switch (values.length) {
+	      case 0:return '';
+	      case 1:return values[0];
+	      case 2:{
+	          var connector = i18n$$1.t('support.array.two_words_connector');
+	          return "".concat(values[0]).concat(connector).concat(values[1]);
+	        }
+	      default:{
+	          var valuesButLast = values.slice(0, values.length - 1);
+	          var lastValue = values.slice(-1);
+
+	          var _connector = i18n$$1.t('support.array.words_connector');
+	          var lastConnector = i18n$$1.t('support.array.last_word_connector');
+
+	          var sentence = "".concat(valuesButLast.join(_connector));
+	          sentence += "".concat(lastConnector).concat(lastValue);
+
+	          return sentence;
+	        }}
+
+	  };
+
+
+	  /*
+	     support:
+	         array:
+	           last_word_connector: ", and "
+	           two_words_connector: " and "
+	           words_connector: ", "
+	      */
+
+	  return i18n$$1;
+	}
+
+	function FixLocalize(i18n$$1) {
+
+	  // Overriding i18n.localize() to fix arguments forwarding to methods `toCurrency()`, `toNumber()`
+	  // and `toPercentage()`.
+	  //   - TODO: verify if it's still needed, since i18n-js has been updated.
+	  //     https://github.com/fnando/i18n-js
+	  i18n$$1.__original_localize = i18n$$1.localize;
+	  i18n$$1.localize = function overridenLocalize(scope, value, opts) {
+	    var options = opts || {};
+
+	    switch (scope) {
+	      case 'currency':
+	        return this.toCurrency(value, options);
+	      case 'number':
+	        return this.toNumber(value, options);
+	      case 'percentage':
+	        return this.toPercentage(value, options);
+	      default:
+	        // default implementation
+	        return this.__original_localize(scope, value, options);}
+
+	  };
+
+	  // XXX updating alias, since we are overriding the method
+	  i18n$$1.l = i18n$$1.localize;
+
+	  return i18n$$1;
+	}
+
+	function Init(i18n$$1) {
+
+	  i18n$$1.init = function init() {var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},locales = _ref.locales,_ref$defaultLocale = _ref.defaultLocale,defaultLocale = _ref$defaultLocale === void 0 ? null : _ref$defaultLocale,translations = _ref.translations;
+	    // initializing i18n module
+	    i18n$$1.availableLocales = locales;
+	    i18n$$1.defaultLocale = defaultLocale || locales[0];
+	    i18n$$1.locale = defaultLocale;
+
+	    // merging translations
+	    lodashExt.merge(i18n$$1.translations, translations);
+	  };
+
+	  return i18n$$1;
+	}
+
+	var i18n$1 = mixin$1(i18n, [
+	Sentence,
+	FixLocalize,
+	Init]);
+
+	function Translatable(Class) {var
+	  TranslatableClass = /*#__PURE__*/function (_Class) {_inherits(TranslatableClass, _Class);function TranslatableClass() {_classCallCheck(this, TranslatableClass);return _possibleConstructorReturn(this, _getPrototypeOf(TranslatableClass).apply(this, arguments));}_createClass(TranslatableClass, null, [{ key: "$tModelName", value: function $tModelName()
+
+
+
+
+	      {var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref$count = _ref.count,count = _ref$count === void 0 ? 1 : _ref$count;
+	        return i18n$1.t(this.i18nScope, { count: count });
+	      } }, { key: "$tAttr", value: function $tAttr(
+
+	      attrName) {var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	        var scope = "".concat(this.i18nScope, ".attributes");
+	        return i18n$1.t(attrName, lodashExt.defaults({}, options, { scope: scope }));
+	      } }, { key: "$tEnum", value: function $tEnum(
+
+	      enumName) {var enumValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+	        var scope = this.i18nScope;
+	        var key = null;
+
+	        if (enumValue === undefined) {
+	          // .attributes.${enumName}
+	          scope += '.attributes';
+	          key = enumName;
+	        } else {
+	          // .enums.${enumName}.${enumValue}
+	          scope += ".enums.".concat(enumName);
+	          key = enumValue;
+	        }
+
+	        return i18n$1.t(key, lodashExt.defaults({}, options, { scope: scope }));
+	      }
+
+	      // TODO: localize attribute
+	      // $l(attrName) {
+	      //  // checkout type definition for date or datetime
+	      //  // use $l('date', attrName)
+	      //  // or  $l('time', attrName)
+	      // }
+	    }, { key: "i18nScope", get: function get() {return "models.".concat(lodashExt.underscore(this.name));} }]);return TranslatableClass;}(Class);
+
+	  return TranslatableClass;
+	}
+
 	var _anInstance = function (it, Constructor, name, forbiddenField) {
 	  if (!(it instanceof Constructor) || (forbiddenField !== undefined && forbiddenField in it)) {
 	    throw TypeError(name + ': incorrect invocation!');
@@ -19329,15 +20213,13 @@
 	  }
 	};
 
-	var _iterators$1 = {};
-
 	// check on default Array iterator
 
 	var ITERATOR$2 = _wks('iterator');
-	var ArrayProto$2 = Array.prototype;
+	var ArrayProto$1 = Array.prototype;
 
 	var _isArrayIter = function (it) {
-	  return it !== undefined && (_iterators$1.Array === it || ArrayProto$2[ITERATOR$2] === it);
+	  return it !== undefined && (_iterators.Array === it || ArrayProto$1[ITERATOR$2] === it);
 	};
 
 	var ITERATOR$3 = _wks('iterator');
@@ -19345,7 +20227,7 @@
 	var core_getIteratorMethod = _core.getIteratorMethod = function (it) {
 	  if (it != undefined) return it[ITERATOR$3]
 	    || it['@@iterator']
-	    || _iterators$1[_classof(it)];
+	    || _iterators[_classof(it)];
 	};
 
 	var _forOf = createCommonjsModule(function (module) {
@@ -19396,9 +20278,6 @@
 	                      : fn.call(that, args[0], args[1], args[2], args[3]);
 	  } return fn.apply(that, args);
 	};
-
-	var document$4 = _global.document;
-	var _html$1 = document$4 && document$4.documentElement;
 
 	var process = _global.process;
 	var setTask = _global.setImmediate;
@@ -19463,8 +20342,8 @@
 	  // IE8-
 	  } else if (ONREADYSTATECHANGE in _domCreate('script')) {
 	    defer = function (id) {
-	      _html$1.appendChild(_domCreate('script'))[ONREADYSTATECHANGE] = function () {
-	        _html$1.removeChild(this);
+	      _html.appendChild(_domCreate('script'))[ONREADYSTATECHANGE] = function () {
+	        _html.removeChild(this);
 	        run.call(id);
 	      };
 	    };
@@ -19563,12 +20442,12 @@
 	  this.reject = _aFunction(reject);
 	}
 
-	var f$3 = function (C) {
+	var f$2 = function (C) {
 	  return new PromiseCapability(C);
 	};
 
 	var _newPromiseCapability = {
-		f: f$3
+		f: f$2
 	};
 
 	var _perform = function (exec) {
@@ -19595,14 +20474,6 @@
 	var _redefineAll = function (target, src, safe) {
 	  for (var key in src) _redefine(target, key, src[key], safe);
 	  return target;
-	};
-
-	var def$1 = _objectDp.f;
-
-	var TAG$2 = _wks('toStringTag');
-
-	var _setToStringTag$1 = function (it, tag, stat) {
-	  if (it && !_has(it = stat ? it : it.prototype, TAG$2)) def$1(it, TAG$2, { configurable: true, value: tag });
 	};
 
 	var SPECIES$2 = _wks('species');
@@ -19847,7 +20718,7 @@
 	}
 
 	_export(_export.G + _export.W + _export.F * !USE_NATIVE, { Promise: $Promise });
-	_setToStringTag$1($Promise, PROMISE);
+	_setToStringTag($Promise, PROMISE);
 	_setSpecies(PROMISE);
 	Wrapper = _core[PROMISE];
 
@@ -26575,7 +27446,7 @@
 
 	    {
 	      return this.toJSON.apply(this, arguments);
-	    } }]);return Model;}(mixin(Base, [Attributable, Validatable]));
+	    } }]);return Model;}(mixin(Base, [Attributable, Translatable, Validatable]));
 
 	exports.Model = Model;
 	exports.mixin = mixin;

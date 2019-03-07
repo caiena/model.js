@@ -545,13 +545,22 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@caiena/enum@file:../enum.js":
+"@caiena/enum@ssh://git@github.com:ppdeassis/enum.js.git":
   version "0.1.0"
+  resolved "ssh://git@github.com:ppdeassis/enum.js.git#f3afe7a9d0d40fac5e068b7a065dcc73ad170896"
   dependencies:
     "@caiena/lodash-ext" "^0.4.0"
 
 "@caiena/i18n@file:../i18n.js":
   version "0.1.0"
+  dependencies:
+    "@caiena/lodash-ext" "^0.4.0"
+    i18n-js "^3.2.1"
+    moment "^2.24.0"
+
+"@caiena/i18n@ssh://git@github.com:ppdeassis/i18n.js.git":
+  version "0.1.0"
+  resolved "ssh://git@github.com:ppdeassis/i18n.js.git#ab987839521de040ab8c982a6ad748801ee1e7f0"
   dependencies:
     "@caiena/lodash-ext" "^0.4.0"
     i18n-js "^3.2.1"

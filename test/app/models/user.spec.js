@@ -20,6 +20,12 @@ describe('User', () => {
     // TODO
   })
 
+  describe('enums', () => {
+    it('defines "status"', () => {
+      expect(User.enums.status).to.deep.equal({ failure: -1, scheduled: 0, success: 1 })
+    })
+  })
+
   describe('validation', () => {
     // TODO
   })
@@ -31,6 +37,17 @@ describe('User', () => {
     context('static i18nScope', () => {
       it('reflects class name: "user"', () => {
         expect(User.i18nScope).to.equal('models.user')
+      })
+    })
+
+    context('static $tModelName()', () => {
+      it('translates model name', () => {
+        expect(User.$tModelName()).to.equal('Usuário')
+        expect(User.$tModelName({ count: 0 })).to.equal('Usuário')
+      })
+
+      it('translates pluralized model name', () => {
+        expect(User.$tModelName({ count: _.sample([2, 3, 5]) })).to.equal('Usuários')
       })
     })
 

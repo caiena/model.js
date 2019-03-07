@@ -6,8 +6,8 @@
   "module": "dist/model.esm.js",
   "browser": "dist/model.umd.js",
   "dependencies": {
-    "@caiena/enum": "file://Users/pedro/src/enum.js",
-    "@caiena/i18n": "file://Users/pedro/src/i18n.js",
+    "@caiena/enum": "ssh://git@github.com:ppdeassis/enum.js.git",
+    "@caiena/i18n": "ssh://git@github.com:ppdeassis/i18n.js.git",
     "@caiena/lodash-ext": "^0.4.0",
     "moment": "^2.24.0",
     "validate.js": "^0.12.0"
@@ -39,7 +39,8 @@
     "prebuild": "rm -rf ./dist/*",
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "pretest": "npm run build",
+    "pretest": "yarn run build",
+    "pretest:all": "yarn run build",
     "test": "mocha --exit",
     "test:all": "mocha --exit \"test/**/*.spec.js\"",
     "test:watch": "node ./bin/mocha-watch"

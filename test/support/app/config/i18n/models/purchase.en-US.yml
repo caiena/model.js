@@ -1,0 +1,23 @@
+---
+
+en-US:
+  models:
+    purchase:
+      zero: Purchase
+      one: Purchase
+      other: Purchases
+
+      attributes:
+        id: ID
+        status: Status
+        createdAt: Received at
+        approvedAt: Approved at
+        shippedAt: Shipped at
+        deliveredAt: Delivered at
+
+      enums:
+        status:
+          received: Received
+          approved: Approved
+          shipped: Shipped
+          delivered: Delivered

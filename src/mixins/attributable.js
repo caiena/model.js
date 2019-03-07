@@ -138,6 +138,10 @@ function Attributable(Class) {
       return _.blank(this.$get(attrNameOrPath))
     }
 
+    $enumValue(enumName) {
+      return this.constructor.$enums[enumName].value(this[enumName])
+    }
+
     $get(attrNameOrPath) {
       return _.get(this, attrNameOrPath)
     }

@@ -2,9 +2,11 @@ import _      from '@caiena/lodash-ext'
 import Enum   from '@caiena/enum'
 import moment from 'moment'
 import Model  from '../../../src/model'
+import i18n   from '../../../src/i18n'
 
 // support models
 import Purchase  from '../../support/app/models/purchase'
+import translations from '../../support/app/config/i18n/translations'
 
 
 describe('Purchase', () => {
@@ -68,6 +70,52 @@ describe('Purchase', () => {
         ])
         expect(await purchase.$validate()).to.be.true
         expect(purchase.$errors).to.be.empty
+      })
+    })
+  })
+
+
+  describe('translations', () => {
+    i18n.init({ locales: ['pt-BR', 'en-US'], defaultLocale: 'pt-BR', translations })
+
+    context('static i18nScope', () => {
+      it('reflects class name: "purchase"', () => {
+        expect(Purchase.i18nScope).to.equal('models.purchase')
+      })
+    })
+
+    context('static $tModelName()', () => {
+      it('translates model name', () => {
+        expect(Purchase.$tModelName()).to.equal('Pedido')
+        expect(Purchase.$tModelName({ count: 0 })).to.equal('Pedido')
+      })
+
+      it('translates pluralized model name', () => {
+        expect(Purchase.$tModelName({ count: _.sample([2, 3, 5]) })).to.equal('Pedidos')
+      })
+    })
+
+    context('translations attributes', () => {
+      it('translates "id"', () => {
+        expect(Purchase.$tAttr('id')).to.equal('ID')
+      })
+
+      it('translates "status"', () => {
+        expect(Purchase.$tAttr('status')).to.equal('Situação')
+      })
+
+      it('translates "createdAt"', () => {
+        expect(Purchase.$tAttr('createdAt')).to.equal('Recebido em')
+      })
+    })
+
+    context('translations enums', () => {
+      it('translates with enum name only', () => {
+        expect(Purchase.$tEnum('status')).to.equal('Situação')
+      })
+
+      it('translates with enum name and value', () => {
+        expect(Purchase.$tEnum('status', 'shipped')).to.equal('Enviado')
       })
     })
   })

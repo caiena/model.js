@@ -6,6 +6,7 @@ import 'core-js/modules/es7.array.includes';
 import 'core-js/modules/es6.string.includes';
 import 'core-js/modules/es6.function.name';
 import Enum from '@caiena/enum';
+import { i18n } from '@caiena/i18n';
 import 'core-js/modules/es6.promise';
 import 'regenerator-runtime/runtime';
 import validate from 'validate.js';
@@ -295,6 +296,10 @@ function Attributable(Class) {var
 
       attrNameOrPath) {
         return _.blank(this.$get(attrNameOrPath));
+      } }, { key: "$enumValue", value: function $enumValue(
+
+      enumName) {
+        return this.constructor.$enums[enumName].value(this[enumName]);
       } }, { key: "$get", value: function $get(
 
       attrNameOrPath) {
@@ -322,6 +327,49 @@ function Attributable(Class) {var
         // set props, one-by-one, using setter method
         var sanitizedAttrs = _.pick(attrs, this.constructor.attrs);_.each(sanitizedAttrs, function (value, name) {_this2[name] = value;});} // TODO: remove it?
     }, { key: "$props", get: function get() {var _this3 = this;var instance = this;var proto = Object.getPrototypeOf(this);var propNames = _.chain(Object.getOwnPropertyNames(proto)).concat(Object.getOwnPropertyNames(instance)).filter(function (name) {return !(_.includes(['constructor'], name) || _.startsWith(name, '$'));}).uniq().value().sort();return _.reduce(propNames, function (props, propName) {props[propName] = _this3[propName];return props;}, {});} }]);return AttributableClass;}(Class);return AttributableClass;}
+
+function Translatable(Class) {var
+  TranslatableClass = /*#__PURE__*/function (_Class) {_inherits(TranslatableClass, _Class);function TranslatableClass() {_classCallCheck(this, TranslatableClass);return _possibleConstructorReturn(this, _getPrototypeOf(TranslatableClass).apply(this, arguments));}_createClass(TranslatableClass, null, [{ key: "$tModelName", value: function $tModelName()
+
+
+
+
+      {var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref$count = _ref.count,count = _ref$count === void 0 ? 1 : _ref$count;
+        return i18n.t(this.i18nScope, { count: count });
+      } }, { key: "$tAttr", value: function $tAttr(
+
+      attrName) {var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var scope = "".concat(this.i18nScope, ".attributes");
+        return i18n.t(attrName, _.defaults({}, options, { scope: scope }));
+      } }, { key: "$tEnum", value: function $tEnum(
+
+      enumName) {var enumValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+        var scope = this.i18nScope;
+        var key = null;
+
+        if (enumValue === undefined) {
+          // .attributes.${enumName}
+          scope += '.attributes';
+          key = enumName;
+        } else {
+          // .enums.${enumName}.${enumValue}
+          scope += ".enums.".concat(enumName);
+          key = enumValue;
+        }
+
+        return i18n.t(key, _.defaults({}, options, { scope: scope }));
+      }
+
+      // TODO: localize attribute
+      // $l(attrName) {
+      //  // checkout type definition for date or datetime
+      //  // use $l('date', attrName)
+      //  // or  $l('time', attrName)
+      // }
+    }, { key: "i18nScope", get: function get() {return "models.".concat(_.underscore(this.name));} }]);return TranslatableClass;}(Class);
+
+  return TranslatableClass;
+}
 
 // @see https://validatejs.org/#validators-datetime
 
@@ -479,7 +527,7 @@ Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);
 
     {
       return this.toJSON.apply(this, arguments);
-    } }]);return Model;}(mixin(Base, [Attributable, Validatable]));
+    } }]);return Model;}(mixin(Base, [Attributable, Translatable, Validatable]));
 
 export { Model, mixin };
 //# sourceMappingURL=model.esm.js.map

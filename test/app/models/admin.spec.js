@@ -33,6 +33,17 @@ describe('Admin', () => {
       })
     })
 
+    context('static $tModelName()', () => {
+      it('translates model name', () => {
+        expect(Admin.$tModelName()).to.equal('Administrador')
+        expect(Admin.$tModelName({ count: 0 })).to.equal('Administrador')
+      })
+
+      it('translates pluralized model name', () => {
+        expect(Admin.$tModelName({ count: _.sample([2, 3, 5]) })).to.equal('Administradores')
+      })
+    })
+
     context('translations attributes', () => {
       it('translates "id"', () => {
         expect(Admin.$tAttr('id')).to.equal('ID')

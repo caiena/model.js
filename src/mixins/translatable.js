@@ -8,6 +8,10 @@ function Translatable(Class) {
       return `models.${_.underscore(this.name)}`
     }
 
+    static $tModelName({ count = 1 } = {}) {
+      return i18n.t(this.i18nScope, { count })
+    }
+
     static $tAttr(attrName, options = {}) {
       let scope = `${this.i18nScope}.attributes`
       return i18n.t(attrName, _.defaults({}, options, { scope }))
