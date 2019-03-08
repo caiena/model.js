@@ -1,6 +1,8 @@
 import _     from '@caiena/lodash-ext'
 import Model from '../../../../src/model'
 
+import Admin from './admin'
+
 
 class Purchase extends Model {
   static get attrs() {
@@ -19,14 +21,28 @@ class Purchase extends Model {
 
   static get relations() {
     return {
-      owner: {
+      buyer: {
         type: 'belongsTo',
         model() {
-          // XXX: we're using mocha+babel tooling to perform a lazy evaluated model class
-          // Use your own app tooling to achieve the same result (e.g. method, global variable already initialized, ...)
+          // XXX: we're providing a custom lazily evaluated function to return model class.
+          // Since we're using mocha+babel, we will rely on their tooling to perform the lazy
+          // evaluation.
+          // Use your own app tooling to achieve the same result (e.g. method, global variable
+          // already initialized, ...)
           const User = require('./user').default
+
           return User
         }
+      },
+
+      seller: {
+        type: 'belongsTo',
+        model: 'User' // falling back to default $lookup, since we provided the global $models in test/support/app/boot.js
+      },
+
+      auditor: {
+        type: 'belongsTo',
+        model: Admin // here we're providing the class instantly. Use it with caution, avoiding circular dependencies.
       }
     }
   }

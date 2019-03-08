@@ -14,8 +14,11 @@ function belongsTo(instance, relationName, config, { get = null, set = null } = 
   if (!set) {
     // providing a way to lazily evaluate related model class
     let ModelClass = null
+
     if (config.model.$$model) { // check if is a model class without circular dependency
       ModelClass = config.model
+    } else if (typeof config.model === 'string') { // use lookup
+      ModelClass = instance.constructor.$lookupModel(config.model)
     } else if (typeof config.model === 'function') { // check if is a callable (function)
       ModelClass = config.model()
     } else {
@@ -53,8 +56,11 @@ function hasMany(instance, relationName, config, { get = null, set = null } = {}
   if (!set) {
     // providing a way to lazily evaluate related model class
     let ModelClass = null
+
     if (config.model.$$model) { // check if is a model class without circular dependency
       ModelClass = config.model
+    } else if (typeof config.model === 'string') { // use lookup
+      ModelClass = instance.constructor.$lookupModel(config.model)
     } else if (typeof config.model === 'function') { // check if is a callable (function)
       ModelClass = config.model()
     } else {

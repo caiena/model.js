@@ -38,6 +38,10 @@ global.sinon = sinon
 global.pry = pry
 
 
+// booting the support app
+import './support/app/boot'
+
+
 // exporting the lib globally
 // import _ from '../src/index'
 // global._ = _

@@ -39,12 +39,30 @@ describe('Purchase', () => {
 
 
   describe('relations', () => {
-    it('belongs to owner', () => {
-      expect(Purchase.relations.owner).to.have.property('type', 'belongsTo')
+    it('belongs to buyer', () => {
+      expect(Purchase.relations.buyer).to.have.property('type', 'belongsTo')
 
-      let purchase = new Purchase({ owner: { name: 'Hank Moody' } })
-      expect(purchase.owner).to.be.instanceof(User)
-      expect(purchase.$get('owner.name')).to.equal('Hank Moody')
+      let purchase = new Purchase({ buyer: { name: 'Charlie Runkle' } })
+      expect(purchase.buyer).to.be.instanceof(User)
+      expect(purchase.$get('buyer.name')).to.equal('Charlie Runkle')
+    })
+
+    it('belongs to seller', () => {
+      expect(Purchase.relations.seller).to.have.property('type', 'belongsTo')
+
+      let purchase = new Purchase({ seller: { name: 'Hank Moody' } })
+      expect(purchase.seller).to.be.instanceof(User)
+      expect(purchase.$get('seller.name')).to.equal('Hank Moody')
+    })
+
+
+    it('belongs to auditor', () => {
+      expect(Purchase.relations.auditor).to.have.property('type', 'belongsTo')
+
+      let purchase = new Purchase({ auditor: { name: 'Karen van der Beek ' } })
+      expect(purchase.auditor).to.be.instanceof(User)
+      // XXX: using include() istead of equal() because Admin overrides name's setter
+      expect(purchase.$get('auditor.name')).to.include('Karen van der Beek ')
     })
   })
 

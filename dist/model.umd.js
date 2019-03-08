@@ -19006,8 +19006,11 @@
 	  if (!set) {
 	    // providing a way to lazily evaluate related model class
 	    var ModelClass = null;
+
 	    if (config.model.$$model) {// check if is a model class without circular dependency
 	      ModelClass = config.model;
+	    } else if (typeof config.model === 'string') {// use lookup
+	      ModelClass = instance.constructor.$lookupModel(config.model);
 	    } else if (typeof config.model === 'function') {// check if is a callable (function)
 	      ModelClass = config.model();
 	    } else {
@@ -19045,8 +19048,11 @@
 	  if (!set) {
 	    // providing a way to lazily evaluate related model class
 	    var ModelClass = null;
+
 	    if (config.model.$$model) {// check if is a model class without circular dependency
 	      ModelClass = config.model;
+	    } else if (typeof config.model === 'string') {// use lookup
+	      ModelClass = instance.constructor.$lookupModel(config.model);
 	    } else if (typeof config.model === 'function') {// check if is a callable (function)
 	      ModelClass = config.model();
 	    } else {
@@ -27523,10 +27529,14 @@
 	var
 
 
-	Base = /*#__PURE__*/function () {function Base() {_classCallCheck(this, Base);}_createClass(Base, null, [{ key: "attrs", get: function get()
-	    {return [];} }, { key: "enums", get: function get()
-	    {return {};} }, { key: "virtuals", get: function get()
-	    {return [];} }]);return Base;}();var
+	Base = /*#__PURE__*/function () {function Base() {_classCallCheck(this, Base);}_createClass(Base, null, [{ key: "$lookupModel", value: function $lookupModel(
+
+
+
+
+	    name) {
+	      throw new Error('Model.$lookupModel(name) is not implemented.');
+	    } }, { key: "attrs", get: function get() {return [];} }, { key: "enums", get: function get() {return {};} }, { key: "virtuals", get: function get() {return [];} }]);return Base;}();var
 
 
 	Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Model, null, [{ key: "$$model", get: function get()

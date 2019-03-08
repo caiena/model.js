@@ -11,6 +11,10 @@ class Base {
   static get attrs()     { return [] }
   static get enums()     { return {} }
   static get virtuals()  { return [] }
+
+  static $lookupModel(name) {
+    throw new Error('Model.$lookupModel(name) is not implemented.')
+  }
 }
 
 class Model extends mixin(Base, [Attributable, Relatable, Translatable, Validatable]) {
