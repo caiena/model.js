@@ -3,6 +3,12 @@ import User from './user'
 
 
 class Admin extends User {
+  static get relations() {
+    return {
+      auditing_purchases: { type: 'hasMany', model: 'Purchase' }
+    }
+  }
+
   static get attrs() {
     return _.chain(super.attrs)
       .concat(['area'])

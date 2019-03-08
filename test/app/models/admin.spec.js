@@ -16,6 +16,19 @@ describe('Admin', () => {
   })
 
 
+  describe('relations', () => {
+    it('has many auditing_purchases', () => {
+      expect(Admin.relations.auditing_purchases).to.have.property('type', 'hasMany')
+
+      let yesterday = moment.utc().subtract(1, 'day').format('YYYY-MM-DD')
+      let admin = new Admin({ auditing_purchases: [{ id: 11, createdAt: yesterday }] })
+
+      expect(admin.auditing_purchases[0]).to.be.instanceof($models.Purchase)
+      expect(admin.$get('auditing_purchases[0].id')).to.equal(11)
+      expect(admin.$get('auditing_purchases[0].createdAt')).to.equal(yesterday)
+    })
+  })
+
   describe('attributes', () => {
     // TODO
   })
