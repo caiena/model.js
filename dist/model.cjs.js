@@ -334,6 +334,147 @@ function Attributable(Class) {var
         var sanitizedAttrs = _.pick(attrs, this.constructor.attrs);_.each(sanitizedAttrs, function (value, name) {_this2[name] = value;});} // TODO: remove it?
     }, { key: "$props", get: function get() {var _this3 = this;var instance = this;var proto = Object.getPrototypeOf(this);var propNames = _.chain(Object.getOwnPropertyNames(proto)).concat(Object.getOwnPropertyNames(instance)).filter(function (name) {return !(_.includes(['constructor'], name) || _.startsWith(name, '$'));}).uniq().value().sort();return _.reduce(propNames, function (props, propName) {props[propName] = _this3[propName];return props;}, {});} }]);return AttributableClass;}(Class);return AttributableClass;}
 
+function belongsTo(instance, relationName, config) {var _ref = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},_ref$get = _ref.get,get = _ref$get === void 0 ? null : _ref$get,_ref$set = _ref.set,set = _ref$set === void 0 ? null : _ref$set;
+  if (!get) {
+    get = function get() {
+      return this.$relations[relationName];
+    };
+  }
+
+  if (!set) {
+    // providing a way to lazily evaluate related model class
+    var ModelClass = null;
+    if (config.model.$$model) {// check if is a model class without circular dependency
+      ModelClass = config.model;
+    } else if (typeof config.model === 'function') {// check if is a callable (function)
+      ModelClass = config.model();
+    } else {
+      ModelClass = config.model; // default: assign it as a model class
+    }
+
+    set = function set(value) {
+      if (_.isArray(value)) throw new Error("can't assign an array to a belongsTo relation");
+
+      if (value instanceof ModelClass) {
+        return this.$relations[relationName] = value;
+      } else {
+        // construct model instance with value as attributes
+        return this.$relations[relationName] = new ModelClass(value);
+      }
+    };
+  }
+
+  Object.defineProperty(instance, relationName, {
+    get: get,
+    set: set,
+    configurable: true,
+    enumerable: true });
+
+}
+
+
+function hasMany(instance, relationName, config) {var _ref2 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},_ref2$get = _ref2.get,get = _ref2$get === void 0 ? null : _ref2$get,_ref2$set = _ref2.set,set = _ref2$set === void 0 ? null : _ref2$set;
+  if (!get) {
+    get = function get() {
+      return this.$relations[relationName];
+    };
+  }
+
+  if (!set) {
+    // providing a way to lazily evaluate related model class
+    var ModelClass = null;
+    if (config.model.$$model) {// check if is a model class without circular dependency
+      ModelClass = config.model;
+    } else if (typeof config.model === 'function') {// check if is a callable (function)
+      ModelClass = config.model();
+    } else {
+      ModelClass = config.model; // default: assign it as a model class
+    }
+
+    set = function set(values) {
+      if (values == null) {// null or undefined
+        return this.$relations[relationName] = [];
+      }
+
+      if (!_.isArray(values)) throw new Error("can't assign a non-array value to a hasMany relation");
+
+      var modelInstances = _.map(values, function (value) {
+        return value instanceof ModelClass ? value : new ModelClass(value);
+      });
+
+      return this.$relations[relationName] = modelInstances;
+    };
+  }
+
+  Object.defineProperty(instance, relationName, {
+    get: get,
+    set: set,
+    configurable: true,
+    enumerable: true });
+
+}
+
+
+function defineRelation(instance, relationName, config) {var _ref3 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},get = _ref3.get,set = _ref3.set;
+  switch (config.type) {
+    case 'belongsTo':{
+        return belongsTo.apply(void 0, arguments);
+      }
+    case 'hasMany':{
+        return hasMany.apply(void 0, arguments);
+      }
+    default:{
+        throw new Error("Unknown relation type \"".concat(type, "\""));
+      }}
+
+}
+
+
+
+
+function Relatable(Class) {var
+
+  RelatableClass = /*#__PURE__*/function (_Class) {_inherits(RelatableClass, _Class);_createClass(RelatableClass, null, [{ key: "$relations",
+
+      // lazy evaluated $relations
+      get: function get() {
+        return this.$$relations = this.$$relations || _.reduce(this.relations, function (result, config, name) {
+          result[name] = config;
+          return result;
+        }, {});
+      } }]);
+
+    function RelatableClass() {var _getPrototypeOf2;var _this;_classCallCheck(this, RelatableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
+      _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(RelatableClass)).call.apply(_getPrototypeOf2, [this].concat(args)));
+
+      var klass = _this.constructor;
+
+      defineInternalProp(_assertThisInitialized(_assertThisInitialized(_this)), '$$relations', {});
+
+      // defining relations get/set properties
+      _.each(klass.relations, function (config, relationName) {
+        if (!_.has(_assertThisInitialized(_assertThisInitialized(_this)), relationName)) {
+          // first, check if it is defined in prototype
+          if (_.hasIn(_assertThisInitialized(_assertThisInitialized(_this)), relationName)) {
+            var _proto = Object.getPrototypeOf(_assertThisInitialized(_assertThisInitialized(_this)));
+            var _descr = Object.getOwnPropertyDescriptor(_proto, relationName);
+            defineRelation(_assertThisInitialized(_assertThisInitialized(_this)), relationName, config, { get: _descr.get, set: _descr.set });
+          } else {
+            defineRelation(_assertThisInitialized(_assertThisInitialized(_this)), relationName, config);
+          }
+        }
+      });return _this;
+    }_createClass(RelatableClass, [{ key: "$relations", get: function get()
+
+      {
+        // XXX: $relations and $$relations will be confusing...
+        return this.$$relations;
+      } }]);return RelatableClass;}(Class);
+
+
+  return RelatableClass;
+}
+
 function Translatable(Class) {var
   TranslatableClass = /*#__PURE__*/function (_Class) {_inherits(TranslatableClass, _Class);function TranslatableClass() {_classCallCheck(this, TranslatableClass);return _possibleConstructorReturn(this, _getPrototypeOf(TranslatableClass).apply(this, arguments));}_createClass(TranslatableClass, null, [{ key: "$tModelName", value: function $tModelName()
 
@@ -475,10 +616,12 @@ Base = /*#__PURE__*/function () {function Base() {_classCallCheck(this, Base);}_
     {return [];} }]);return Base;}();var
 
 
-Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);
-  // using "props" as name to make it explicit that we'll set any enumerable "property" in the instance
-  // (JavaScript land - getOwnPropertyDescriptor() and prototype)
-  function Model() {var _this;var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},_ref$undefs = _ref.undefs,undefs = _ref$undefs === void 0 ? true : _ref$undefs;_classCallCheck(this, Model);
+Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Model, null, [{ key: "$$model", get: function get()
+    {return true;} // allow for checking if is a model clas
+
+    // using "props" as name to make it explicit that we'll set any enumerable "property" in the instance
+    // (JavaScript land - getOwnPropertyDescriptor() and prototype)
+  }]);function Model() {var _this;var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},_ref$undefs = _ref.undefs,undefs = _ref$undefs === void 0 ? true : _ref$undefs;_classCallCheck(this, Model);
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Model).call(this));
 
     var propNames = writablePropNames(_assertThisInitialized(_assertThisInitialized(_this)));
@@ -533,7 +676,7 @@ Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);
 
     {
       return this.toJSON.apply(this, arguments);
-    } }]);return Model;}(mixin(Base, [Attributable, Translatable, Validatable]));
+    } }]);return Model;}(mixin(Base, [Attributable, Relatable, Translatable, Validatable]));
 
 exports.Model = Model;
 exports.mixin = mixin;

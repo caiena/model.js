@@ -2,6 +2,8 @@ import localResolve from 'rollup-plugin-local-resolve'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import babel from 'rollup-plugin-babel'
+import glob from 'rollup-plugin-glob-import'
+import yaml from 'rollup-plugin-yaml'
 import pkg from './package.json'
 
 export default [
@@ -15,11 +17,19 @@ export default [
       sourcemap: true
     },
     plugins: [
+      yaml(),
+      glob({
+        format: 'default',  // required for yaml plugin to work!
+        rename(name, id) {
+          return `${path.relative(__dirname, id)}/${name}`.replace(/[^\w]/g, '_')
+        }
+      }),
+      localResolve(),
       resolve(), // so Rollup can find dependencies (e.g. `lodash`)
       commonjs(), // so Rollup can convert dependencies (e.g. `lodash`) to an ES module
       babel({
         exclude: ['node_modules/**']
-      })
+      }),
     ]
   },
 
@@ -37,10 +47,17 @@ export default [
       { file: pkg.module, format: 'es',  sourcemap: true }
     ],
     plugins: [
+      yaml(),
+      glob({
+        format: 'default',  // required for yaml plugin to work!
+        rename(name, id) {
+          return `${path.relative(__dirname, id)}/${name}`.replace(/[^\w]/g, '_')
+        }
+      }),
+      localResolve(), // allowing import of index.js files from directory name
       babel({
         exclude: ['node_modules/**']
       }),
-      localResolve() // allowing import of index.js files from directory name
     ]
   }
 ];

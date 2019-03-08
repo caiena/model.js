@@ -8,6 +8,8 @@ import i18n   from '../../../src/i18n'
 import Purchase  from '../../support/app/models/purchase'
 import translations from '../../support/app/config/i18n/translations'
 
+import User  from '../../support/app/models/user'
+
 
 describe('Purchase', () => {
 
@@ -33,6 +35,17 @@ describe('Purchase', () => {
 
     //   expect(user.status).to.equal('failure')
     // })
+  })
+
+
+  describe('relations', () => {
+    it('belongs to owner', () => {
+      expect(Purchase.relations.owner).to.have.property('type', 'belongsTo')
+
+      let purchase = new Purchase({ owner: { name: 'Hank Moody' } })
+      expect(purchase.owner).to.be.instanceof(User)
+      expect(purchase.$get('owner.name')).to.equal('Hank Moody')
+    })
   })
 
 

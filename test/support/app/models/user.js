@@ -1,6 +1,8 @@
 import _     from '@caiena/lodash-ext'
 import Model from '../../../../src/model'
 
+import Purchase from './purchase'
+
 
 class User extends Model {
   static get attrs() {
@@ -14,6 +16,12 @@ class User extends Model {
   static get enums() {
     return {
       status: { failure: -1, scheduled: 0, success: 1 }
+    }
+  }
+
+  static get relations() {
+    return {
+      purchases: { type: 'hasMany', model: Purchase }
     }
   }
 

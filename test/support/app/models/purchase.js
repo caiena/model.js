@@ -17,6 +17,20 @@ class Purchase extends Model {
     }
   }
 
+  static get relations() {
+    return {
+      owner: {
+        type: 'belongsTo',
+        model() {
+          // XXX: we're using mocha+babel tooling to perform a lazy evaluated model class
+          // Use your own app tooling to achieve the same result (e.g. method, global variable already initialized, ...)
+          const User = require('./user').default
+          return User
+        }
+      }
+    }
+  }
+
   static get constraints() {
     return {
       status: {

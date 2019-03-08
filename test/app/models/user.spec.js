@@ -7,6 +7,7 @@ import i18n   from '../../../src/i18n'
 // support models
 import User         from '../../support/app/models/user'
 import translations from '../../support/app/config/i18n/translations'
+import Purchase from '../../support/app/models/purchase'
 
 
 describe('User', () => {
@@ -15,6 +16,14 @@ describe('User', () => {
     // TODO
   })
 
+  describe('relations', () => {
+    it('has many purchases', () => {
+      expect(User.relations.purchases).to.have.property('type', 'hasMany')
+
+      let user = new User({ purchases: [{}] })
+      expect(user.purchases[0]).to.be.instanceof(Purchase)
+    })
+  })
 
   describe('attributes', () => {
     // TODO
@@ -25,6 +34,7 @@ describe('User', () => {
       expect(User.enums.status).to.deep.equal({ failure: -1, scheduled: 0, success: 1 })
     })
   })
+
 
   describe('validation', () => {
     // TODO
