@@ -21,7 +21,8 @@ class User extends Model {
 
   static get relations() {
     return {
-      purchases: { type: 'hasMany', model: Purchase }
+      purchases: { type: 'hasMany', model: Purchase },
+      createdBy: { type: 'belongsTo', model: 'Admin' }
     }
   }
 

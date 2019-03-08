@@ -23,6 +23,14 @@ describe('User', () => {
       let user = new User({ purchases: [{}] })
       expect(user.purchases[0]).to.be.instanceof(Purchase)
     })
+
+    it('belongs to createdBy (Admin)', () => {
+      expect(User.relations.createdBy).to.have.property('type', 'belongsTo')
+
+      let user = new User({ createdBy: { id: 11 }, purchases: [] })
+      expect(user.createdBy).to.be.instanceof($models.Admin)
+      expect(user.$get('createdBy.id')).to.equal(11)
+    })
   })
 
   describe('attributes', () => {

@@ -356,6 +356,10 @@ function belongsTo(instance, relationName, config) {var _ref = arguments.length 
     }
 
     set = function set(value) {
+      if (value == null) {// null or undefined
+        return this.$relations[relationName] = value;
+      }
+
       if (_.isArray(value)) throw new Error("can't assign an array to a belongsTo relation");
 
       if (value instanceof ModelClass) {

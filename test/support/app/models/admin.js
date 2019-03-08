@@ -5,7 +5,8 @@ import User from './user'
 class Admin extends User {
   static get relations() {
     return {
-      auditing_purchases: { type: 'hasMany', model: 'Purchase' }
+      auditing_purchases: { type: 'hasMany', model: 'Purchase' },
+      createdBy:          { type: 'belongsTo', model: Admin }
     }
   }
 

@@ -19018,6 +19018,10 @@
 	    }
 
 	    set = function set(value) {
+	      if (value == null) {// null or undefined
+	        return this.$relations[relationName] = value;
+	      }
+
 	      if (lodashExt.isArray(value)) throw new Error("can't assign an array to a belongsTo relation");
 
 	      if (value instanceof ModelClass) {

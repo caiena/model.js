@@ -27,6 +27,14 @@ describe('Admin', () => {
       expect(admin.$get('auditing_purchases[0].id')).to.equal(11)
       expect(admin.$get('auditing_purchases[0].createdAt')).to.equal(yesterday)
     })
+
+    it('belongs to createdBy (Admin)', () => {
+      expect(Admin.relations.createdBy).to.have.property('type', 'belongsTo')
+
+      let admin = new Admin({ createdBy: { id: 11 } })
+      expect(admin.createdBy).to.be.instanceof(Admin)
+      expect(admin.$get('createdBy.id')).to.equal(11)
+    })
   })
 
   describe('attributes', () => {
