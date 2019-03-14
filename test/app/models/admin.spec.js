@@ -1,12 +1,11 @@
-import _      from '@caiena/lodash-ext'
-import Enum   from '@caiena/enum'
-import moment from 'moment'
-import Model  from '../../../src/model'
-import i18n   from '../../../src/i18n'
+import _        from '@caiena/lodash-ext'
+import { i18n } from '@caiena/i18n'
+import Enum     from '@caiena/enum'
+import moment   from 'moment'
+import Model    from '../../../src/model'
 
 // support models
-import Admin         from '../../support/app/models/admin'
-import translations from '../../support/app/config/i18n/translations'
+import Admin        from '../../support/app/models/admin'
 
 
 describe('Admin', () => {
@@ -46,8 +45,6 @@ describe('Admin', () => {
   })
 
   describe('translations', () => {
-    i18n.init({ locales: ['pt-BR', 'en-US'], defaultLocale: 'pt-BR', translations })
-
     context('static i18nScope', () => {
       it('reflects class name: "admin"', () => {
         expect(Admin.i18nScope).to.equal('models.admin')

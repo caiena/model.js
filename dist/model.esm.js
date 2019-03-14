@@ -9,8 +9,12 @@ import Enum from '@caiena/enum';
 import { i18n } from '@caiena/i18n';
 import 'core-js/modules/es6.promise';
 import 'regenerator-runtime/runtime';
+import 'core-js/modules/es7.symbol.async-iterator';
+import 'core-js/modules/es6.symbol';
+import 'core-js/modules/web.dom.iterable';
 import validate from 'validate.js';
 import moment from 'moment';
+import 'core-js/modules/es6.object.freeze';
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
@@ -560,6 +564,76 @@ validate.validators.presence = presence;
 
 // register all custom validators
 
+// custom error formatter, creating a code/values interpolation scheme with i18n
+// @see http://validatejs.org/#validate-error-formatting
+function transformErrors(i18nScope, errors) {
+  // errors sample:
+  // // => [
+  //   {
+  //     "attribute": "username",
+  //     "value": "nicklas",
+  //     "validator": "exclusion",
+  //     "globalOptions": {
+  //       "format": "detailed"
+  //     },
+  //     "attributes": {
+  //       "username": "nicklas",
+  //       "password": "bad"
+  //     },
+  //     "options": {
+  //       "within": [
+  //         "nicklas"
+  //       ],
+  //       "message": "'%{value}' is not allowed"
+  //     },
+  //     "error": "Username 'nicklas' is not allowed"
+  //   },
+  //   {
+  //     "attribute": "password",
+  //     "value": "bad",
+  //     "validator": "length",
+  //     "globalOptions": {
+  //       "format": "detailed"
+  //     },
+  //     "attributes": {
+  //       "username": "nicklas",
+  //       "password": "bad"
+  //     },
+  //     "options": {
+  //       "minimum": 6,
+  //       "message": "must be at least 6 characters"
+  //     },
+  //     "error": "Password must be at least 6 characters"
+  //   }
+  // ]
+  errors = validate.groupErrorsByAttribute(errors);
+  var transformedErrors = {};
+
+  for (var attr in errors) {
+    transformedErrors[attr] = [];var _iteratorNormalCompletion = true;var _didIteratorError = false;var _iteratorError = undefined;try {
+
+      for (var _iterator = errors[attr][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {var error = _step.value;
+        var code = error.validator;
+        var message = _.get(error, 'options.message') ||
+        i18n.t("errors.".concat(code), {
+          scope: i18nScope,
+          defaultValue: i18n.t("errors.".concat(code)),
+          value: error.value });
+
+
+        transformedErrors[attr].push({
+          attribute: error.attribute,
+          value: error.value,
+          code: code,
+          message: message });
+
+      }} catch (err) {_didIteratorError = true;_iteratorError = err;} finally {try {if (!_iteratorNormalCompletion && _iterator.return != null) {_iterator.return();}} finally {if (_didIteratorError) {throw _iteratorError;}}}
+  }
+
+  return transformedErrors;
+}
+
+
 function Validatable(Class) {
   var meta = {
     instance: {
@@ -567,13 +641,14 @@ function Validatable(Class) {
 
 
 
-  ValidatableClass = /*#__PURE__*/function (_Class) {_inherits(ValidatableClass, _Class);function ValidatableClass() {_classCallCheck(this, ValidatableClass);return _possibleConstructorReturn(this, _getPrototypeOf(ValidatableClass).apply(this, arguments));}_createClass(ValidatableClass, [{ key: "$validate", value: function () {var _$validate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {var _this = this;var constraints;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:
+  ValidatableClass = /*#__PURE__*/function (_Class) {_inherits(ValidatableClass, _Class);function ValidatableClass() {_classCallCheck(this, ValidatableClass);return _possibleConstructorReturn(this, _getPrototypeOf(ValidatableClass).apply(this, arguments));}_createClass(ValidatableClass, [{ key: "$validate", value: function () {var _$validate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {var _this = this;var constraints, instance;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:
 
 
 
 
 
                   constraints = this.constructor.constraints;
+                  instance = this;
 
                   // adapting api to .then(success, error) to .then(success).catch(error)
                   return _context.abrupt("return", new Promise(function (resolve, reject) {
@@ -583,7 +658,7 @@ function Validatable(Class) {
                     //   > two additional options; cleanAttributes which, unless false, makes validate.async
                     //   > call validate.cleanAttributes before resolving the promise (...)
                     // @see https://validatejs.org/#utilities-clean-attributes
-                    validate.async(_this, constraints, { cleanAttributes: false }).
+                    validate.async(_this, constraints, { format: 'detailed', cleanAttributes: false }).
                     then(
                     function success(attributes) {
                       // reset errors
@@ -600,11 +675,11 @@ function Validatable(Class) {
                       } else {
                         // validation error.
                         // assign to $errors
-                        meta.instance.$errors = errors;
+                        meta.instance.$errors = transformErrors(instance.constructor.i18nScope, errors);
                         resolve(false);
                       }
                     });
-                  }));case 2:case "end":return _context.stop();}}}, _callee, this);}));function $validate() {return _$validate.apply(this, arguments);}return $validate;}() }, { key: "$errors", get: function get() {return meta.instance.$errors;} }]);return ValidatableClass;}(Class);
+                  }));case 3:case "end":return _context.stop();}}}, _callee, this);}));function $validate() {return _$validate.apply(this, arguments);}return $validate;}() }, { key: "$errors", get: function get() {return meta.instance.$errors;} }]);return ValidatableClass;}(Class);
 
 
 
@@ -625,7 +700,7 @@ Base = /*#__PURE__*/function () {function Base() {_classCallCheck(this, Base);}_
 
 
 Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Model, null, [{ key: "$$model", get: function get()
-    {return true;} // allow for checking if is a model clas
+    {return true;} // allow programmatically checking if it's a model class
 
     // using "props" as name to make it explicit that we'll set any enumerable "property" in the instance
     // (JavaScript land - getOwnPropertyDescriptor() and prototype)
@@ -660,7 +735,7 @@ Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Mo
       // override it in subclasses
     } }, { key: "toJSON", value: function toJSON()
 
-    {var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref2$pick = _ref2.pick,pick = _ref2$pick === void 0 ? [] : _ref2$pick,_ref2$omit = _ref2.omit,omit = _ref2$omit === void 0 ? [] : _ref2$omit,_ref2$virtuals = _ref2.virtuals,virtuals = _ref2$virtuals === void 0 ? false : _ref2$virtuals,_ref2$undefs = _ref2.undefs,undefs = _ref2$undefs === void 0 ? false : _ref2$undefs;
+    {var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref2$pick = _ref2.pick,pick = _ref2$pick === void 0 ? [] : _ref2$pick,_ref2$include = _ref2.include,include = _ref2$include === void 0 ? [] : _ref2$include,_ref2$omit = _ref2.omit,omit = _ref2$omit === void 0 ? [] : _ref2$omit,_ref2$virtuals = _ref2.virtuals,virtuals = _ref2$virtuals === void 0 ? false : _ref2$virtuals,_ref2$relations = _ref2.relations,relations = _ref2$relations === void 0 ? false : _ref2$relations,_ref2$undefs = _ref2.undefs,undefs = _ref2$undefs === void 0 ? false : _ref2$undefs;
       var json = _.clone(this.$attrs);
 
       if (!undefs) {
@@ -671,12 +746,20 @@ Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Mo
         _.merge(json, _.pick(this, this.constructor.virtuals));
       }
 
-      if (_.present(omit)) {
-        json = _.omit(json, omit);
+      if (relations) {// TODO: test it
+        _.merge(json, _.pick(this, this.constructor.$relations));
       }
 
       if (_.present(pick)) {
         json = _.pick(json, pick);
+      }
+
+      if (_.present(include)) {// TODO: test it
+        json = _.merge(json, _.pick(this, include));
+      }
+
+      if (_.present(omit)) {
+        json = _.omit(json, omit);
       }
 
       return json;
@@ -686,5 +769,14 @@ Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Mo
       return this.toJSON.apply(this, arguments);
     } }]);return Model;}(mixin(Base, [Attributable, Relatable, Translatable, Validatable]));
 
-export { Model, mixin };
+var _contents_errorsEnUS = { "en-US": { errors: { date: "must be a valid date", datetime: "must be a valid date", email: "is not a valid e-mail", equality: "is not equal to %{attribute}", exclusion: "%{value} is restricted", format: "is invalid", inclusion: "%{value} is not included in the list", length: "has incorrect length", numericality: "must be a valid number", presence: "can't be blank", url: "is not a valid URL" } } };var _contents_errorsPtBR = { "pt-BR": { errors: { date: "n\xE3o \xE9 uma data v\xE1lida", datetime: "n\xE3o \xE9 uma data v\xE1lida", email: "n\xE3o \xE9 um e-mail v\xE1lido", equality: "n\xE3o \xE9 igual a %{attribute}", exclusion: "%{value} n\xE3o \xE9 permitido", format: "n\xE3o \xE9 v\xE1lido", inclusion: "%{value} n\xE3o est\xE1 inclu\xEDdo na lista", length: "tem tamanho incorreto", numericality: "n\xE3o \xE9 um n\xFAmero v\xE1lido", presence: "n\xE3o pode ficar em branco", url: "n\xE3o \xE9 uma URL v\xE1lida" } } };var contents = { errorsEnUS: _contents_errorsEnUS, errorsPtBR: _contents_errorsPtBR };Object.freeze(contents);
+
+
+var translations = {};
+
+_.each(contents, function (content, _id) {
+  _.merge(translations, content);
+});
+
+export { Model, mixin, translations };
 //# sourceMappingURL=model.esm.js.map

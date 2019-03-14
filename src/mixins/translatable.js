@@ -1,5 +1,5 @@
-import _    from '@caiena/lodash-ext'
-import i18n from '../i18n'
+import _        from '@caiena/lodash-ext'
+import { i18n } from '@caiena/i18n'
 
 
 function Translatable(Class) {

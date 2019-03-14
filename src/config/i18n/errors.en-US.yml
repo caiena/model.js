@@ -1,0 +1,18 @@
+---
+
+en-US:
+  errors:
+    # keywords (error or validator codes)
+
+    # validate.js
+    date:         must be a valid date
+    datetime:     must be a valid date
+    email:        is not a valid e-mail
+    equality:     is not equal to %{attribute}
+    exclusion:    "%{value} is restricted"
+    format:       is invalid
+    inclusion:    "%{value} is not included in the list"
+    length:       has incorrect length
+    numericality: must be a valid number
+    presence:     can't be blank
+    url:          is not a valid URL

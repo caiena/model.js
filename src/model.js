@@ -18,7 +18,7 @@ class Base {
 }
 
 class Model extends mixin(Base, [Attributable, Relatable, Translatable, Validatable]) {
-  static get $$model() { return true } // allow for checking if is a model clas
+  static get $$model() { return true } // allow programmatically checking if it's a model class
 
   // using "props" as name to make it explicit that we'll set any enumerable "property" in the instance
   // (JavaScript land - getOwnPropertyDescriptor() and prototype)
@@ -53,7 +53,7 @@ class Model extends mixin(Base, [Attributable, Relatable, Translatable, Validata
     // override it in subclasses
   }
 
-  toJSON({ pick = [], omit = [], virtuals = false, undefs = false } = {}) {
+  toJSON({ pick = [], include = [], omit = [], virtuals = false, relations = false, undefs = false } = {}) {
     let json = _.clone(this.$attrs)
 
     if (!undefs) {
@@ -64,12 +64,20 @@ class Model extends mixin(Base, [Attributable, Relatable, Translatable, Validata
       _.merge(json, _.pick(this, this.constructor.virtuals))
     }
 
-    if (_.present(omit)) {
-      json = _.omit(json, omit)
+    if (relations) { // TODO: test it
+      _.merge(json, _.pick(this, this.constructor.$relations))
     }
 
     if (_.present(pick)) {
       json = _.pick(json, pick)
+    }
+
+    if (_.present(include)) {  // TODO: test it
+      json = _.merge(json, _.pick(this, include))
+    }
+
+    if (_.present(omit)) {
+      json = _.omit(json, omit)
     }
 
     return json

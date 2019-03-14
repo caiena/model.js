@@ -17,6 +17,11 @@ module.exports = {
     ]
   ],
 
+  plugins: [
+    "convert-to-json",
+    "import-glob"
+  ],
+
   // @see https://github.com/Microsoft/vscode/issues/5728#issuecomment-340219041
   "sourceMaps": "inline",
   "retainLines": true

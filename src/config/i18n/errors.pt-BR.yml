@@ -1,0 +1,18 @@
+---
+
+pt-BR:
+  errors:
+    # keywords (error or validator codes)
+
+    # validate.js
+    date:         não é uma data válida
+    datetime:     não é uma data válida
+    email:        não é um e-mail válido
+    equality:     não é igual a %{attribute}
+    exclusion:    "%{value} não é permitido"
+    format:       não é válido
+    inclusion:    "%{value} não está incluído na lista"
+    length:       tem tamanho incorreto
+    numericality: não é um número válido
+    presence:     não pode ficar em branco
+    url:          não é uma URL válida

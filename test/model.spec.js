@@ -1,6 +1,7 @@
-import _     from '@caiena/lodash-ext'
-import Enum  from '@caiena/enum'
-import Model from '../src/model'
+import _        from '@caiena/lodash-ext'
+import { i18n } from '@caiena/i18n'
+import Enum     from '@caiena/enum'
+import Model    from '../src/model'
 
 // support models
 import User  from './support/app/models/user'
@@ -76,6 +77,9 @@ describe('model', () => {
 
       expect(await admin.$validate()).to.be.false
       expect(admin.$errors).to.have.property('area')
+      expect(admin.$errors.area).to.containSubset([{
+        message: "não pode ficar em branco"
+      }])
 
       admin.area = 'Universe'
       expect(admin.area).to.equal('Universe')

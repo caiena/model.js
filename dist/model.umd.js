@@ -21655,6 +21655,333 @@
 	);
 	});
 
+	var f$3 = _wks;
+
+	var _wksExt = {
+		f: f$3
+	};
+
+	var defineProperty = _objectDp.f;
+	var _wksDefine = function (name) {
+	  var $Symbol = _core.Symbol || (_core.Symbol = _global.Symbol || {});
+	  if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty($Symbol, name, { value: _wksExt.f(name) });
+	};
+
+	_wksDefine('asyncIterator');
+
+	var f$4 = Object.getOwnPropertySymbols;
+
+	var _objectGops = {
+		f: f$4
+	};
+
+	// all enumerable object keys, includes symbols
+
+
+
+	var _enumKeys = function (it) {
+	  var result = _objectKeys(it);
+	  var getSymbols = _objectGops.f;
+	  if (getSymbols) {
+	    var symbols = getSymbols(it);
+	    var isEnum = _objectPie.f;
+	    var i = 0;
+	    var key;
+	    while (symbols.length > i) if (isEnum.call(it, key = symbols[i++])) result.push(key);
+	  } return result;
+	};
+
+	// 7.2.2 IsArray(argument)
+
+	var _isArray = Array.isArray || function isArray(arg) {
+	  return _cof(arg) == 'Array';
+	};
+
+	// 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
+
+	var hiddenKeys = _enumBugKeys.concat('length', 'prototype');
+
+	var f$5 = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
+	  return _objectKeysInternal(O, hiddenKeys);
+	};
+
+	var _objectGopn = {
+		f: f$5
+	};
+
+	// fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
+
+	var gOPN = _objectGopn.f;
+	var toString$1 = {}.toString;
+
+	var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
+	  ? Object.getOwnPropertyNames(window) : [];
+
+	var getWindowNames = function (it) {
+	  try {
+	    return gOPN(it);
+	  } catch (e) {
+	    return windowNames.slice();
+	  }
+	};
+
+	var f$6 = function getOwnPropertyNames(it) {
+	  return windowNames && toString$1.call(it) == '[object Window]' ? getWindowNames(it) : gOPN(_toIobject(it));
+	};
+
+	var _objectGopnExt = {
+		f: f$6
+	};
+
+	var gOPD = Object.getOwnPropertyDescriptor;
+
+	var f$7 = _descriptors ? gOPD : function getOwnPropertyDescriptor(O, P) {
+	  O = _toIobject(O);
+	  P = _toPrimitive(P, true);
+	  if (_ie8DomDefine) try {
+	    return gOPD(O, P);
+	  } catch (e) { /* empty */ }
+	  if (_has(O, P)) return _propertyDesc(!_objectPie.f.call(O, P), O[P]);
+	};
+
+	var _objectGopd = {
+		f: f$7
+	};
+
+	// ECMAScript 6 symbols shim
+
+
+
+
+
+	var META = _meta.KEY;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	var gOPD$1 = _objectGopd.f;
+	var dP$2 = _objectDp.f;
+	var gOPN$1 = _objectGopnExt.f;
+	var $Symbol = _global.Symbol;
+	var $JSON = _global.JSON;
+	var _stringify = $JSON && $JSON.stringify;
+	var PROTOTYPE$2 = 'prototype';
+	var HIDDEN = _wks('_hidden');
+	var TO_PRIMITIVE = _wks('toPrimitive');
+	var isEnum$1 = {}.propertyIsEnumerable;
+	var SymbolRegistry = _shared('symbol-registry');
+	var AllSymbols = _shared('symbols');
+	var OPSymbols = _shared('op-symbols');
+	var ObjectProto$1 = Object[PROTOTYPE$2];
+	var USE_NATIVE$1 = typeof $Symbol == 'function';
+	var QObject = _global.QObject;
+	// Don't use setters in Qt Script, https://github.com/zloirock/core-js/issues/173
+	var setter = !QObject || !QObject[PROTOTYPE$2] || !QObject[PROTOTYPE$2].findChild;
+
+	// fallback for old Android, https://code.google.com/p/v8/issues/detail?id=687
+	var setSymbolDesc = _descriptors && _fails(function () {
+	  return _objectCreate(dP$2({}, 'a', {
+	    get: function () { return dP$2(this, 'a', { value: 7 }).a; }
+	  })).a != 7;
+	}) ? function (it, key, D) {
+	  var protoDesc = gOPD$1(ObjectProto$1, key);
+	  if (protoDesc) delete ObjectProto$1[key];
+	  dP$2(it, key, D);
+	  if (protoDesc && it !== ObjectProto$1) dP$2(ObjectProto$1, key, protoDesc);
+	} : dP$2;
+
+	var wrap = function (tag) {
+	  var sym = AllSymbols[tag] = _objectCreate($Symbol[PROTOTYPE$2]);
+	  sym._k = tag;
+	  return sym;
+	};
+
+	var isSymbol = USE_NATIVE$1 && typeof $Symbol.iterator == 'symbol' ? function (it) {
+	  return typeof it == 'symbol';
+	} : function (it) {
+	  return it instanceof $Symbol;
+	};
+
+	var $defineProperty = function defineProperty(it, key, D) {
+	  if (it === ObjectProto$1) $defineProperty(OPSymbols, key, D);
+	  _anObject(it);
+	  key = _toPrimitive(key, true);
+	  _anObject(D);
+	  if (_has(AllSymbols, key)) {
+	    if (!D.enumerable) {
+	      if (!_has(it, HIDDEN)) dP$2(it, HIDDEN, _propertyDesc(1, {}));
+	      it[HIDDEN][key] = true;
+	    } else {
+	      if (_has(it, HIDDEN) && it[HIDDEN][key]) it[HIDDEN][key] = false;
+	      D = _objectCreate(D, { enumerable: _propertyDesc(0, false) });
+	    } return setSymbolDesc(it, key, D);
+	  } return dP$2(it, key, D);
+	};
+	var $defineProperties = function defineProperties(it, P) {
+	  _anObject(it);
+	  var keys = _enumKeys(P = _toIobject(P));
+	  var i = 0;
+	  var l = keys.length;
+	  var key;
+	  while (l > i) $defineProperty(it, key = keys[i++], P[key]);
+	  return it;
+	};
+	var $create = function create(it, P) {
+	  return P === undefined ? _objectCreate(it) : $defineProperties(_objectCreate(it), P);
+	};
+	var $propertyIsEnumerable = function propertyIsEnumerable(key) {
+	  var E = isEnum$1.call(this, key = _toPrimitive(key, true));
+	  if (this === ObjectProto$1 && _has(AllSymbols, key) && !_has(OPSymbols, key)) return false;
+	  return E || !_has(this, key) || !_has(AllSymbols, key) || _has(this, HIDDEN) && this[HIDDEN][key] ? E : true;
+	};
+	var $getOwnPropertyDescriptor = function getOwnPropertyDescriptor(it, key) {
+	  it = _toIobject(it);
+	  key = _toPrimitive(key, true);
+	  if (it === ObjectProto$1 && _has(AllSymbols, key) && !_has(OPSymbols, key)) return;
+	  var D = gOPD$1(it, key);
+	  if (D && _has(AllSymbols, key) && !(_has(it, HIDDEN) && it[HIDDEN][key])) D.enumerable = true;
+	  return D;
+	};
+	var $getOwnPropertyNames = function getOwnPropertyNames(it) {
+	  var names = gOPN$1(_toIobject(it));
+	  var result = [];
+	  var i = 0;
+	  var key;
+	  while (names.length > i) {
+	    if (!_has(AllSymbols, key = names[i++]) && key != HIDDEN && key != META) result.push(key);
+	  } return result;
+	};
+	var $getOwnPropertySymbols = function getOwnPropertySymbols(it) {
+	  var IS_OP = it === ObjectProto$1;
+	  var names = gOPN$1(IS_OP ? OPSymbols : _toIobject(it));
+	  var result = [];
+	  var i = 0;
+	  var key;
+	  while (names.length > i) {
+	    if (_has(AllSymbols, key = names[i++]) && (IS_OP ? _has(ObjectProto$1, key) : true)) result.push(AllSymbols[key]);
+	  } return result;
+	};
+
+	// 19.4.1.1 Symbol([description])
+	if (!USE_NATIVE$1) {
+	  $Symbol = function Symbol() {
+	    if (this instanceof $Symbol) throw TypeError('Symbol is not a constructor!');
+	    var tag = _uid(arguments.length > 0 ? arguments[0] : undefined);
+	    var $set = function (value) {
+	      if (this === ObjectProto$1) $set.call(OPSymbols, value);
+	      if (_has(this, HIDDEN) && _has(this[HIDDEN], tag)) this[HIDDEN][tag] = false;
+	      setSymbolDesc(this, tag, _propertyDesc(1, value));
+	    };
+	    if (_descriptors && setter) setSymbolDesc(ObjectProto$1, tag, { configurable: true, set: $set });
+	    return wrap(tag);
+	  };
+	  _redefine($Symbol[PROTOTYPE$2], 'toString', function toString() {
+	    return this._k;
+	  });
+
+	  _objectGopd.f = $getOwnPropertyDescriptor;
+	  _objectDp.f = $defineProperty;
+	  _objectGopn.f = _objectGopnExt.f = $getOwnPropertyNames;
+	  _objectPie.f = $propertyIsEnumerable;
+	  _objectGops.f = $getOwnPropertySymbols;
+
+	  if (_descriptors && !_library) {
+	    _redefine(ObjectProto$1, 'propertyIsEnumerable', $propertyIsEnumerable, true);
+	  }
+
+	  _wksExt.f = function (name) {
+	    return wrap(_wks(name));
+	  };
+	}
+
+	_export(_export.G + _export.W + _export.F * !USE_NATIVE$1, { Symbol: $Symbol });
+
+	for (var es6Symbols = (
+	  // 19.4.2.2, 19.4.2.3, 19.4.2.4, 19.4.2.6, 19.4.2.8, 19.4.2.9, 19.4.2.10, 19.4.2.11, 19.4.2.12, 19.4.2.13, 19.4.2.14
+	  'hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables'
+	).split(','), j = 0; es6Symbols.length > j;)_wks(es6Symbols[j++]);
+
+	for (var wellKnownSymbols = _objectKeys(_wks.store), k = 0; wellKnownSymbols.length > k;) _wksDefine(wellKnownSymbols[k++]);
+
+	_export(_export.S + _export.F * !USE_NATIVE$1, 'Symbol', {
+	  // 19.4.2.1 Symbol.for(key)
+	  'for': function (key) {
+	    return _has(SymbolRegistry, key += '')
+	      ? SymbolRegistry[key]
+	      : SymbolRegistry[key] = $Symbol(key);
+	  },
+	  // 19.4.2.5 Symbol.keyFor(sym)
+	  keyFor: function keyFor(sym) {
+	    if (!isSymbol(sym)) throw TypeError(sym + ' is not a symbol!');
+	    for (var key in SymbolRegistry) if (SymbolRegistry[key] === sym) return key;
+	  },
+	  useSetter: function () { setter = true; },
+	  useSimple: function () { setter = false; }
+	});
+
+	_export(_export.S + _export.F * !USE_NATIVE$1, 'Object', {
+	  // 19.1.2.2 Object.create(O [, Properties])
+	  create: $create,
+	  // 19.1.2.4 Object.defineProperty(O, P, Attributes)
+	  defineProperty: $defineProperty,
+	  // 19.1.2.3 Object.defineProperties(O, Properties)
+	  defineProperties: $defineProperties,
+	  // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
+	  getOwnPropertyDescriptor: $getOwnPropertyDescriptor,
+	  // 19.1.2.7 Object.getOwnPropertyNames(O)
+	  getOwnPropertyNames: $getOwnPropertyNames,
+	  // 19.1.2.8 Object.getOwnPropertySymbols(O)
+	  getOwnPropertySymbols: $getOwnPropertySymbols
+	});
+
+	// 24.3.2 JSON.stringify(value [, replacer [, space]])
+	$JSON && _export(_export.S + _export.F * (!USE_NATIVE$1 || _fails(function () {
+	  var S = $Symbol();
+	  // MS Edge converts symbol values to JSON as {}
+	  // WebKit converts symbol values to JSON as null
+	  // V8 throws on boxed symbols
+	  return _stringify([S]) != '[null]' || _stringify({ a: S }) != '{}' || _stringify(Object(S)) != '{}';
+	})), 'JSON', {
+	  stringify: function stringify(it) {
+	    var args = [it];
+	    var i = 1;
+	    var replacer, $replacer;
+	    while (arguments.length > i) args.push(arguments[i++]);
+	    $replacer = replacer = args[1];
+	    if (!_isObject(replacer) && it === undefined || isSymbol(it)) return; // IE8 returns string on undefined
+	    if (!_isArray(replacer)) replacer = function (key, value) {
+	      if (typeof $replacer == 'function') value = $replacer.call(this, key, value);
+	      if (!isSymbol(value)) return value;
+	    };
+	    args[1] = replacer;
+	    return _stringify.apply($JSON, args);
+	  }
+	});
+
+	// 19.4.3.4 Symbol.prototype[@@toPrimitive](hint)
+	$Symbol[PROTOTYPE$2][TO_PRIMITIVE] || _hide($Symbol[PROTOTYPE$2], TO_PRIMITIVE, $Symbol[PROTOTYPE$2].valueOf);
+	// 19.4.3.5 Symbol.prototype[@@toStringTag]
+	_setToStringTag($Symbol, 'Symbol');
+	// 20.2.1.9 Math[@@toStringTag]
+	_setToStringTag(Math, 'Math', true);
+	// 24.3.3 JSON[@@toStringTag]
+	_setToStringTag(_global.JSON, 'JSON', true);
+
 	var validate = createCommonjsModule(function (module, exports) {
 	/*!
 	 * validate.js 0.12.0
@@ -27479,6 +27806,76 @@
 
 	// register all custom validators
 
+	// custom error formatter, creating a code/values interpolation scheme with i18n
+	// @see http://validatejs.org/#validate-error-formatting
+	function transformErrors(i18nScope, errors) {
+	  // errors sample:
+	  // // => [
+	  //   {
+	  //     "attribute": "username",
+	  //     "value": "nicklas",
+	  //     "validator": "exclusion",
+	  //     "globalOptions": {
+	  //       "format": "detailed"
+	  //     },
+	  //     "attributes": {
+	  //       "username": "nicklas",
+	  //       "password": "bad"
+	  //     },
+	  //     "options": {
+	  //       "within": [
+	  //         "nicklas"
+	  //       ],
+	  //       "message": "'%{value}' is not allowed"
+	  //     },
+	  //     "error": "Username 'nicklas' is not allowed"
+	  //   },
+	  //   {
+	  //     "attribute": "password",
+	  //     "value": "bad",
+	  //     "validator": "length",
+	  //     "globalOptions": {
+	  //       "format": "detailed"
+	  //     },
+	  //     "attributes": {
+	  //       "username": "nicklas",
+	  //       "password": "bad"
+	  //     },
+	  //     "options": {
+	  //       "minimum": 6,
+	  //       "message": "must be at least 6 characters"
+	  //     },
+	  //     "error": "Password must be at least 6 characters"
+	  //   }
+	  // ]
+	  errors = validate.groupErrorsByAttribute(errors);
+	  var transformedErrors = {};
+
+	  for (var attr in errors) {
+	    transformedErrors[attr] = [];var _iteratorNormalCompletion = true;var _didIteratorError = false;var _iteratorError = undefined;try {
+
+	      for (var _iterator = errors[attr][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {var error = _step.value;
+	        var code = error.validator;
+	        var message = lodashExt.get(error, 'options.message') ||
+	        i18n$1.t("errors.".concat(code), {
+	          scope: i18nScope,
+	          defaultValue: i18n$1.t("errors.".concat(code)),
+	          value: error.value });
+
+
+	        transformedErrors[attr].push({
+	          attribute: error.attribute,
+	          value: error.value,
+	          code: code,
+	          message: message });
+
+	      }} catch (err) {_didIteratorError = true;_iteratorError = err;} finally {try {if (!_iteratorNormalCompletion && _iterator.return != null) {_iterator.return();}} finally {if (_didIteratorError) {throw _iteratorError;}}}
+	  }
+
+	  return transformedErrors;
+	}
+
+
 	function Validatable(Class) {
 	  var meta = {
 	    instance: {
@@ -27486,13 +27883,14 @@
 
 
 
-	  ValidatableClass = /*#__PURE__*/function (_Class) {_inherits(ValidatableClass, _Class);function ValidatableClass() {_classCallCheck(this, ValidatableClass);return _possibleConstructorReturn(this, _getPrototypeOf(ValidatableClass).apply(this, arguments));}_createClass(ValidatableClass, [{ key: "$validate", value: function () {var _$validate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {var _this = this;var constraints;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:
+	  ValidatableClass = /*#__PURE__*/function (_Class) {_inherits(ValidatableClass, _Class);function ValidatableClass() {_classCallCheck(this, ValidatableClass);return _possibleConstructorReturn(this, _getPrototypeOf(ValidatableClass).apply(this, arguments));}_createClass(ValidatableClass, [{ key: "$validate", value: function () {var _$validate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {var _this = this;var constraints, instance;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:
 
 
 
 
 
 	                  constraints = this.constructor.constraints;
+	                  instance = this;
 
 	                  // adapting api to .then(success, error) to .then(success).catch(error)
 	                  return _context.abrupt("return", new Promise(function (resolve, reject) {
@@ -27502,7 +27900,7 @@
 	                    //   > two additional options; cleanAttributes which, unless false, makes validate.async
 	                    //   > call validate.cleanAttributes before resolving the promise (...)
 	                    // @see https://validatejs.org/#utilities-clean-attributes
-	                    validate.async(_this, constraints, { cleanAttributes: false }).
+	                    validate.async(_this, constraints, { format: 'detailed', cleanAttributes: false }).
 	                    then(
 	                    function success(attributes) {
 	                      // reset errors
@@ -27519,11 +27917,11 @@
 	                      } else {
 	                        // validation error.
 	                        // assign to $errors
-	                        meta.instance.$errors = errors;
+	                        meta.instance.$errors = transformErrors(instance.constructor.i18nScope, errors);
 	                        resolve(false);
 	                      }
 	                    });
-	                  }));case 2:case "end":return _context.stop();}}}, _callee, this);}));function $validate() {return _$validate.apply(this, arguments);}return $validate;}() }, { key: "$errors", get: function get() {return meta.instance.$errors;} }]);return ValidatableClass;}(Class);
+	                  }));case 3:case "end":return _context.stop();}}}, _callee, this);}));function $validate() {return _$validate.apply(this, arguments);}return $validate;}() }, { key: "$errors", get: function get() {return meta.instance.$errors;} }]);return ValidatableClass;}(Class);
 
 
 
@@ -27544,7 +27942,7 @@
 
 
 	Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Model, null, [{ key: "$$model", get: function get()
-	    {return true;} // allow for checking if is a model clas
+	    {return true;} // allow programmatically checking if it's a model class
 
 	    // using "props" as name to make it explicit that we'll set any enumerable "property" in the instance
 	    // (JavaScript land - getOwnPropertyDescriptor() and prototype)
@@ -27579,7 +27977,7 @@
 	      // override it in subclasses
 	    } }, { key: "toJSON", value: function toJSON()
 
-	    {var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref2$pick = _ref2.pick,pick = _ref2$pick === void 0 ? [] : _ref2$pick,_ref2$omit = _ref2.omit,omit = _ref2$omit === void 0 ? [] : _ref2$omit,_ref2$virtuals = _ref2.virtuals,virtuals = _ref2$virtuals === void 0 ? false : _ref2$virtuals,_ref2$undefs = _ref2.undefs,undefs = _ref2$undefs === void 0 ? false : _ref2$undefs;
+	    {var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref2$pick = _ref2.pick,pick = _ref2$pick === void 0 ? [] : _ref2$pick,_ref2$include = _ref2.include,include = _ref2$include === void 0 ? [] : _ref2$include,_ref2$omit = _ref2.omit,omit = _ref2$omit === void 0 ? [] : _ref2$omit,_ref2$virtuals = _ref2.virtuals,virtuals = _ref2$virtuals === void 0 ? false : _ref2$virtuals,_ref2$relations = _ref2.relations,relations = _ref2$relations === void 0 ? false : _ref2$relations,_ref2$undefs = _ref2.undefs,undefs = _ref2$undefs === void 0 ? false : _ref2$undefs;
 	      var json = lodashExt.clone(this.$attrs);
 
 	      if (!undefs) {
@@ -27590,12 +27988,20 @@
 	        lodashExt.merge(json, lodashExt.pick(this, this.constructor.virtuals));
 	      }
 
-	      if (lodashExt.present(omit)) {
-	        json = lodashExt.omit(json, omit);
+	      if (relations) {// TODO: test it
+	        lodashExt.merge(json, lodashExt.pick(this, this.constructor.$relations));
 	      }
 
 	      if (lodashExt.present(pick)) {
 	        json = lodashExt.pick(json, pick);
+	      }
+
+	      if (lodashExt.present(include)) {// TODO: test it
+	        json = lodashExt.merge(json, lodashExt.pick(this, include));
+	      }
+
+	      if (lodashExt.present(omit)) {
+	        json = lodashExt.omit(json, omit);
 	      }
 
 	      return json;
@@ -27605,8 +28011,18 @@
 	      return this.toJSON.apply(this, arguments);
 	    } }]);return Model;}(mixin(Base, [Attributable, Relatable, Translatable, Validatable]));
 
+	var _contents_errorsEnUS = { "en-US": { errors: { date: "must be a valid date", datetime: "must be a valid date", email: "is not a valid e-mail", equality: "is not equal to %{attribute}", exclusion: "%{value} is restricted", format: "is invalid", inclusion: "%{value} is not included in the list", length: "has incorrect length", numericality: "must be a valid number", presence: "can't be blank", url: "is not a valid URL" } } };var _contents_errorsPtBR = { "pt-BR": { errors: { date: "n\xE3o \xE9 uma data v\xE1lida", datetime: "n\xE3o \xE9 uma data v\xE1lida", email: "n\xE3o \xE9 um e-mail v\xE1lido", equality: "n\xE3o \xE9 igual a %{attribute}", exclusion: "%{value} n\xE3o \xE9 permitido", format: "n\xE3o \xE9 v\xE1lido", inclusion: "%{value} n\xE3o est\xE1 inclu\xEDdo na lista", length: "tem tamanho incorreto", numericality: "n\xE3o \xE9 um n\xFAmero v\xE1lido", presence: "n\xE3o pode ficar em branco", url: "n\xE3o \xE9 uma URL v\xE1lida" } } };var contents = { errorsEnUS: _contents_errorsEnUS, errorsPtBR: _contents_errorsPtBR };Object.freeze(contents);
+
+
+	var translations = {};
+
+	lodashExt.each(contents, function (content, _id) {
+	  lodashExt.merge(translations, content);
+	});
+
 	exports.Model = Model;
 	exports.mixin = mixin;
+	exports.translations = translations;
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 
