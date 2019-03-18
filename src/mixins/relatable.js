@@ -164,10 +164,16 @@ function Relatable(Class) {
 
     // lazy evaluated $relations
     static get $relations() {
-      return this.$$relations = this.$$relations || _.reduce(this.relations, (result, config, name) => {
-        result[name] = config
-        return result
-      }, {})
+      // avoiding static property inheritance
+      // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
+      if (!this.hasOwnProperty('$$relations')) {
+        this.$$relations = this.$$relations || _.reduce(this.relations, (result, config, name) => {
+          result[name] = config
+          return result
+        }, {})
+      }
+
+      return this.$$relations
     }
 
 

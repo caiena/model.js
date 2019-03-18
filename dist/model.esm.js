@@ -211,22 +211,34 @@ function Attributable(Class) {var
 
       // lazy evaluated $enums, using @caiena/enum
       get: function get() {
-        return this.$$enums = this.$$enums || _.reduce(this.enums, function (result, enumeration, enumName) {
-          if (enumeration instanceof Enum) {
-            result[enumName] = enumeration;
-          } else {
-            result[enumName] = new Enum(enumeration);
-          }
+        // avoiding static property inheritance
+        // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
+        if (!this.hasOwnProperty('$$enums')) {
+          this.$$enums = _.reduce(this.enums, function (result, enumeration, enumName) {
+            if (enumeration instanceof Enum) {
+              result[enumName] = enumeration;
+            } else {
+              result[enumName] = new Enum(enumeration);
+            }
 
-          return result;
-        }, {});
+            return result;
+          }, {});
+        }
+
+        return this.$$enums;
       }
 
       // lazy evaluated $attrs
       // for now we're only keeping the API consistent, adding a '$methodName' getter
       // TODO: define types and create "intelligent" setters? (with constraints)
     }, { key: "$attrs", get: function get() {
-        return this.$$attrs = this.$$attrs || _.clone(this.attrs);
+        // avoiding static property inheritance
+        // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
+        if (!this.hasOwnProperty('$$attrs')) {
+          this.$$attrs = _.clone(this.attrs);
+        }
+
+        return this.$$attrs;
       } }]);
 
     function AttributableClass() {var _getPrototypeOf2;var _this;_classCallCheck(this, AttributableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
@@ -238,7 +250,7 @@ function Attributable(Class) {var
 
       // handling enums first then attrs, avoiding overrides
       // defining enums get/set properties
-      _.each(klass.enums, function (enumeration, enumName) {
+      _.each(klass.$enums, function (enumeration, enumName) {
         // sanity check!
         // enum must be defined in attrs list as well
         if (!_.includes(klass.attrs, enumName)) {
@@ -258,7 +270,7 @@ function Attributable(Class) {var
       });
 
       // defining attrs get/set properties
-      _.each(klass.attrs, function (attrName) {
+      _.each(klass.$attrs, function (attrName) {
         if (!_.has(_assertThisInitialized(_assertThisInitialized(_this)), attrName)) {
           // first, check if it is defined in prototype
           if (_.hasIn(_assertThisInitialized(_assertThisInitialized(_this)), attrName)) {
@@ -336,7 +348,7 @@ function Attributable(Class) {var
         return this.$$attrs;}, set: function set(attrs) {var _this2 = this; // TODO: remove old code
         // return _.merge(this.$$attrs, attrs)
         // set props, one-by-one, using setter method
-        var sanitizedAttrs = _.pick(attrs, this.constructor.attrs);_.each(sanitizedAttrs, function (value, name) {_this2[name] = value;});} // TODO: remove it?
+        var sanitizedAttrs = _.pick(attrs, this.constructor.$attrs);_.each(sanitizedAttrs, function (value, name) {_this2[name] = value;});} // TODO: remove it?
     }, { key: "$props", get: function get() {var _this3 = this;var instance = this;var proto = Object.getPrototypeOf(this);var propNames = _.chain(Object.getOwnPropertyNames(proto)).concat(Object.getOwnPropertyNames(instance)).filter(function (name) {return !(_.includes(['constructor'], name) || _.startsWith(name, '$'));}).uniq().value().sort();return _.reduce(propNames, function (props, propName) {props[propName] = _this3[propName];return props;}, {});} }]);return AttributableClass;}(Class);return AttributableClass;}
 
 function belongsTo(instance, relationName, config) {var _ref = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},_ref$get = _ref.get,get = _ref$get === void 0 ? null : _ref$get,_ref$set = _ref.set,set = _ref$set === void 0 ? null : _ref$set;
@@ -499,10 +511,16 @@ function Relatable(Class) {var
 
       // lazy evaluated $relations
       get: function get() {
-        return this.$$relations = this.$$relations || _.reduce(this.relations, function (result, config, name) {
-          result[name] = config;
-          return result;
-        }, {});
+        // avoiding static property inheritance
+        // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
+        if (!this.hasOwnProperty('$$relations')) {
+          this.$$relations = this.$$relations || _.reduce(this.relations, function (result, config, name) {
+            result[name] = config;
+            return result;
+          }, {});
+        }
+
+        return this.$$relations;
       } }]);
 
 
@@ -688,14 +706,15 @@ function transformErrors(i18nScope, errors) {
 }
 
 
-function Validatable(Class) {
-  var meta = {
-    instance: {
-      $errors: {} } };var
+function Validatable(Class) {var
 
+  ValidatableClass = /*#__PURE__*/function (_Class) {_inherits(ValidatableClass, _Class);
 
+    function ValidatableClass() {var _getPrototypeOf2;var _this;_classCallCheck(this, ValidatableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
+      _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(ValidatableClass)).call.apply(_getPrototypeOf2, [this].concat(args)));
+      defineInternalProp(_assertThisInitialized(_assertThisInitialized(_this)), '$$errors', {});return _this;
+    }_createClass(ValidatableClass, [{ key: "$validate", value: function () {var _$validate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {var _this2 = this;var constraints, instance;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:
 
-  ValidatableClass = /*#__PURE__*/function (_Class) {_inherits(ValidatableClass, _Class);function ValidatableClass() {_classCallCheck(this, ValidatableClass);return _possibleConstructorReturn(this, _getPrototypeOf(ValidatableClass).apply(this, arguments));}_createClass(ValidatableClass, [{ key: "$validate", value: function () {var _$validate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {var _this = this;var constraints, instance;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:
 
 
 
@@ -712,11 +731,11 @@ function Validatable(Class) {
                     //   > two additional options; cleanAttributes which, unless false, makes validate.async
                     //   > call validate.cleanAttributes before resolving the promise (...)
                     // @see https://validatejs.org/#utilities-clean-attributes
-                    validate.async(_this, constraints, { format: 'detailed', cleanAttributes: false }).
+                    validate.async(_this2, constraints, { format: 'detailed', cleanAttributes: false }).
                     then(
                     function success(attributes) {
                       // reset errors
-                      meta.instance.$errors = {};
+                      instance.$$errors = {};
                       resolve(true);
                     },
 
@@ -724,16 +743,16 @@ function Validatable(Class) {
                       if (errors instanceof Error) {
                         // runtime Error. Just throw it
                         // reset errors
-                        meta.instance.$errors = {};
+                        instance.$$errors = {};
                         reject(errors);
                       } else {
                         // validation error.
                         // assign to $errors
-                        meta.instance.$errors = transformErrors(instance.constructor.i18nScope, errors);
+                        instance.$$errors = transformErrors(instance.constructor.i18nScope, errors);
                         resolve(false);
                       }
                     });
-                  }));case 3:case "end":return _context.stop();}}}, _callee, this);}));function $validate() {return _$validate.apply(this, arguments);}return $validate;}() }, { key: "$errors", get: function get() {return meta.instance.$errors;} }]);return ValidatableClass;}(Class);
+                  }));case 3:case "end":return _context.stop();}}}, _callee, this);}));function $validate() {return _$validate.apply(this, arguments);}return $validate;}() }, { key: "$errors", get: function get() {return this.$$errors;} }]);return ValidatableClass;}(Class);
 
 
 

@@ -1,5 +1,6 @@
 import _        from '@caiena/lodash-ext'
 import { i18n } from '@caiena/i18n'
+import { defineInternalProp } from '../meta'
 import validate from 'validate.js'
 import '../validators/register'
 
@@ -75,15 +76,16 @@ function transformErrors(i18nScope, errors) {
 
 
 function Validatable(Class) {
-  const meta = {
-    instance: {
-      $errors: {}
-    }
-  }
 
   class ValidatableClass extends Class {
+
+    constructor(...args) {
+      super(...args)
+      defineInternalProp(this, '$$errors', {})
+    }
+
     get $errors() {
-      return meta.instance.$errors
+      return this.$$errors
     }
 
     async $validate() {
@@ -102,7 +104,7 @@ function Validatable(Class) {
           .then(
             function success(attributes) {
               // reset errors
-              meta.instance.$errors = {}
+              instance.$$errors = {}
               resolve(true)
             },
 
@@ -110,12 +112,12 @@ function Validatable(Class) {
               if (errors instanceof Error) {
                 // runtime Error. Just throw it
                 // reset errors
-                meta.instance.$errors = {}
+                instance.$$errors = {}
                 reject(errors)
               } else {
                 // validation error.
                 // assign to $errors
-                meta.instance.$errors = transformErrors(instance.constructor.i18nScope, errors)
+                instance.$$errors = transformErrors(instance.constructor.i18nScope, errors)
                 resolve(false)
               }
             })

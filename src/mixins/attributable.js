@@ -47,22 +47,34 @@ function Attributable(Class) {
 
     // lazy evaluated $enums, using @caiena/enum
     static get $enums() {
-      return this.$$enums = this.$$enums || _.reduce(this.enums, (result, enumeration, enumName) => {
-        if (enumeration instanceof Enum) {
-          result[enumName] = enumeration
-        } else {
-          result[enumName] = new Enum(enumeration)
-        }
+      // avoiding static property inheritance
+      // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
+      if (!this.hasOwnProperty('$$enums')) {
+        this.$$enums = _.reduce(this.enums, (result, enumeration, enumName) => {
+          if (enumeration instanceof Enum) {
+            result[enumName] = enumeration
+          } else {
+            result[enumName] = new Enum(enumeration)
+          }
 
-        return result
-      }, {})
+          return result
+        }, {})
+      }
+
+      return this.$$enums
     }
 
     // lazy evaluated $attrs
     // for now we're only keeping the API consistent, adding a '$methodName' getter
     // TODO: define types and create "intelligent" setters? (with constraints)
     static get $attrs() {
-      return this.$$attrs = this.$$attrs || _.clone(this.attrs)
+      // avoiding static property inheritance
+      // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
+      if (!this.hasOwnProperty('$$attrs')) {
+        this.$$attrs = _.clone(this.attrs)
+      }
+
+      return this.$$attrs
     }
 
     constructor(...args) {
@@ -74,7 +86,7 @@ function Attributable(Class) {
 
       // handling enums first then attrs, avoiding overrides
       // defining enums get/set properties
-      _.each(klass.enums, (enumeration, enumName) => {
+      _.each(klass.$enums, (enumeration, enumName) => {
         // sanity check!
         // enum must be defined in attrs list as well
         if (!_.includes(klass.attrs, enumName)) {
@@ -94,7 +106,7 @@ function Attributable(Class) {
       })
 
       // defining attrs get/set properties
-      _.each(klass.attrs, (attrName) => {
+      _.each(klass.$attrs, (attrName) => {
         if (!_.has(this, attrName)) {
           // first, check if it is defined in prototype
           if (_.hasIn(this, attrName)) {
@@ -118,7 +130,7 @@ function Attributable(Class) {
       // return _.merge(this.$$attrs, attrs)
 
       // set props, one-by-one, using setter method
-      let sanitizedAttrs = _.pick(attrs, this.constructor.attrs)
+      let sanitizedAttrs = _.pick(attrs, this.constructor.$attrs)
       _.each(sanitizedAttrs, (value, name) => {
         this[name] = value
       })
