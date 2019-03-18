@@ -226,6 +226,13 @@ function Attributable(Class) {var
 
           return result;
         }, {});
+      }
+
+      // lazy evaluated $attrs
+      // for now we're only keeping the API consistent, adding a '$methodName' getter
+      // TODO: define types and create "intelligent" setters? (with constraints)
+    }, { key: "$attrs", get: function get() {
+        return this.$$attrs = this.$$attrs || _.clone(this.attrs);
       } }]);
 
     function AttributableClass() {var _getPrototypeOf2;var _this;_classCallCheck(this, AttributableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
@@ -366,6 +373,8 @@ function belongsTo(instance, relationName, config) {var _ref = arguments.length 
 
       if (_.isArray(value)) throw new Error("can't assign an array to a belongsTo relation");
 
+      // TODO: should we assign values to fks? `${relation}_id``
+
       if (value instanceof ModelClass) {
         return this.$relations[relationName] = value;
       } else {
@@ -384,7 +393,53 @@ function belongsTo(instance, relationName, config) {var _ref = arguments.length 
 }
 
 
-function hasMany(instance, relationName, config) {var _ref2 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},_ref2$get = _ref2.get,get = _ref2$get === void 0 ? null : _ref2$get,_ref2$set = _ref2.set,set = _ref2$set === void 0 ? null : _ref2$set;
+function hasOne(instance, relationName, config) {var _ref2 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},_ref2$get = _ref2.get,get = _ref2$get === void 0 ? null : _ref2$get,_ref2$set = _ref2.set,set = _ref2$set === void 0 ? null : _ref2$set;
+  if (!get) {
+    get = function get() {
+      return this.$relations[relationName];
+    };
+  }
+
+  if (!set) {
+    // providing a way to lazily evaluate related model class
+    var ModelClass = null;
+
+    if (config.model.$$model) {// check if is a model class without circular dependency
+      ModelClass = config.model;
+    } else if (typeof config.model === 'string') {// use lookup
+      ModelClass = instance.constructor.$lookupModel(config.model);
+    } else if (typeof config.model === 'function') {// check if is a callable (function)
+      ModelClass = config.model();
+    } else {
+      ModelClass = config.model; // default: assign it as a model class
+    }
+
+    set = function set(value) {
+      if (value == null) {// null or undefined
+        return this.$relations[relationName] = value;
+      }
+
+      if (_.isArray(value)) throw new Error("can't assign an array to a hasOne relation");
+
+      if (value instanceof ModelClass) {
+        return this.$relations[relationName] = value;
+      } else {
+        // construct model instance with value as attributes
+        return this.$relations[relationName] = new ModelClass(value);
+      }
+    };
+  }
+
+  Object.defineProperty(instance, relationName, {
+    get: get,
+    set: set,
+    configurable: true,
+    enumerable: true });
+
+}
+
+
+function hasMany(instance, relationName, config) {var _ref3 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},_ref3$get = _ref3.get,get = _ref3$get === void 0 ? null : _ref3$get,_ref3$set = _ref3.set,set = _ref3$set === void 0 ? null : _ref3$set;
   if (!get) {
     get = function get() {
       return this.$relations[relationName];
@@ -412,6 +467,8 @@ function hasMany(instance, relationName, config) {var _ref2 = arguments.length >
 
       if (!_.isArray(values)) throw new Error("can't assign a non-array value to a hasMany relation");
 
+      // TODO: should we assign values to fks? `${relation}_id`
+
       var modelInstances = _.map(values, function (value) {
         return value instanceof ModelClass ? value : new ModelClass(value);
       });
@@ -429,20 +486,16 @@ function hasMany(instance, relationName, config) {var _ref2 = arguments.length >
 }
 
 
-function defineRelation(instance, relationName, config) {var _ref3 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},get = _ref3.get,set = _ref3.set;
+function defineRelation(instance, relationName, config) {var _ref4 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},get = _ref4.get,set = _ref4.set;
   switch (config.type) {
-    case 'belongsTo':{
-        return belongsTo.apply(void 0, arguments);
-      }
-    case 'hasMany':{
-        return hasMany.apply(void 0, arguments);
-      }
+    case 'belongsTo':return belongsTo.apply(void 0, arguments);
+    case 'hasMany':return hasMany.apply(void 0, arguments);
+    case 'hasOne':return hasOne.apply(void 0, arguments);
     default:{
         throw new Error("Unknown relation type \"".concat(type, "\""));
       }}
 
 }
-
 
 
 
@@ -457,6 +510,7 @@ function Relatable(Class) {var
           return result;
         }, {});
       } }]);
+
 
     function RelatableClass() {var _getPrototypeOf2;var _this;_classCallCheck(this, RelatableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
       _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(RelatableClass)).call.apply(_getPrototypeOf2, [this].concat(args)));

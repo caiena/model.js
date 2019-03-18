@@ -21,8 +21,9 @@ class User extends Model {
 
   static get relations() {
     return {
-      purchases: { type: 'hasMany', model: Purchase },
-      createdBy: { type: 'belongsTo', model: 'Admin' }
+      createdBy: { type: 'belongsTo', model: 'Admin'  },
+      photo:     { type: 'hasOne',    model: 'Photo'  },
+      purchases: { type: 'hasMany',   model: Purchase },
     }
   }
 
@@ -37,5 +38,6 @@ class User extends Model {
     return _.present(this.disabledAt)
   }
 }
+
 
 export default User

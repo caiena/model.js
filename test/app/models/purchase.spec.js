@@ -38,8 +38,10 @@ describe('Purchase', () => {
 
 
   describe('relations', () => {
+    const $relations = Purchase.$relations
+
     it('belongs to buyer', () => {
-      expect(Purchase.relations.buyer).to.have.property('type', 'belongsTo')
+      expect($relations.buyer).to.have.property('type', 'belongsTo')
 
       let purchase = new Purchase({ buyer: { name: 'Charlie Runkle' } })
       expect(purchase.buyer).to.be.instanceof(User)
@@ -47,7 +49,7 @@ describe('Purchase', () => {
     })
 
     it('belongs to seller', () => {
-      expect(Purchase.relations.seller).to.have.property('type', 'belongsTo')
+      expect($relations.seller).to.have.property('type', 'belongsTo')
 
       let purchase = new Purchase({ seller: { name: 'Hank Moody' } })
       expect(purchase.seller).to.be.instanceof(User)
@@ -56,7 +58,7 @@ describe('Purchase', () => {
 
 
     it('belongs to auditor', () => {
-      expect(Purchase.relations.auditor).to.have.property('type', 'belongsTo')
+      expect($relations.auditor).to.have.property('type', 'belongsTo')
 
       let purchase = new Purchase({ auditor: { name: 'Karen van der Beek ' } })
       expect(purchase.auditor).to.be.instanceof(User)

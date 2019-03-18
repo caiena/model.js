@@ -58,6 +58,13 @@ function Attributable(Class) {
       }, {})
     }
 
+    // lazy evaluated $attrs
+    // for now we're only keeping the API consistent, adding a '$methodName' getter
+    // TODO: define types and create "intelligent" setters? (with constraints)
+    static get $attrs() {
+      return this.$$attrs = this.$$attrs || _.clone(this.attrs)
+    }
+
     constructor(...args) {
       super(...args)
 

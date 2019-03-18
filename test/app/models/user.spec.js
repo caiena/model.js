@@ -17,19 +17,31 @@ describe('User', () => {
   })
 
   describe('relations', () => {
-    it('has many purchases', () => {
-      expect(User.relations.purchases).to.have.property('type', 'hasMany')
-
-      let user = new User({ purchases: [{}] })
-      expect(user.purchases[0]).to.be.instanceof(Purchase)
-    })
+    const $relations = User.$relations
 
     it('belongs to createdBy (Admin)', () => {
-      expect(User.relations.createdBy).to.have.property('type', 'belongsTo')
+      expect($relations.createdBy).to.have.property('type', 'belongsTo')
 
       let user = new User({ createdBy: { id: 11 }, purchases: [] })
       expect(user.createdBy).to.be.instanceof($models.Admin)
       expect(user.$get('createdBy.id')).to.equal(11)
+    })
+
+    it('has one photo', () => {
+      expect($relations.photo).to.deep.equal({
+        type: 'hasOne', model: 'Photo'
+      })
+
+      let user = new User({ photo: { filename: 'path/to/avatar.png', size: 128000 } })
+      expect(user.photo).to.be.instanceof($models.Photo)
+      expect(user.$get('photo.filename')).to.equal('path/to/avatar.png')
+    })
+
+    it('has many purchases', () => {
+      expect($relations.purchases).to.have.property('type', 'hasMany')
+
+      let user = new User({ purchases: [{}] })
+      expect(user.purchases[0]).to.be.instanceof(Purchase)
     })
   })
 
