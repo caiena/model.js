@@ -48,14 +48,14 @@ class Model extends mixin(Base, [Attributable, Relatable, Translatable, Validata
       this[name] = value
     })
 
-    this.$afterInit() // hook for user land
+    this.$afterInit(...arguments) // hook for user land
   }
 
   $beforeInit(...args) {
     // override it in subclasses
   }
 
-  $afterInit() {
+  $afterInit(...args) {
     // override it in subclasses
   }
 

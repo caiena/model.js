@@ -24,8 +24,8 @@ class Admin extends User {
   }
 
   // do not use constructor()
-  // if you need extra functionality, use $afterInit()
-  $afterInit() {
+  // if you need extra functionality, use $afterInit(...args)
+  $afterInit(...args) {
     // default value
     if (this.$blank('status')) {
       this.status = 'success'
