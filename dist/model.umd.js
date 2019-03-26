@@ -28022,6 +28022,8 @@
 	  }]);function Model() {var _this;var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},_ref$undefs = _ref.undefs,undefs = _ref$undefs === void 0 ? true : _ref$undefs;_classCallCheck(this, Model);
 	    _this = _possibleConstructorReturn(this, _getPrototypeOf(Model).call(this));
 
+	    _this.$beforeInit(); // hook for user land
+
 	    var propNames = writablePropNames(_assertThisInitialized(_assertThisInitialized(_this)));
 	    var sanitizedProps = lodashExt.pick(props, propNames);
 
@@ -28043,8 +28045,12 @@
 	      _this[name] = value;
 	    });
 
-	    _this.$init(); // hook for user land
-	    return _this;}_createClass(Model, [{ key: "$init", value: function $init()
+	    _this.$afterInit(); // hook for user land
+	    return _this;}_createClass(Model, [{ key: "$beforeInit", value: function $beforeInit()
+
+	    {
+	      // override it in subclasses
+	    } }, { key: "$afterInit", value: function $afterInit()
 
 	    {
 	      // override it in subclasses

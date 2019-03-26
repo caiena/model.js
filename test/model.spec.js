@@ -72,7 +72,7 @@ describe('model', () => {
     it('allows model classes to extend others', async () => {
       let admin = new Admin({ name: 'Chuck Norris'})
 
-      // default value
+      // default value with $afterInit() method
       expect(admin.status).to.equal('success')
 
       expect(await admin.$validate()).to.be.false
