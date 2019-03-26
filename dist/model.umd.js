@@ -18879,11 +18879,8 @@
 	        // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
 	        if (!this.hasOwnProperty('$$enums')) {
 	          this.$$enums = lodashExt.reduce(this.enums, function (result, enumeration, enumName) {
-	            if (enumeration instanceof Enum) {
-	              result[enumName] = enumeration;
-	            } else {
-	              result[enumName] = new Enum(enumeration);
-	            }
+	            // transform to Enum instance, if needed
+	            result[enumName] = enumeration instanceof Enum ? enumeration : new Enum(enumeration);
 
 	            return result;
 	          }, {});
@@ -18917,13 +18914,15 @@
 	      lodashExt.each(klass.$enums, function (enumeration, enumName) {
 	        // sanity check!
 	        // enum must be defined in attrs list as well
-	        if (!lodashExt.includes(klass.attrs, enumName)) {
+	        if (!lodashExt.includes(klass.$attrs, enumName)) {
 	          throw new Error("enum \"".concat(enumName, "\" is not listed as an attribute in model ").concat(klass.name));
 	        }
 
-	        if (!lodashExt.has(_assertThisInitialized(_assertThisInitialized(_this)), enumName)) {
+	        // XXX: lodash _.has and _.hasIn actually _execute_ the method/property to check for
+	        // existence. We don't want that!
+	        if (!_this.hasOwnProperty(enumName)) {
 	          // first, check if it is defined in prototype
-	          if (lodashExt.hasIn(_assertThisInitialized(_assertThisInitialized(_this)), enumName)) {
+	          if (_this.constructor.prototype.hasOwnProperty(enumName)) {
 	            var _proto = Object.getPrototypeOf(_assertThisInitialized(_assertThisInitialized(_this)));
 	            var _descr = Object.getOwnPropertyDescriptor(_proto, enumName);
 	            defineEnum(_assertThisInitialized(_assertThisInitialized(_this)), enumName, { get: _descr.get, set: _descr.set });
@@ -18935,9 +18934,11 @@
 
 	      // defining attrs get/set properties
 	      lodashExt.each(klass.$attrs, function (attrName) {
-	        if (!lodashExt.has(_assertThisInitialized(_assertThisInitialized(_this)), attrName)) {
+	        // XXX: lodash _.has and _.hasIn actually _execute_ the method/property to check for
+	        // existence. We don't want that!
+	        if (!_this.hasOwnProperty(attrName)) {
 	          // first, check if it is defined in prototype
-	          if (lodashExt.hasIn(_assertThisInitialized(_assertThisInitialized(_this)), attrName)) {
+	          if (_this.constructor.prototype.hasOwnProperty(attrName)) {
 	            var _proto = Object.getPrototypeOf(_assertThisInitialized(_assertThisInitialized(_this)));
 	            var _descr = Object.getOwnPropertyDescriptor(_proto, attrName);
 	            defineAttr(_assertThisInitialized(_assertThisInitialized(_this)), attrName, { get: _descr.get, set: _descr.set });
@@ -18995,6 +18996,8 @@
 
 	      attrNameOrPath) {
 	        // TODO: should it be _.hasIn(), to include inherited properties?
+	        // XXX: lodash _.has and _.hasIn actually _execute_ the method/property to check for its exitence.
+	        // It can have side effects!
 	        return lodashExt.has(this, attrNameOrPath);
 	      } }, { key: "$pick", value: function $pick()
 
@@ -19197,9 +19200,11 @@
 
 	      // defining relations get/set properties
 	      lodashExt.each(klass.relations, function (config, relationName) {
-	        if (!lodashExt.has(_assertThisInitialized(_assertThisInitialized(_this)), relationName)) {
+	        // XXX: lodash _.has and _.hasIn actually _execute_ the method/property to check for
+	        // existence. We don't want that!
+	        if (!_this.hasOwnProperty(relationName)) {
 	          // first, check if it is defined in prototype
-	          if (lodashExt.hasIn(_assertThisInitialized(_assertThisInitialized(_this)), relationName)) {
+	          if (_this.constructor.prototype.hasOwnProperty(relationName)) {
 	            var _proto = Object.getPrototypeOf(_assertThisInitialized(_assertThisInitialized(_this)));
 	            var _descr = Object.getOwnPropertyDescriptor(_proto, relationName);
 	            defineRelation(_assertThisInitialized(_assertThisInitialized(_this)), relationName, config, { get: _descr.get, set: _descr.set });

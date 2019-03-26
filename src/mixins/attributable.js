@@ -51,11 +51,8 @@ function Attributable(Class) {
       // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
       if (!this.hasOwnProperty('$$enums')) {
         this.$$enums = _.reduce(this.enums, (result, enumeration, enumName) => {
-          if (enumeration instanceof Enum) {
-            result[enumName] = enumeration
-          } else {
-            result[enumName] = new Enum(enumeration)
-          }
+          // transform to Enum instance, if needed
+          result[enumName] = (enumeration instanceof Enum) ? enumeration : new Enum(enumeration)
 
           return result
         }, {})
@@ -89,13 +86,15 @@ function Attributable(Class) {
       _.each(klass.$enums, (enumeration, enumName) => {
         // sanity check!
         // enum must be defined in attrs list as well
-        if (!_.includes(klass.attrs, enumName)) {
+        if (!_.includes(klass.$attrs, enumName)) {
           throw new Error(`enum "${enumName}" is not listed as an attribute in model ${klass.name}`)
         }
 
-        if (!_.has(this, enumName)) {
+        // XXX: lodash _.has and _.hasIn actually _execute_ the method/property to check for
+        // existence. We don't want that!
+        if (!this.hasOwnProperty(enumName)) {
           // first, check if it is defined in prototype
-          if (_.hasIn(this, enumName)) {
+          if (this.constructor.prototype.hasOwnProperty(enumName)) {
             let _proto = Object.getPrototypeOf(this)
             let _descr = Object.getOwnPropertyDescriptor(_proto, enumName)
             defineEnum(this, enumName, { get: _descr.get, set: _descr.set })
@@ -107,9 +106,11 @@ function Attributable(Class) {
 
       // defining attrs get/set properties
       _.each(klass.$attrs, (attrName) => {
-        if (!_.has(this, attrName)) {
+        // XXX: lodash _.has and _.hasIn actually _execute_ the method/property to check for
+        // existence. We don't want that!
+        if (!this.hasOwnProperty(attrName)) {
           // first, check if it is defined in prototype
-          if (_.hasIn(this, attrName)) {
+          if (this.constructor.prototype.hasOwnProperty(attrName)) {
             let _proto = Object.getPrototypeOf(this)
             let _descr = Object.getOwnPropertyDescriptor(_proto, attrName)
             defineAttr(this, attrName, { get: _descr.get, set: _descr.set })
@@ -167,6 +168,8 @@ function Attributable(Class) {
 
     $has(attrNameOrPath) {
       // TODO: should it be _.hasIn(), to include inherited properties?
+      // XXX: lodash _.has and _.hasIn actually _execute_ the method/property to check for its exitence.
+      // It can have side effects!
       return _.has(this, attrNameOrPath)
     }
 

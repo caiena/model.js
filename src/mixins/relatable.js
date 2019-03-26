@@ -186,9 +186,11 @@ function Relatable(Class) {
 
       // defining relations get/set properties
       _.each(klass.relations, (config, relationName) => {
-        if (!_.has(this, relationName)) {
+        // XXX: lodash _.has and _.hasIn actually _execute_ the method/property to check for
+        // existence. We don't want that!
+        if (!this.hasOwnProperty(relationName)) {
           // first, check if it is defined in prototype
-          if (_.hasIn(this, relationName)) {
+          if (this.constructor.prototype.hasOwnProperty(relationName)) {
             let _proto = Object.getPrototypeOf(this)
             let _descr = Object.getOwnPropertyDescriptor(_proto, relationName)
             defineRelation(this, relationName, config, { get: _descr.get, set: _descr.set })
