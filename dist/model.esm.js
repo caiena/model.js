@@ -777,10 +777,10 @@ Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Mo
 
     // using "props" as name to make it explicit that we'll set any enumerable "property" in the instance
     // (JavaScript land - getOwnPropertyDescriptor() and prototype)
-  }]);function Model() {var _this;var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},_ref$undefs = _ref.undefs,undefs = _ref$undefs === void 0 ? true : _ref$undefs;_classCallCheck(this, Model);
+  }]);function Model() {var _this2;var _this;var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},_ref$undefs = _ref.undefs,undefs = _ref$undefs === void 0 ? true : _ref$undefs;_classCallCheck(this, Model);
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Model).call(this));
 
-    _this.$beforeInit(); // hook for user land
+    (_this2 = _this).$beforeInit.apply(_this2, arguments); // hook for user land
 
     var propNames = writablePropNames(_assertThisInitialized(_assertThisInitialized(_this)));
     var sanitizedProps = _.pick(props, propNames);

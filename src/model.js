@@ -25,7 +25,7 @@ class Model extends mixin(Base, [Attributable, Relatable, Translatable, Validata
   constructor(props = {}, { undefs = true } = {}) {
     super()
 
-    this.$beforeInit() // hook for user land
+    this.$beforeInit(...arguments) // hook for user land
 
     let propNames = writablePropNames(this)
     let sanitizedProps = _.pick(props, propNames)
@@ -51,7 +51,7 @@ class Model extends mixin(Base, [Attributable, Relatable, Translatable, Validata
     this.$afterInit() // hook for user land
   }
 
-  $beforeInit() {
+  $beforeInit(...args) {
     // override it in subclasses
   }
 
