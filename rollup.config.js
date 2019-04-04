@@ -12,8 +12,8 @@ export default [
     input: 'src/index.js',
     output: {
       name: 'model',
-      file: 'dist/model.umd.js',
-      // file: pkg.browser,
+      // file: 'dist/model.umd.js',
+      file: pkg.browser,
       format: 'umd',
       sourcemap: true
     },
@@ -44,10 +44,10 @@ export default [
     input: 'src/index.js',
     external: ['@caiena/lodash-ext', '@caiena/i18n', 'moment'],
     output: [
-      // { file: pkg.main,   format: 'cjs', sourcemap: true },
-      // { file: pkg.module, format: 'es',  sourcemap: true }
-      { file: 'dist/model.cjs.js', format: 'cjs', sourcemap: true },
-      { file: 'dist/model.esm.js', format: 'es',  sourcemap: true }
+      { file: pkg.main,   format: 'cjs', sourcemap: true },
+      { file: pkg.module, format: 'es',  sourcemap: true }
+      // { file: 'dist/model.cjs.js', format: 'cjs', sourcemap: true },
+      // { file: 'dist/model.esm.js', format: 'es',  sourcemap: true }
     ],
     plugins: [
       yaml(),
