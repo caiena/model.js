@@ -91,12 +91,13 @@ describe('model', () => {
       expect(admin.disabled).to.be.true
 
       expect(admin.toJSON({ virtuals: true, undefs: true })).to.deep.equal({
-        id: undefined,
-        name: '[admin] Chuck Norris',
+        photoId:    undefined,
+        id:         undefined,
+        name:       '[admin] Chuck Norris',
         disabledAt: '3500-01-01',
-        disabled: true,
-        status: 'success',
-        area: 'Universe'
+        disabled:   true,
+        status:     'success',
+        area:       'Universe'
       })
     })
 

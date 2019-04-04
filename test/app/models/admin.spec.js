@@ -18,15 +18,15 @@ describe('Admin', () => {
   describe('relations', () => {
     const $relations = Admin.$relations
 
-    it('has many auditing_purchases', () => {
-      expect($relations.auditing_purchases).to.have.property('type', 'hasMany')
+    it('has many auditingPurchases', () => {
+      expect($relations.auditingPurchases).to.have.property('type', 'hasMany')
 
       let yesterday = moment.utc().subtract(1, 'day').format('YYYY-MM-DD')
-      let admin = new Admin({ auditing_purchases: [{ id: 11, createdAt: yesterday }] })
+      let admin = new Admin({ auditingPurchases: [{ id: 11, createdAt: yesterday }] })
 
-      expect(admin.auditing_purchases[0]).to.be.instanceof($models.Purchase)
-      expect(admin.$get('auditing_purchases[0].id')).to.equal(11)
-      expect(admin.$get('auditing_purchases[0].createdAt')).to.equal(yesterday)
+      expect(admin.auditingPurchases[0]).to.be.instanceof($models.Purchase)
+      expect(admin.$get('auditingPurchases[0].id')).to.equal(11)
+      expect(admin.$get('auditingPurchases[0].createdAt')).to.equal(yesterday)
     })
 
     it('belongs to createdBy (Admin)', () => {

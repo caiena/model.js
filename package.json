@@ -2,9 +2,9 @@
   "name": "@caiena/model",
   "version": "0.1.0",
   "description": "Model structure to control your data",
-  "main": "dist/model.cjs.js",
-  "module": "dist/model.esm.js",
-  "browser": "dist/model.umd.js",
+  "main": "dist/model.esm.js",
+  "//module": "dist/model.esm.js",
+  "//browser": "dist/model.umd.js",
   "dependencies": {
     "@caiena/enum": "ssh://git@github.com:ppdeassis/enum.js.git",
     "@caiena/i18n": "ssh://git@github.com:ppdeassis/i18n.js.git",

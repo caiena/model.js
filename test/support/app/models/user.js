@@ -5,19 +5,6 @@ import Purchase from './purchase'
 
 
 class User extends Model {
-  static get attrs() {
-    return ['id', 'name', 'status', 'disabledAt']
-  }
-
-  static get virtuals() {
-    return ['disabled']
-  }
-
-  static get enums() {
-    return {
-      status: { failure: -1, scheduled: 0, success: 1 }
-    }
-  }
 
   static get relations() {
     return {
@@ -27,6 +14,31 @@ class User extends Model {
     }
   }
 
+  static get enums() {
+    return {
+      status: { failure: -1, scheduled: 0, success: 1 }
+    }
+  }
+
+  static get attrs() {
+    return [
+      // fks
+      'photoId',
+
+      // enums
+      'status',
+
+      // attrs
+      'id',
+      'name',
+      'disabledAt'
+    ]
+  }
+
+  static get virtuals() {
+    return ['disabled']
+  }
+
   static get constraints() {
     return {
       name:   { presence: true },
@@ -34,6 +46,9 @@ class User extends Model {
     }
   }
 
+
+  // methods
+  // ----
   get disabled() {
     return _.present(this.disabledAt)
   }
