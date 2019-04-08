@@ -4,8 +4,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-require('core-js/modules/es6.date.to-json');
 var _ = _interopDefault(require('@caiena/lodash-ext'));
+require('core-js/modules/es6.date.to-json');
 require('core-js/modules/es6.array.sort');
 require('core-js/modules/es6.string.starts-with');
 require('core-js/modules/es7.array.includes');
@@ -80,6 +80,40 @@ function _createClass(Constructor, protoProps, staticProps) {
   return Constructor;
 }
 
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+
+function _objectSpread(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i] != null ? arguments[i] : {};
+    var ownKeys = Object.keys(source);
+
+    if (typeof Object.getOwnPropertySymbols === 'function') {
+      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+      }));
+    }
+
+    ownKeys.forEach(function (key) {
+      _defineProperty(target, key, source[key]);
+    });
+  }
+
+  return target;
+}
+
 function _inherits(subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
     throw new TypeError("Super expression must either be null or a function");
@@ -125,6 +159,36 @@ function _possibleConstructorReturn(self, call) {
   }
 
   return _assertThisInitialized(self);
+}
+
+function _superPropBase(object, property) {
+  while (!Object.prototype.hasOwnProperty.call(object, property)) {
+    object = _getPrototypeOf(object);
+    if (object === null) break;
+  }
+
+  return object;
+}
+
+function _get(target, property, receiver) {
+  if (typeof Reflect !== "undefined" && Reflect.get) {
+    _get = Reflect.get;
+  } else {
+    _get = function _get(target, property, receiver) {
+      var base = _superPropBase(target, property);
+
+      if (!base) return;
+      var desc = Object.getOwnPropertyDescriptor(base, property);
+
+      if (desc.get) {
+        return desc.get.call(receiver);
+      }
+
+      return desc.value;
+    };
+  }
+
+  return _get(target, property, receiver || target);
 }
 
 function defineInternalProp(obj, prop, value) {
@@ -859,6 +923,33 @@ Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Mo
       return this.toJSON.apply(this, arguments);
     } }]);return Model;}(mixin(Base, [Attributable, Relatable, Translatable, Validatable]));
 
+function Decorator(ModelClass) {var
+
+  DecoratedClass = /*#__PURE__*/function (_ModelClass) {_inherits(DecoratedClass, _ModelClass);_createClass(DecoratedClass, null, [{ key: "$modelClass", get: function get$$1()
+      {return ModelClass;} }]);
+
+    function DecoratedClass(object) {_classCallCheck(this, DecoratedClass);
+      var _object = object instanceof Model ? object : new ModelClass(object);
+
+      // sanity check
+      if (_object.hasOwnProperty('$object')) {
+        throw new Error('Decorated object cannot have a property named "$object"');
+      }return _possibleConstructorReturn(this, _getPrototypeOf(DecoratedClass).call(this, _objectSpread({
+
+        $object: _object }, _object.$props)));
+    }
+
+    // hook to define $object before constructing the model instance
+    _createClass(DecoratedClass, [{ key: "$beforeInit", value: function $beforeInit(props, opts) {
+        this.$object = props.$object;
+
+        _get(_getPrototypeOf(DecoratedClass.prototype), "$beforeInit", this).call(this, props, opts);
+      } }]);return DecoratedClass;}(ModelClass);
+
+
+  return DecoratedClass;
+}
+
 var _contents_errorsEnUS = { "en-US": { errors: { date: "must be a valid date", datetime: "must be a valid date", email: "is not a valid e-mail", equality: "is not equal to %{attribute}", exclusion: "%{value} is restricted", format: "is invalid", inclusion: "%{value} is not included in the list", length: "has incorrect length", numericality: "must be a valid number", presence: "can't be blank", url: "is not a valid URL" } } };var _contents_errorsPtBR = { "pt-BR": { errors: { date: "n\xE3o \xE9 uma data v\xE1lida", datetime: "n\xE3o \xE9 uma data v\xE1lida", email: "n\xE3o \xE9 um e-mail v\xE1lido", equality: "n\xE3o \xE9 igual a %{attribute}", exclusion: "%{value} n\xE3o \xE9 permitido", format: "n\xE3o \xE9 v\xE1lido", inclusion: "%{value} n\xE3o est\xE1 inclu\xEDdo na lista", length: "tem tamanho incorreto", numericality: "n\xE3o \xE9 um n\xFAmero v\xE1lido", presence: "n\xE3o pode ficar em branco", url: "n\xE3o \xE9 uma URL v\xE1lida" } } };var contents = { errorsEnUS: _contents_errorsEnUS, errorsPtBR: _contents_errorsPtBR };Object.freeze(contents);
 
 
@@ -868,7 +959,8 @@ _.each(contents, function (content, _id) {
   _.merge(translations, content);
 });
 
-exports.Model = Model;
+exports.Decorator = Decorator;
 exports.mixin = mixin;
+exports.Model = Model;
 exports.translations = translations;
 //# sourceMappingURL=model.cjs.js.map
