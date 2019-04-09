@@ -8,6 +8,9 @@ import Validatable           from './mixins/validatable'
 
 
 class Base {
+  static get $modelNameAdapter() { return _.camelize }
+  static get $modelName()        { return this.$modelNameAdapter(this.name) }
+
   static get attrs()     { return [] }
   static get enums()     { return {} }
   static get virtuals()  { return [] }

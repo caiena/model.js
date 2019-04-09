@@ -3,21 +3,21 @@
 pt-BR:
   models:
     purchase:
-      zero: Pedido
-      one: Pedido
+      zero:  Pedido
+      one:   Pedido
       other: Pedidos
 
       attributes:
-        id: ID
-        status: Situação
-        createdAt: Recebido em
-        approvedAt: Aprovado em
-        shippedAt: Enviado em
+        id:          ID
+        status:      Situação
+        createdAt:   Recebido em
+        approvedAt:  Aprovado em
+        shippedAt:   Enviado em
         deliveredAt: Entregue em
 
       enums:
         status:
-          received: Recebido
-          approved: Aprovado
-          shipped: Enviado
+          received:  Recebido
+          approved:  Aprovado
+          shipped:   Enviado
           delivered: Recebido

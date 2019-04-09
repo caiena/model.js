@@ -18257,6 +18257,23 @@
     }
   });
 
+  var dP$1 = _objectDp.f;
+  var FProto = Function.prototype;
+  var nameRE = /^\s*function ([^ (]*)/;
+  var NAME = 'name';
+
+  // 19.2.4.2 name
+  NAME in FProto || _descriptors && dP$1(FProto, NAME, {
+    configurable: true,
+    get: function () {
+      try {
+        return ('' + this).match(nameRE)[1];
+      } catch (e) {
+        return '';
+      }
+    }
+  });
+
   var _strictMethod = function (method, arg) {
     return !!method && _fails(function () {
       // eslint-disable-next-line no-useless-call
@@ -18344,23 +18361,6 @@
   function mixin(Class, mixins) {
     return mixins.reduce(function (MixedClass, Mixin) {return Mixin(MixedClass);}, Class);
   }
-
-  var dP$1 = _objectDp.f;
-  var FProto = Function.prototype;
-  var nameRE = /^\s*function ([^ (]*)/;
-  var NAME = 'name';
-
-  // 19.2.4.2 name
-  NAME in FProto || _descriptors && dP$1(FProto, NAME, {
-    configurable: true,
-    get: function () {
-      try {
-        return ('' + this).match(nameRE)[1];
-      } catch (e) {
-        return '';
-      }
-    }
-  });
 
   var shared = _shared('keys');
 
@@ -20481,7 +20481,7 @@
         //  // use $l('date', attrName)
         //  // or  $l('time', attrName)
         // }
-      }, { key: "i18nScope", get: function get() {return "models.".concat(lodashExt.underscore(this.name));} }]);return TranslatableClass;}(Class);
+      }, { key: "i18nScope", get: function get() {return "models.".concat(this.$modelName);} }]);return TranslatableClass;}(Class);
 
     return TranslatableClass;
   }
@@ -28078,9 +28078,12 @@
 
 
 
+
+
+
       name) {
         throw new Error('Model.$lookupModel(name) is not implemented.');
-      } }, { key: "attrs", get: function get() {return [];} }, { key: "enums", get: function get() {return {};} }, { key: "virtuals", get: function get() {return [];} }]);return Base;}();var
+      } }, { key: "$modelNameAdapter", get: function get() {return lodashExt.camelize;} }, { key: "$modelName", get: function get() {return this.$modelNameAdapter(this.name);} }, { key: "attrs", get: function get() {return [];} }, { key: "enums", get: function get() {return {};} }, { key: "virtuals", get: function get() {return [];} }]);return Base;}();var
 
 
   Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Model, null, [{ key: "$$model", get: function get()

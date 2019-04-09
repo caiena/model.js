@@ -3,19 +3,19 @@
 en-US:
   models:
     admin:
-      zero: Administrator
-      one: Administrator
+      zero:  Administrator
+      one:   Administrator
       other: Administrators
 
       attributes:
-        id: ID
-        name: Name
-        area: Area
-        status: Status
+        id:         ID
+        name:       Name
+        area:       Area
+        status:     Status
         disabledAt: Disabled at
 
       enums:
         status:
-          failure: Failure
+          failure:   Failure
           scheduled: Scheduled
-          success: Complete
+          success:   Complete

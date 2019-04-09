@@ -1,10 +1,10 @@
 import _ from '@caiena/lodash-ext';
 import 'core-js/modules/es6.date.to-json';
+import 'core-js/modules/es6.function.name';
 import 'core-js/modules/es6.array.sort';
 import 'core-js/modules/es6.string.starts-with';
 import 'core-js/modules/es7.array.includes';
 import 'core-js/modules/es6.string.includes';
-import 'core-js/modules/es6.function.name';
 import Enum from '@caiena/enum';
 import { i18n } from '@caiena/i18n';
 import 'core-js/modules/es6.promise';
@@ -662,7 +662,7 @@ function Translatable(Class) {var
       //  // use $l('date', attrName)
       //  // or  $l('time', attrName)
       // }
-    }, { key: "i18nScope", get: function get() {return "models.".concat(_.underscore(this.name));} }]);return TranslatableClass;}(Class);
+    }, { key: "i18nScope", get: function get() {return "models.".concat(this.$modelName);} }]);return TranslatableClass;}(Class);
 
   return TranslatableClass;
 }
@@ -836,9 +836,12 @@ Base = /*#__PURE__*/function () {function Base() {_classCallCheck(this, Base);}_
 
 
 
+
+
+
     name) {
       throw new Error('Model.$lookupModel(name) is not implemented.');
-    } }, { key: "attrs", get: function get() {return [];} }, { key: "enums", get: function get() {return {};} }, { key: "virtuals", get: function get() {return [];} }]);return Base;}();var
+    } }, { key: "$modelNameAdapter", get: function get() {return _.camelize;} }, { key: "$modelName", get: function get() {return this.$modelNameAdapter(this.name);} }, { key: "attrs", get: function get() {return [];} }, { key: "enums", get: function get() {return {};} }, { key: "virtuals", get: function get() {return [];} }]);return Base;}();var
 
 
 Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Model, null, [{ key: "$$model", get: function get()

@@ -3,19 +3,19 @@
 pt-BR:
   models:
     admin:
-      zero: Administrador
-      one: Administrador
+      zero:  Administrador
+      one:   Administrador
       other: Administradores
 
       attributes:
-        id: ID
-        name: Nome
-        area: Área
-        status: Situação
+        id:         ID
+        name:       Nome
+        area:       Área
+        status:     Situação
         disabledAt: Desabilitado em
 
       enums:
         status:
-          failure: Falha
+          failure:   Falha
           scheduled: Agendado
-          success: Concluído
+          success:   Concluído

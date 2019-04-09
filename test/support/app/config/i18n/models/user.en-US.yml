@@ -3,18 +3,18 @@
 en-US:
   models:
     user:
-      zero: User
-      one: User
+      zero:  User
+      one:   User
       other: Users
 
       attributes:
-        id: ID
-        name: Name
-        status: Status
+        id:         ID
+        name:       Name
+        status:     Status
         disabledAt: Disabled at
 
       enums:
         status:
-          failure: Failure
+          failure:   Failure
           scheduled: Scheduled
-          success: Complete
+          success:   Complete

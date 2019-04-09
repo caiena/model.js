@@ -5,7 +5,7 @@ import { i18n } from '@caiena/i18n'
 function Translatable(Class) {
   class TranslatableClass extends Class {
     static get i18nScope() {
-      return `models.${_.underscore(this.name)}`
+      return `models.${this.$modelName}`
     }
 
     static $tModelName({ count = 1 } = {}) {
