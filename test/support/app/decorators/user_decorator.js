@@ -1,8 +1,7 @@
-import _ from '@caiena/lodash-ext'
+import _         from '@caiena/lodash-ext'
 import mixin     from '../../../../src/mixin'
-// import Model from '../../../../src/model'
 import Decorator from '../../../../src/mixins/decorator'
-import User from '../models/user'
+import User      from '../models/user'
 
 
 class UserDecorator extends mixin(User, [Decorator]) {

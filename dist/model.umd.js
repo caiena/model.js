@@ -20443,6 +20443,16 @@
   FixLocalize,
   Init]);
 
+  var _contents_coreEnUS = { "en-US": { date: { abbr_day_names: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], abbr_month_names: [null, "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], day_names: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], formats: { "default": "%m/%d/%Y", normal: "%b %d, %Y", long: "%B %d, %Y", short: "%b %d, %Y", iso: "%Y-%m-%d", week: "%A" }, month_names: [null, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], order: [":month", ":day", ":year"] }, number: { currency: { format: { delimiter: ",", format: "%u%n", precision: 2, separator: ".", significant: false, strip_insignificant_zeros: false, unit: "$" } }, format: { delimiter: ",", precision: 3, separator: ".", significant: false, strip_insignificant_zeros: false }, human: { decimal_units: { format: "%n %u", units: { billion: "Billion", million: "Million", quadrillion: "Quadrillion", thousand: "Thousand", trillion: "Trillion", unit: "" } }, format: { delimiter: "", precision: 3, significant: true, strip_insignificant_zeros: true }, storage_units: { format: "%n %u", units: { byte: { one: "Byte", other: "Bytes" }, gb: "GB", kb: "KB", mb: "MB", tb: "TB" } } }, percentage: { format: { delimiter: "", format: "%n%" } }, precision: { format: { delimiter: "" } } }, support: { array: { last_word_connector: " and ", two_words_connector: " and ", words_connector: ", " } }, time: { am: "AM", formats: { "default": "%b %d, %Y %I:%M %p", simple: "%b %d %I:%M %p", long: "%B %d, %Y %I:%M %p", short: "%I:%M %p", iso: "%Y-%m-%dT%H:%M:%S%z" }, pm: "PM" } } };var _contents_corePtBR = { "pt-BR": { date: { abbr_day_names: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "S\xE1b"], abbr_month_names: [null, "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"], day_names: ["Domingo", "Segunda-feira", "Ter\xE7a-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "S\xE1bado"], formats: { "default": "%d/%m/%Y", normal: "%d de %b de %Y", long: "%d de %B de %Y", short: "%d de %b", iso: "%Y-%m-%d", week: "%A" }, month_names: [null, "Janeiro", "Fevereiro", "Mar\xE7o", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"], order: [":day", ":month", ":year"] }, number: { currency: { format: { delimiter: ".", format: "%u %n", precision: 2, separator: ",", significant: false, strip_insignificant_zeros: false, unit: "R$" } }, format: { delimiter: ".", precision: 3, separator: ",", significant: false, strip_insignificant_zeros: false }, human: { decimal_units: { format: "%n %u", units: { billion: { one: "bilh\xE3o", other: "bilh\xF5es" }, million: { one: "milh\xE3o", other: "milh\xF5es" }, quadrillion: { one: "quatrilh\xE3o", other: "quatrilh\xF5es" }, thousand: "mil", trillion: { one: "trilh\xE3o", other: "trilh\xF5es" }, unit: "" } }, format: { delimiter: "", precision: 3, significant: true, strip_insignificant_zeros: true }, storage_units: { format: "%n %u", units: { byte: { one: "Byte", other: "Bytes" }, gb: "GB", kb: "KB", mb: "MB", tb: "TB" } } }, percentage: { format: { delimiter: ".", format: "%n%u", precision: 2, separator: ",", unit: "%" } } }, support: { array: { last_word_connector: " e ", two_words_connector: " e ", words_connector: ", " } }, time: { am: "", formats: { "default": "%a, %d de %B de %Y \xE0s %H:%M:%S", simple: "%d de %B de %Y \xE0s %H:%M", long: "%d de %B de %Y \xE0s %H:%M", short: "%H:%M", iso: "%Y-%m-%dT%H:%M:%S%z" }, pm: "" } } };var contents = { coreEnUS: _contents_coreEnUS, corePtBR: _contents_corePtBR };Object.freeze(contents);var namespacedContents = {};Object.freeze(namespacedContents);
+
+
+
+
+  var translations = {};
+
+  lodashExt.each(contents, function (content, _id) {lodashExt.merge(translations, content);});
+  lodashExt.each(namespacedContents, function (content, _id) {lodashExt.merge(translations, content);});
+
   function Translatable(Class) {var
     TranslatableClass = /*#__PURE__*/function (_Class) {_inherits(TranslatableClass, _Class);function TranslatableClass() {_classCallCheck(this, TranslatableClass);return _possibleConstructorReturn(this, _getPrototypeOf(TranslatableClass).apply(this, arguments));}_createClass(TranslatableClass, null, [{ key: "$tModelName", value: function $tModelName()
 
@@ -28189,19 +28199,19 @@
     return DecoratedClass;
   }
 
-  var _contents_errorsEnUS = { "en-US": { errors: { date: "must be a valid date", datetime: "must be a valid date", email: "is not a valid e-mail", equality: "is not equal to %{attribute}", exclusion: "%{value} is restricted", format: "is invalid", inclusion: "%{value} is not included in the list", length: "has incorrect length", numericality: "must be a valid number", presence: "can't be blank", url: "is not a valid URL" } } };var _contents_errorsPtBR = { "pt-BR": { errors: { date: "n\xE3o \xE9 uma data v\xE1lida", datetime: "n\xE3o \xE9 uma data v\xE1lida", email: "n\xE3o \xE9 um e-mail v\xE1lido", equality: "n\xE3o \xE9 igual a %{attribute}", exclusion: "%{value} n\xE3o \xE9 permitido", format: "n\xE3o \xE9 v\xE1lido", inclusion: "%{value} n\xE3o est\xE1 inclu\xEDdo na lista", length: "tem tamanho incorreto", numericality: "n\xE3o \xE9 um n\xFAmero v\xE1lido", presence: "n\xE3o pode ficar em branco", url: "n\xE3o \xE9 uma URL v\xE1lida" } } };var contents = { errorsEnUS: _contents_errorsEnUS, errorsPtBR: _contents_errorsPtBR };Object.freeze(contents);
+  var _contents_errorsEnUS = { "en-US": { errors: { date: "must be a valid date", datetime: "must be a valid date", email: "is not a valid e-mail", equality: "is not equal to %{attribute}", exclusion: "%{value} is restricted", format: "is invalid", inclusion: "%{value} is not included in the list", length: "has incorrect length", numericality: "must be a valid number", presence: "can't be blank", url: "is not a valid URL" } } };var _contents_errorsPtBR = { "pt-BR": { errors: { date: "n\xE3o \xE9 uma data v\xE1lida", datetime: "n\xE3o \xE9 uma data v\xE1lida", email: "n\xE3o \xE9 um e-mail v\xE1lido", equality: "n\xE3o \xE9 igual a %{attribute}", exclusion: "%{value} n\xE3o \xE9 permitido", format: "n\xE3o \xE9 v\xE1lido", inclusion: "%{value} n\xE3o est\xE1 inclu\xEDdo na lista", length: "tem tamanho incorreto", numericality: "n\xE3o \xE9 um n\xFAmero v\xE1lido", presence: "n\xE3o pode ficar em branco", url: "n\xE3o \xE9 uma URL v\xE1lida" } } };var contents$1 = { errorsEnUS: _contents_errorsEnUS, errorsPtBR: _contents_errorsPtBR };Object.freeze(contents$1);
 
 
-  var translations = {};
+  var translations$1 = {};
 
-  lodashExt.each(contents, function (content, _id) {
-    lodashExt.merge(translations, content);
+  lodashExt.each(contents$1, function (content, _id) {
+    lodashExt.merge(translations$1, content);
   });
 
   exports.Decorator = Decorator;
   exports.mixin = mixin;
   exports.Model = Model;
-  exports.translations = translations;
+  exports.translations = translations$1;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
