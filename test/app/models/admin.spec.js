@@ -40,6 +40,7 @@ describe('Admin', () => {
 
   describe('attributes', () => {
     // TODO
+    const $attrs = Admin.$attrs
   })
 
   describe('validation', () => {

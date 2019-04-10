@@ -1,6 +1,7 @@
-import _     from '@caiena/lodash-ext'
-import Model from '../../../../src/model'
+import _      from '@caiena/lodash-ext'
+import moment from 'moment'
 
+import Model  from '../../../../src/model'
 import Purchase from './purchase'
 
 
@@ -31,12 +32,16 @@ class User extends Model {
       // attrs
       'id',
       'name',
+      'passwordHash',
       'disabledAt'
     ]
   }
 
   static get virtuals() {
-    return ['disabled']
+    return [
+      'disabled',
+      'password'
+    ]
   }
 
   static get constraints() {
@@ -51,6 +56,14 @@ class User extends Model {
   // ----
   get disabled() {
     return _.present(this.disabledAt)
+  }
+
+  set disabled(value) {
+    if (!!value) {
+      this.disabledAt = moment().format('YYYY-MM-DD')
+    } else {
+      this.disabledAt = null
+    }
   }
 }
 

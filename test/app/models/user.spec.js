@@ -45,14 +45,40 @@ describe('User', () => {
     })
   })
 
-  describe('attributes', () => {
-    // TODO
-  })
 
   describe('enums', () => {
+    const $enums = User.$enums
+
     it('defines "status"', () => {
-      expect(User.enums.status).to.deep.equal({ failure: -1, scheduled: 0, success: 1 })
+      expect($enums.status.all).to.deep.equal({ failure: -1, scheduled: 0, success: 1 })
     })
+  })
+
+
+  describe('attributes', () => {
+    // TODO
+    const $attrs = User.$attrs
+
+    context('fks', () => {
+      it('declares :photoId', () => { expect($attrs).to.include('photoId') })
+    })
+
+    context('enums', () => {
+      it('declares :status', () => { expect($attrs).to.include('status') })
+    })
+
+    it('declares :id',           () => { expect($attrs).to.include('id') })
+    it('declares :name',         () => { expect($attrs).to.include('name') })
+    it('declares :passwordHash', () => { expect($attrs).to.include('passwordHash') })
+    it('declares :disabledAt',   () => { expect($attrs).to.include('disabledAt') })
+  })
+
+
+  describe('virtuals', () => {
+    const $virtuals = User.$virtuals
+
+    it('declares :disabled', () => { expect($virtuals).to.include('disabled') })
+    it('declares :password', () => { expect($virtuals).to.include('password') })
   })
 
 

@@ -300,7 +300,22 @@ function Attributable(Class) {var
         }
 
         return this.$$attrs;
+      }
+
+
+      // lazy evaluated $virtuals
+      // for now we're only keeping the API consistent, adding a '$methodName' getter
+      // TODO: define types and create "intelligent" setters? (with constraints)
+    }, { key: "$virtuals", get: function get() {
+        // avoiding static property inheritance
+        // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
+        if (!this.hasOwnProperty('$$virtuals')) {
+          this.$$virtuals = _.clone(this.virtuals);
+        }
+
+        return this.$$virtuals;
       } }]);
+
 
     function AttributableClass() {var _getPrototypeOf2;var _this;_classCallCheck(this, AttributableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
       _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(AttributableClass)).call.apply(_getPrototypeOf2, [this].concat(args)));

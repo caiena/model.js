@@ -70,7 +70,7 @@ describe('model', () => {
 
   describe('extending', () => {
     it('allows model classes to extend others', async () => {
-      let admin = new Admin({ name: 'Chuck Norris'})
+      let admin = new Admin({ name: 'Chuck Norris' })
 
       // default value with $afterInit() method
       expect(admin.status).to.equal('success')
@@ -91,13 +91,14 @@ describe('model', () => {
       expect(admin.disabled).to.be.true
 
       expect(admin.toJSON({ virtuals: true, undefs: true })).to.deep.equal({
-        photoId:    undefined,
-        id:         undefined,
-        name:       '[admin] Chuck Norris',
-        disabledAt: '3500-01-01',
-        disabled:   true,
-        status:     'success',
-        area:       'Universe'
+        photoId:      undefined,
+        id:           undefined,
+        name:         '[admin] Chuck Norris',
+        disabledAt:   '3500-01-01',
+        disabled:     true,
+        passwordHash: undefined,
+        status:       'success',
+        area:         'Universe'
       })
     })
 
