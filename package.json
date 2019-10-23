@@ -6,8 +6,8 @@
   "module": "dist/model.esm.js",
   "browser": "dist/model.umd.js",
   "dependencies": {
-    "@caiena/enum": "ssh://git@github.com:ppdeassis/enum.js.git",
-    "@caiena/i18n": "ssh://git@github.com:ppdeassis/i18n.js.git",
+    "@caiena/enum": "ssh://git@github.com:caiena/enum.js.git",
+    "@caiena/i18n": "ssh://git@github.com:caiena/i18n.js.git",
     "@caiena/lodash-ext": "^0.4.0",
     "moment": "^2.24.0",
     "validate.js": "^0.12.0"
