@@ -16,3 +16,4 @@ en-US:
     numericality: must be a valid number
     presence:     can't be blank
     url:          is not a valid URL
+    type:         has incorrect type

@@ -16,3 +16,4 @@ pt-BR:
     numericality: não é um número válido
     presence:     não pode ficar em branco
     url:          não é uma URL válida
+    type:         não é do tipo correto
