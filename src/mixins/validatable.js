@@ -88,6 +88,16 @@ function Validatable(Class) {
       return this.$$errors
     }
 
+    static get $constraints() {
+      // avoiding static property inheritance
+      // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
+      if (!this.hasOwnProperty('$$constraints')) {
+        this.$$constraints = _.clone(this.constraints)
+      }
+
+      return this.$$constraints
+    }
+
     async $validate() {
       let constraints = this.constructor.constraints
       let instance = this

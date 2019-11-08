@@ -46,7 +46,7 @@ class User extends Model {
 
   static get constraints() {
     return {
-      name:   { presence: true },
+      name:   { presence: true, type: 'string' },
       status: { inclusion: this.$enums.status.keys }
     }
   }

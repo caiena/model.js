@@ -83,7 +83,41 @@ describe('User', () => {
 
 
   describe('validation', () => {
-    // TODO
+    const $constraints = User.$constraints
+
+    context('name', () => {
+      it('validates its presence', async () => {
+        expect($constraints.name).to.have.property('presence', true)
+
+        let user = new User({ name: null })
+        expect(await user.$validate()).to.be.false
+        expect(user.$errors).to.have.property('name')
+        expect(user.$errors.name[0]).to.have.property('code', 'presence')
+        expect(user.$errors.name).to.containSubset([{
+          message: "não pode ficar em branco"
+        }])
+
+        user.name = 'John Wick'
+        expect(await user.$validate()).to.be.true
+        expect(user.$errors).to.be.empty
+      })
+
+      it('validates its type as "string"', async () => {
+        expect($constraints.name).to.have.property('type', 'string')
+
+        let user = new User({ name: true })
+        expect(await user.$validate()).to.be.false
+        expect(user.$errors).to.have.property('name')
+        expect(user.$errors.name[0]).to.have.property('code', 'type')
+        expect(user.$errors.name).to.containSubset([{
+          message: "não é do tipo correto"
+        }])
+
+        user.name = 'John Wick'
+        expect(await user.$validate()).to.be.true
+        expect(user.$errors).to.be.empty
+      })
+    })
   })
 
 
