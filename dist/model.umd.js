@@ -18978,20 +18978,6 @@
           }
 
           return this.$$virtuals;
-        }
-
-
-        // lazy evaluated $constraints
-        // for now we're only keeping the API consistent, adding a '$methodName' getter
-        // TODO: define types and create "intelligent" setters? (with constraints)
-      }, { key: "$constraints", get: function get() {
-          // avoiding static property inheritance
-          // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
-          if (!this.hasOwnProperty('$$constraints')) {
-            this.$$constraints = lodashExt.clone(this.constraints);
-          }
-
-          return this.$$constraints;
         } }]);
 
 
@@ -28137,6 +28123,16 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
                     constraints = this.constructor.constraints;
                     instance = this;
 
@@ -28169,9 +28165,9 @@
                           resolve(false);
                         }
                       });
-                    }));case 3:case "end":return _context.stop();}}}, _callee, this);}));function $validate() {return _$validate.apply(this, arguments);}return $validate;}() }, { key: "$errors", get: function get() {return this.$$errors;} }]);return ValidatableClass;}(Class);
-
-
+                    }));case 3:case "end":return _context.stop();}}}, _callee, this);}));function $validate() {return _$validate.apply(this, arguments);}return $validate;}() }, { key: "$errors", get: function get() {return this.$$errors;} }], [{ key: "$constraints", get: function get() {// avoiding static property inheritance
+          // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
+          if (!this.hasOwnProperty('$$constraints')) {this.$$constraints = lodashExt.clone(this.constraints);}return this.$$constraints;} }]);return ValidatableClass;}(Class);
 
     return ValidatableClass;
   }

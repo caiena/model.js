@@ -89,20 +89,6 @@ function Attributable(Class) {
     }
 
 
-    // lazy evaluated $constraints
-    // for now we're only keeping the API consistent, adding a '$methodName' getter
-    // TODO: define types and create "intelligent" setters? (with constraints)
-    static get $constraints() {
-      // avoiding static property inheritance
-      // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
-      if (!this.hasOwnProperty('$$constraints')) {
-        this.$$constraints = _.clone(this.constraints)
-      }
-
-      return this.$$constraints
-    }
-
-
     constructor(...args) {
       super(...args)
 
