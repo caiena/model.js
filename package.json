@@ -10,7 +10,7 @@
     "@caiena/i18n": "ssh://git@github.com:caiena/i18n.js.git",
     "@caiena/lodash-ext": "^0.4.0",
     "moment": "^2.24.0",
-    "validate.js": "^0.12.0"
+    "validate.js": "^0.13.1"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
