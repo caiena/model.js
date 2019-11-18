@@ -1,56 +1,31 @@
 import _ from '@caiena/lodash-ext';
-import 'core-js/modules/es6.date.to-json';
-import 'core-js/modules/es6.function.name';
-import 'core-js/modules/es6.array.sort';
-import 'core-js/modules/es6.string.starts-with';
-import 'core-js/modules/es7.array.includes';
-import 'core-js/modules/es6.string.includes';
+import 'core-js/modules/es.date.to-json';
+import 'core-js/modules/es.function.name';
+import 'core-js/modules/web.url.to-json';
+import 'core-js/modules/es.array.concat';
+import 'core-js/modules/es.array.filter';
+import 'core-js/modules/es.array.includes';
+import 'core-js/modules/es.array.sort';
+import 'core-js/modules/es.object.get-own-property-descriptor';
+import 'core-js/modules/es.object.get-own-property-names';
+import 'core-js/modules/es.object.get-prototype-of';
+import 'core-js/modules/es.string.includes';
+import 'core-js/modules/es.string.starts-with';
 import Enum from '@caiena/enum';
+import 'core-js/modules/es.array.map';
 import { i18n } from '@caiena/i18n';
-import 'core-js/modules/es6.promise';
+import 'core-js/modules/es.symbol';
+import 'core-js/modules/es.symbol.description';
+import 'core-js/modules/es.symbol.iterator';
+import 'core-js/modules/es.array.iterator';
+import 'core-js/modules/es.object.to-string';
+import 'core-js/modules/es.promise';
+import 'core-js/modules/es.string.iterator';
+import 'core-js/modules/web.dom-collections.iterator';
 import 'regenerator-runtime/runtime';
-import 'core-js/modules/es7.symbol.async-iterator';
-import 'core-js/modules/es6.symbol';
-import 'core-js/modules/web.dom.iterable';
 import validate from 'validate.js';
 import moment from 'moment';
-import 'core-js/modules/es6.object.freeze';
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
-  try {
-    var info = gen[key](arg);
-    var value = info.value;
-  } catch (error) {
-    reject(error);
-    return;
-  }
-
-  if (info.done) {
-    resolve(value);
-  } else {
-    Promise.resolve(value).then(_next, _throw);
-  }
-}
-
-function _asyncToGenerator(fn) {
-  return function () {
-    var self = this,
-        args = arguments;
-    return new Promise(function (resolve, reject) {
-      var gen = fn.apply(self, args);
-
-      function _next(value) {
-        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
-      }
-
-      function _throw(err) {
-        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
-      }
-
-      _next(undefined);
-    });
-  };
-}
+import 'core-js/modules/es.object.freeze';
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -322,7 +297,7 @@ function Attributable(Class) {var
 
       var klass = _this.constructor;
 
-      defineInternalProp(_assertThisInitialized(_assertThisInitialized(_this)), '$$attrs', {});
+      defineInternalProp(_assertThisInitialized(_this), '$$attrs', {});
 
       // handling enums first then attrs, avoiding overrides
       // defining enums get/set properties
@@ -338,11 +313,11 @@ function Attributable(Class) {var
         if (!_this.hasOwnProperty(enumName)) {
           // first, check if it is defined in prototype
           if (_this.constructor.prototype.hasOwnProperty(enumName)) {
-            var _proto = Object.getPrototypeOf(_assertThisInitialized(_assertThisInitialized(_this)));
+            var _proto = Object.getPrototypeOf(_assertThisInitialized(_this));
             var _descr = Object.getOwnPropertyDescriptor(_proto, enumName);
-            defineEnum(_assertThisInitialized(_assertThisInitialized(_this)), enumName, { get: _descr.get, set: _descr.set });
+            defineEnum(_assertThisInitialized(_this), enumName, { get: _descr.get, set: _descr.set });
           } else {
-            defineEnum(_assertThisInitialized(_assertThisInitialized(_this)), enumName);
+            defineEnum(_assertThisInitialized(_this), enumName);
           }
         }
       });
@@ -354,11 +329,11 @@ function Attributable(Class) {var
         if (!_this.hasOwnProperty(attrName)) {
           // first, check if it is defined in prototype
           if (_this.constructor.prototype.hasOwnProperty(attrName)) {
-            var _proto = Object.getPrototypeOf(_assertThisInitialized(_assertThisInitialized(_this)));
+            var _proto = Object.getPrototypeOf(_assertThisInitialized(_this));
             var _descr = Object.getOwnPropertyDescriptor(_proto, attrName);
-            defineAttr(_assertThisInitialized(_assertThisInitialized(_this)), attrName, { get: _descr.get, set: _descr.set });
+            defineAttr(_assertThisInitialized(_this), attrName, { get: _descr.get, set: _descr.set });
           } else {
-            defineAttr(_assertThisInitialized(_assertThisInitialized(_this)), attrName);
+            defineAttr(_assertThisInitialized(_this), attrName);
           }
         }
       });return _this;
@@ -611,7 +586,7 @@ function Relatable(Class) {var
 
       var klass = _this.constructor;
 
-      defineInternalProp(_assertThisInitialized(_assertThisInitialized(_this)), '$$relations', {});
+      defineInternalProp(_assertThisInitialized(_this), '$$relations', {});
 
       // defining relations get/set properties
       _.each(klass.relations, function (config, relationName) {
@@ -620,11 +595,11 @@ function Relatable(Class) {var
         if (!_this.hasOwnProperty(relationName)) {
           // first, check if it is defined in prototype
           if (_this.constructor.prototype.hasOwnProperty(relationName)) {
-            var _proto = Object.getPrototypeOf(_assertThisInitialized(_assertThisInitialized(_this)));
+            var _proto = Object.getPrototypeOf(_assertThisInitialized(_this));
             var _descr = Object.getOwnPropertyDescriptor(_proto, relationName);
-            defineRelation(_assertThisInitialized(_assertThisInitialized(_this)), relationName, config, { get: _descr.get, set: _descr.set });
+            defineRelation(_assertThisInitialized(_this), relationName, config, { get: _descr.get, set: _descr.set });
           } else {
-            defineRelation(_assertThisInitialized(_assertThisInitialized(_this)), relationName, config);
+            defineRelation(_assertThisInitialized(_this), relationName, config);
           }
         }
       });return _this;
@@ -718,8 +693,6 @@ function presence(value, options, key, attrs) {
 
 validate.validators.presence = presence;
 
-// register all custom validators
-
 // custom error formatter, creating a code/values interpolation scheme with i18n
 // @see http://validatejs.org/#validate-error-formatting
 function transformErrors(i18nScope, errors) {
@@ -796,8 +769,8 @@ function Validatable(Class) {var
 
     function ValidatableClass() {var _getPrototypeOf2;var _this;_classCallCheck(this, ValidatableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
       _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(ValidatableClass)).call.apply(_getPrototypeOf2, [this].concat(args)));
-      defineInternalProp(_assertThisInitialized(_assertThisInitialized(_this)), '$$errors', {});return _this;
-    }_createClass(ValidatableClass, [{ key: "$validate", value: function () {var _$validate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {var _this2 = this;var constraints, instance;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:
+      defineInternalProp(_assertThisInitialized(_this), '$$errors', {});return _this;
+    }_createClass(ValidatableClass, [{ key: "$validate", value: function $validate() {var _this2 = this;var constraints, instance;return regeneratorRuntime.async(function $validate$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:
 
 
 
@@ -814,39 +787,39 @@ function Validatable(Class) {var
 
 
 
-                  constraints = this.constructor.constraints;
-                  instance = this;
+                constraints = this.constructor.constraints;
+                instance = this;
 
-                  // adapting api to .then(success, error) to .then(success).catch(error)
-                  return _context.abrupt("return", new Promise(function (resolve, reject) {
-                    // - cleanAttributes: false - to tell validatejs not to delete empty or without constraint attributes
-                    // @see https://validatejs.org/#validate-async
-                    //   > Besides accepting all options as the non async validation function it also accepts
-                    //   > two additional options; cleanAttributes which, unless false, makes validate.async
-                    //   > call validate.cleanAttributes before resolving the promise (...)
-                    // @see https://validatejs.org/#utilities-clean-attributes
-                    validate.async(_this2, constraints, { format: 'detailed', cleanAttributes: false }).
-                    then(
-                    function success(attributes) {
+                // adapting api to .then(success, error) to .then(success).catch(error)
+                return _context.abrupt("return", new Promise(function (resolve, reject) {
+                  // - cleanAttributes: false - to tell validatejs not to delete empty or without constraint attributes
+                  // @see https://validatejs.org/#validate-async
+                  //   > Besides accepting all options as the non async validation function it also accepts
+                  //   > two additional options; cleanAttributes which, unless false, makes validate.async
+                  //   > call validate.cleanAttributes before resolving the promise (...)
+                  // @see https://validatejs.org/#utilities-clean-attributes
+                  validate.async(_this2, constraints, { format: 'detailed', cleanAttributes: false }).
+                  then(
+                  function success(attributes) {
+                    // reset errors
+                    instance.$$errors = {};
+                    resolve(true);
+                  },
+
+                  function error(errors) {
+                    if (errors instanceof Error) {
+                      // runtime Error. Just throw it
                       // reset errors
                       instance.$$errors = {};
-                      resolve(true);
-                    },
-
-                    function error(errors) {
-                      if (errors instanceof Error) {
-                        // runtime Error. Just throw it
-                        // reset errors
-                        instance.$$errors = {};
-                        reject(errors);
-                      } else {
-                        // validation error.
-                        // assign to $errors
-                        instance.$$errors = transformErrors(instance.constructor.i18nScope, errors);
-                        resolve(false);
-                      }
-                    });
-                  }));case 3:case "end":return _context.stop();}}}, _callee, this);}));function $validate() {return _$validate.apply(this, arguments);}return $validate;}() }, { key: "$errors", get: function get() {return this.$$errors;} }], [{ key: "$constraints", get: function get() {// avoiding static property inheritance
+                      reject(errors);
+                    } else {
+                      // validation error.
+                      // assign to $errors
+                      instance.$$errors = transformErrors(instance.constructor.i18nScope, errors);
+                      resolve(false);
+                    }
+                  });
+                }));case 3:case "end":return _context.stop();}}}, null, this);} }, { key: "$errors", get: function get() {return this.$$errors;} }], [{ key: "$constraints", get: function get() {// avoiding static property inheritance
         // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
         if (!this.hasOwnProperty('$$constraints')) {this.$$constraints = _.clone(this.constraints);}return this.$$constraints;} }]);return ValidatableClass;}(Class);
 
@@ -879,7 +852,7 @@ Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Mo
 
     (_this2 = _this).$beforeInit.apply(_this2, arguments); // hook for user land
 
-    var propNames = writablePropNames(_assertThisInitialized(_assertThisInitialized(_this)));
+    var propNames = writablePropNames(_assertThisInitialized(_this));
     var sanitizedProps = _.pick(props, propNames);
 
     if (undefs) {
@@ -947,7 +920,7 @@ Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Mo
 
 function Decorator(ModelClass) {var
 
-  DecoratedClass = /*#__PURE__*/function (_ModelClass) {_inherits(DecoratedClass, _ModelClass);_createClass(DecoratedClass, null, [{ key: "$modelClass", get: function get$$1()
+  DecoratedClass = /*#__PURE__*/function (_ModelClass) {_inherits(DecoratedClass, _ModelClass);_createClass(DecoratedClass, null, [{ key: "$modelClass", get: function get()
       {return ModelClass;} }]);
 
     function DecoratedClass(object) {_classCallCheck(this, DecoratedClass);
@@ -981,5 +954,4 @@ _.each(contents, function (content, _id) {
   _.merge(translations, content);
 });
 
-export { Decorator, mixin, Model, translations };
-//# sourceMappingURL=model.esm.js.map
+export { Decorator, Model, mixin, translations };

@@ -3,7 +3,7 @@ import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import babel from 'rollup-plugin-babel'
 import glob from 'rollup-plugin-glob-import'
-import yaml from 'rollup-plugin-yaml'
+import yaml from '@rollup/plugin-yaml'
 import pkg from './package.json'
 
 export default [
@@ -12,10 +12,8 @@ export default [
     input: 'src/index.js',
     output: {
       name: 'model',
-      // file: 'dist/model.umd.js',
       file: pkg.browser,
-      format: 'umd',
-      sourcemap: true
+      format: 'umd'
     },
     plugins: [
       yaml(),
@@ -25,9 +23,9 @@ export default [
           return `${path.relative(__dirname, id)}/${name}`.replace(/[^\w]/g, '_')
         }
       }),
-      localResolve(),
-      resolve(), // so Rollup can find dependencies (e.g. `lodash`)
-      commonjs(), // so Rollup can convert dependencies (e.g. `lodash`) to an ES module
+
+      resolve(),
+      commonjs(),
       babel({
         exclude: ['node_modules/**']
       }),
@@ -35,19 +33,48 @@ export default [
   },
 
   // CommonJS (for Node) and ES module (for bundlers) build.
-  // (We could have three entries in the configuration array
-  // instead of two, but it's quicker to generate multiple
-  // builds from a single configuration where possible, using
-  // an array for the `output` option, where we can specify
-  // `file` and `format` for each target)
   {
     input: 'src/index.js',
-    external: ['@caiena/lodash-ext', '@caiena/i18n', 'moment'],
-    output: [
-      { file: pkg.main,   format: 'cjs', sourcemap: true },
-      { file: pkg.module, format: 'es',  sourcemap: true }
-      // { file: 'dist/model.cjs.js', format: 'cjs', sourcemap: true },
-      // { file: 'dist/model.esm.js', format: 'es',  sourcemap: true }
+    external: [
+      '@caiena/lodash-ext',
+      '@caiena/i18n',
+      'moment',
+      '@caiena/enum',
+      'validate.js'
+    ],
+    output:{
+      file: pkg.main,
+      format: 'cjs',
+      sourcemap: true,
+    },
+    plugins: [
+      localResolve(),
+      babel({
+        exclude: ['node_modules/**'],
+        presets: [[
+          "@babel/preset-env", {
+            targets: {
+              node: "8"
+            }
+          }
+        ]]
+      }),
+    ]
+  },
+
+  // and ES module (for bundlers) build.
+  {
+    input: 'src/index.js',
+    output: {
+      file: pkg.module,
+      format: 'esm'
+    },
+    external: [
+      '@caiena/lodash-ext',
+      '@caiena/i18n',
+      'moment',
+      '@caiena/enum',
+      'validate.js'
     ],
     plugins: [
       yaml(),
@@ -57,10 +84,12 @@ export default [
           return `${path.relative(__dirname, id)}/${name}`.replace(/[^\w]/g, '_')
         }
       }),
-      localResolve(), // allowing import of index.js files from directory name
+
+      commonjs(),
+      localResolve(),
       babel({
         exclude: ['node_modules/**']
       }),
     ]
-  }
+  },
 ];
