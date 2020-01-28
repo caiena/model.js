@@ -770,12 +770,6 @@
     i18n-js "^3.5.0"
     moment "^2.24.0"
 
-"@caiena/lodash-ext@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@caiena/lodash-ext/-/lodash-ext-0.4.0.tgz#8961b3cf7d7c652624866cd2d324718446349d28"
-  dependencies:
-    lodash "^4.17.11"
-
 "@caiena/lodash-ext@^0.7.0":
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@caiena/lodash-ext/-/lodash-ext-0.7.0.tgz#0d0d7e9a6a5b175234c4449c28f22f1d7ca455d6"
@@ -783,6 +777,11 @@
   dependencies:
     core-js "3.4.1"
     lodash "^4.17.15"
+
+"@fnando/cpf@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@fnando/cpf/-/cpf-0.1.1.tgz#b4170275fab4ba086f4e0b45bba6d70b0708fb0a"
+  integrity sha512-KWIk6uh7Z8fAefUmtcDrLfCUIf+gU1DVv6BkL/TgXO5oJFC82X6FferrvBQzVBSRNb+TFbd/na1R7PHRgynrkA==
 
 "@rollup/plugin-yaml@^2.0.0":
   version "2.0.0"
@@ -1357,10 +1356,6 @@ he@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
 
-i18n-js@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/i18n-js/-/i18n-js-3.2.1.tgz#26cea8e327207bebccf1030baa761c5245ceb63b"
-
 i18n-js@^3.5.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/i18n-js/-/i18n-js-3.5.0.tgz#e2c41e1f90405d691d33ddce260f3dff9743215e"
@@ -1551,7 +1546,7 @@ locate-path@^3.0.0:
     p-locate "^3.0.0"
     path-exists "^3.0.0"
 
-lodash@^4.17.10, lodash@^4.17.11:
+lodash@^4.17.10:
   version "4.17.11"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
 

@@ -9,6 +9,7 @@
     "@caiena/enum": "ssh://git@github.com:caiena/enum.js.git",
     "@caiena/i18n": "ssh://git@github.com:caiena/i18n.js.git",
     "@caiena/lodash-ext": "^0.7.0",
+    "@fnando/cpf": "^0.1.1",
     "core-js": "3.4.1",
     "moment": "^2.24.0",
     "validate.js": "^0.13.1"
