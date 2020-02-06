@@ -98,7 +98,8 @@ describe('model', () => {
         disabled:     true,
         passwordHash: undefined,
         status:       'success',
-        area:         'Universe'
+        area:         'Universe',
+        cpf:          undefined
       })
     })
 

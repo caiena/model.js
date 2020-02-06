@@ -33,7 +33,8 @@ class User extends Model {
       'id',
       'name',
       'passwordHash',
-      'disabledAt'
+      'disabledAt',
+      'cpf'
     ]
   }
 
@@ -47,7 +48,8 @@ class User extends Model {
   static get constraints() {
     return {
       name:   { presence: true, type: 'string' },
-      status: { inclusion: this.$enums.status.keys }
+      status: { inclusion: this.$enums.status.keys },
+      cpf:    { cpf: true, type: 'string' }
     }
   }
 

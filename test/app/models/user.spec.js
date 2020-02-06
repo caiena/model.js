@@ -71,6 +71,7 @@ describe('User', () => {
     it('declares :name',         () => { expect($attrs).to.include('name') })
     it('declares :passwordHash', () => { expect($attrs).to.include('passwordHash') })
     it('declares :disabledAt',   () => { expect($attrs).to.include('disabledAt') })
+    it('declares :cpf',          () => { expect($attrs).to.include('cpf') })
   })
 
 
@@ -114,6 +115,40 @@ describe('User', () => {
         }])
 
         user.name = 'John Wick'
+        expect(await user.$validate()).to.be.true
+        expect(user.$errors).to.be.empty
+      })
+    })
+
+    context('cpf', () => {
+      it('validates its format as valid cpf', async () => {
+        expect($constraints.cpf).to.have.property('cpf', true)
+
+        let user = new User({ name: 'João Silva', cpf: _.sample(['000.000.000-00', '000']) })
+        expect(await user.$validate()).to.be.false
+        expect(user.$errors).to.have.property('cpf')
+        expect(user.$errors.cpf[0]).to.have.property('code', 'cpf')
+        expect(user.$errors.cpf).to.containSubset([{
+          message: 'não é um CPF válido'
+        }])
+
+        user.cpf = '975.225.910-31'
+        expect(await user.$validate()).to.be.true
+        expect(user.$errors).to.be.empty
+      })
+
+      it('validates its type as "string"', async () => {
+        expect($constraints.cpf).to.have.property('type', 'string')
+
+        let user = new User({ name: 'João Silva', cpf: _.sample([2, true, null]) })
+        expect(await user.$validate()).to.be.false
+        expect(user.$errors).to.have.property('cpf')
+        expect(user.$errors.cpf[1]).to.have.property('code', 'type')
+        expect(user.$errors.cpf).to.containSubset([{
+          message: 'não é do tipo correto'
+        }])
+
+        user.cpf = '975.225.910-31'
         expect(await user.$validate()).to.be.true
         expect(user.$errors).to.be.empty
       })
