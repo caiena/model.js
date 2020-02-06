@@ -579,6 +579,21 @@ function presence(value, options, key, attrs) {
 
 validate.validators.presence = presence;
 
+// import { isValid } from '@fnando/cpf'
+const { isValid } = require("@fnando/cpf/dist/node");
+
+function cpf(value, options, key, attrs) {
+  let opts = _.merge({}, this.options, options);
+
+  if (_.present(value) && !isValid(value)) {
+    return opts.message || this.message || "is not a valid CPF";
+  }
+
+  // returning nothing means "is valid"
+}
+
+validate.validators.cpf = cpf;
+
 // custom error formatter, creating a code/values interpolation scheme with i18n
 // @see http://validatejs.org/#validate-error-formatting
 function transformErrors(i18nScope, errors) {
@@ -828,7 +843,7 @@ function Decorator(ModelClass) {
   return DecoratedClass;
 }
 
-const _contents_errorsEnUS = { "en-US": { errors: { date: "must be a valid date", datetime: "must be a valid date", email: "is not a valid e-mail", equality: "is not equal to %{attribute}", exclusion: "%{value} is restricted", format: "is invalid", inclusion: "%{value} is not included in the list", length: "has incorrect length", numericality: "must be a valid number", presence: "can't be blank", url: "is not a valid URL", type: "has incorrect type" } } };const _contents_errorsPtBR = { "pt-BR": { errors: { date: "n\xE3o \xE9 uma data v\xE1lida", datetime: "n\xE3o \xE9 uma data v\xE1lida", email: "n\xE3o \xE9 um e-mail v\xE1lido", equality: "n\xE3o \xE9 igual a %{attribute}", exclusion: "%{value} n\xE3o \xE9 permitido", format: "n\xE3o \xE9 v\xE1lido", inclusion: "%{value} n\xE3o est\xE1 inclu\xEDdo na lista", length: "tem tamanho incorreto", numericality: "n\xE3o \xE9 um n\xFAmero v\xE1lido", presence: "n\xE3o pode ficar em branco", url: "n\xE3o \xE9 uma URL v\xE1lida", type: "n\xE3o \xE9 do tipo correto" } } };const contents = { errorsEnUS: _contents_errorsEnUS, errorsPtBR: _contents_errorsPtBR };Object.freeze(contents);
+const _contents_errorsEnUS = { "en-US": { errors: { date: "must be a valid date", datetime: "must be a valid date", email: "is not a valid e-mail", equality: "is not equal to %{attribute}", exclusion: "%{value} is restricted", format: "is invalid", inclusion: "%{value} is not included in the list", length: "has incorrect length", numericality: "must be a valid number", presence: "can't be blank", url: "is not a valid URL", type: "has incorrect type", cpf: "is not a valid CPF" } } };const _contents_errorsPtBR = { "pt-BR": { errors: { date: "n\xE3o \xE9 uma data v\xE1lida", datetime: "n\xE3o \xE9 uma data v\xE1lida", email: "n\xE3o \xE9 um e-mail v\xE1lido", equality: "n\xE3o \xE9 igual a %{attribute}", exclusion: "%{value} n\xE3o \xE9 permitido", format: "n\xE3o \xE9 v\xE1lido", inclusion: "%{value} n\xE3o est\xE1 inclu\xEDdo na lista", length: "tem tamanho incorreto", numericality: "n\xE3o \xE9 um n\xFAmero v\xE1lido", presence: "n\xE3o pode ficar em branco", url: "n\xE3o \xE9 uma URL v\xE1lida", type: "n\xE3o \xE9 do tipo correto", cpf: "n\xE3o \xE9 um CPF v\xE1lido" } } };const contents = { errorsEnUS: _contents_errorsEnUS, errorsPtBR: _contents_errorsPtBR };Object.freeze(contents);
 
 
 const translations = {};
