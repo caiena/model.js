@@ -17,3 +17,4 @@ en-US:
     presence:     can't be blank
     url:          is not a valid URL
     type:         has incorrect type
+    cpf:          is not a valid CPF
