@@ -160,4 +160,42 @@ describe('User', () => {
     })
   })
 
+
+  describe('methods', () => {
+
+    describe("wasDisabledBefore(datetime)", () => {
+      let user = null
+      let datetime = null
+
+      before(() => { datetime = moment().subtract(2, 'days') })
+
+      context("when user is not disabled", () => {
+        let user = null
+        before(() => { user = new User({ disabledAt: null }) })
+
+        it('returns false', () => {
+          expect(user.wasDisabledBefore(datetime)).to.equal(false)
+        })
+      })
+
+      context("when user was disabled before :datetime", () => {
+        before(() => { user = new User({ disabledAt: moment().subtract(3, 'days') }) })
+
+        it('returns true', () => {
+          expect(user.wasDisabledBefore(datetime)).to.equal(true)
+        })
+      })
+
+      context("when user was disabled after :datetime", () => {
+        before(() => { user = new User({ disabledAt: moment().subtract(3, 'hours') }) })
+
+        it('returns true', () => {
+          expect(user.wasDisabledBefore(datetime)).to.equal(false)
+        })
+      })
+
+    }) // wasDisabledBefore(datetime)
+
+  }) // methods
+
 })

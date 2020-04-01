@@ -65,6 +65,13 @@ class User extends Model {
       this.disabledAt = null
     }
   }
+
+  // XXX: this method (function) is here to make sure "methods" work on model.js
+  wasDisabledBefore(datetime) {
+    if (this.$blank("disabledAt")) return false
+
+    return moment(this.disabledAt).isBefore(moment(datetime))
+  }
 }
 
 

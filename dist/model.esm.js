@@ -185,7 +185,9 @@ function writableProp(instance, name) {
     descriptor = Object.getOwnPropertyDescriptor(prototype, name);
   }
 
-  return !!descriptor.set || descriptor.writable === true;
+  // XXX: we're considering "writableProp" a prop that is defined as get/set and
+  // has a setter method!
+  return !!descriptor.set;
 }
 
 
