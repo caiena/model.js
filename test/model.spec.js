@@ -119,4 +119,13 @@ describe('model', () => {
     })
   })
 
+
+  describe('serialization', () => {
+    it('ignores "methods" (functions)', () => {
+      let user = new User()
+
+      expect(user.toJSON({ virtuals: true, undefs: true })).not.to.have.key("wasDisabledBefore")
+    })
+  })
+
 })
