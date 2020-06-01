@@ -19345,6 +19345,45 @@
     });
   }
 
+  var nativeAssign = Object.assign;
+
+  // `Object.assign` method
+  // https://tc39.github.io/ecma262/#sec-object.assign
+  // should work with symbols and should have deterministic property order (V8 bug)
+  var objectAssign = !nativeAssign || fails(function () {
+    var A = {};
+    var B = {};
+    // eslint-disable-next-line no-undef
+    var symbol = Symbol();
+    var alphabet = 'abcdefghijklmnopqrst';
+    A[symbol] = 7;
+    alphabet.split('').forEach(function (chr) { B[chr] = chr; });
+    return nativeAssign({}, A)[symbol] != 7 || objectKeys(nativeAssign({}, B)).join('') != alphabet;
+  }) ? function assign(target, source) { // eslint-disable-line no-unused-vars
+    var T = toObject(target);
+    var argumentsLength = arguments.length;
+    var index = 1;
+    var getOwnPropertySymbols = objectGetOwnPropertySymbols.f;
+    var propertyIsEnumerable = objectPropertyIsEnumerable.f;
+    while (argumentsLength > index) {
+      var S = indexedObject(arguments[index++]);
+      var keys = getOwnPropertySymbols ? objectKeys(S).concat(getOwnPropertySymbols(S)) : objectKeys(S);
+      var length = keys.length;
+      var j = 0;
+      var key;
+      while (length > j) {
+        key = keys[j++];
+        if (!descriptors || propertyIsEnumerable.call(S, key)) T[key] = S[key];
+      }
+    } return T;
+  } : nativeAssign;
+
+  // `Object.assign` method
+  // https://tc39.github.io/ecma262/#sec-object.assign
+  _export({ target: 'Object', stat: true, forced: Object.assign !== objectAssign }, {
+    assign: objectAssign
+  });
+
   // `URL.prototype.toJSON` method
   // https://url.spec.whatwg.org/#dom-url-tojson
   _export({ target: 'URL', proto: true, enumerable: true }, {
@@ -21318,9 +21357,9 @@
     };
 
     // Set aliases, so we can save some typing.
-    I18n.t = I18n.translate;
-    I18n.l = I18n.localize;
-    I18n.p = I18n.pluralize;
+    I18n.t = I18n.translate.bind(I18n);
+    I18n.l = I18n.localize.bind(I18n);
+    I18n.p = I18n.pluralize.bind(I18n);
 
     return I18n;
   }));
@@ -29399,7 +29438,7 @@
         // override it in subclasses
       } }, { key: "toJSON", value: function toJSON()
 
-      {var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref2$pick = _ref2.pick,pick = _ref2$pick === void 0 ? [] : _ref2$pick,_ref2$include = _ref2.include,include = _ref2$include === void 0 ? [] : _ref2$include,_ref2$omit = _ref2.omit,omit = _ref2$omit === void 0 ? [] : _ref2$omit,_ref2$virtuals = _ref2.virtuals,virtuals = _ref2$virtuals === void 0 ? false : _ref2$virtuals,_ref2$relations = _ref2.relations,relations = _ref2$relations === void 0 ? false : _ref2$relations,_ref2$undefs = _ref2.undefs,undefs = _ref2$undefs === void 0 ? false : _ref2$undefs;
+      {var _this4 = this;var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref2$pick = _ref2.pick,pick = _ref2$pick === void 0 ? [] : _ref2$pick,_ref2$include = _ref2.include,include = _ref2$include === void 0 ? [] : _ref2$include,_ref2$omit = _ref2.omit,omit = _ref2$omit === void 0 ? [] : _ref2$omit,_ref2$virtuals = _ref2.virtuals,virtuals = _ref2$virtuals === void 0 ? false : _ref2$virtuals,_ref2$relations = _ref2.relations,relations = _ref2$relations === void 0 ? false : _ref2$relations,_ref2$undefs = _ref2.undefs,undefs = _ref2$undefs === void 0 ? false : _ref2$undefs;
         var json = lodashExt.clone(this.$attrs);
 
         if (!undefs) {
@@ -29418,8 +29457,24 @@
           json = lodashExt.pick(json, pick);
         }
 
-        if (lodashExt.present(include)) {// TODO: test it
-          json = lodashExt.merge(json, lodashExt.pick(this, include));
+        if (lodashExt.present(include)) {
+          var includedFields = include.reduce(function (parsedFields, key) {
+            var field = _this4[key];
+
+            if (Array.isArray(field)) {
+              parsedFields[key] = field.map(function (rel) {return rel.toJSON();});
+
+            } else if (lodashExt.present(field)) {
+              parsedFields[key] = field.toJSON();
+
+            } else {
+              parsedFields[key] = field;
+            }
+
+            return parsedFields;
+          }, {});
+
+          Object.assign(json, includedFields);
         }
 
         if (lodashExt.present(omit)) {
