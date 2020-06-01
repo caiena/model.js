@@ -6,6 +6,8 @@ import Model    from '../src/model'
 // support models
 import User  from './support/app/models/user'
 import Admin from './support/app/models/admin'
+import Purchase from './support/app/models/purchase'
+import Photo from './support/app/models/photo'
 
 
 describe('model', () => {
@@ -125,6 +127,36 @@ describe('model', () => {
       let user = new User()
 
       expect(user.toJSON({ virtuals: true, undefs: true })).not.to.have.key("wasDisabledBefore")
+    })
+
+    it('serializes "include" fields', () => {
+      const photo = new Photo({ filename: 'avatar-23.jpg' })
+      const purchase1 = new Purchase({ status: 'approved' })
+      const purchase2 = new Purchase({ id: 12, status: 'delivered' })
+
+      let user = new User({
+        name: 'First man',
+        status: 'success',
+        photo,
+        purchases: [purchase1, purchase2]
+      })
+
+      const serializedData = user.toJSON({ include: ['purchases', 'photo'] })
+
+      expect(serializedData).to.deep.equal({
+        name: 'First man',
+        status: 'success',
+
+        photo: {
+          filename: 'avatar-23.jpg'
+        },
+
+        purchases: [
+          { status: 'approved' },
+          { status: 'delivered', id: 12 }
+        ]
+      })
+
     })
   })
 

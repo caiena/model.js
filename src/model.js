@@ -81,8 +81,24 @@ class Model extends mixin(Base, [Attributable, Relatable, Translatable, Validata
       json = _.pick(json, pick)
     }
 
-    if (_.present(include)) {  // TODO: test it
-      json = _.merge(json, _.pick(this, include))
+    if (_.present(include)) {
+      const includedFields = include.reduce((parsedFields, key) => {
+        const field = this[key]
+
+        if (Array.isArray(field)) {
+          parsedFields[key] = field.map(rel => rel.toJSON())
+
+        } else if (_.present(field)) {
+          parsedFields[key] = field.toJSON()
+
+        } else {
+          parsedFields[key] = field
+        }
+
+        return parsedFields
+      }, {})
+
+      Object.assign(json, includedFields)
     }
 
     if (_.present(omit)) {
