@@ -6,12 +6,21 @@ import Relatable             from './mixins/relatable'
 import Translatable          from './mixins/translatable'
 import Validatable           from './mixins/validatable'
 
-function serializeField(field) {
-  if (field instanceof Model) {
-    return field.toJSON()
+function _serializeObject(obj) {
+  return _.reduce(obj, (serialized, value, key) => {
+    serialized[key] = _serialize(value)
+    return serialized
+  }, {})
+}
+
+function _serialize(value) {
+  if (Array.isArray(value)) return value.map(_serialize)
+
+  if (_.isObjectLike(value)) {
+    return (typeof value.toJSON === 'function') ? value.toJSON() : _serializeObject(value)
   }
 
-  return field
+  return value
 }
 
 class Base {
@@ -77,15 +86,16 @@ class Model extends mixin(Base, [Attributable, Relatable, Translatable, Validata
       _.merge(json, _.pick(this, this.constructor.virtuals))
     }
 
-    if (relations) { // TODO: test it
-      _.merge(json, _.pick(this, this.constructor.$relations))
+    if (relations) {
+      const modelRelations = Object.keys(this.$relations)
+      _.merge(json, _.pick(this, modelRelations))
     }
 
     if (_.present(pick)) {
       json = _.pick(json, pick)
     }
 
-    if (_.present(include)) {  // TODO: test it
+    if (_.present(include)) {
       json = _.merge(json, _.pick(this, include))
     }
 
@@ -93,22 +103,16 @@ class Model extends mixin(Base, [Attributable, Relatable, Translatable, Validata
       json = _.omit(json, omit)
     }
 
-
-    json = Object.keys(json).reduce((parsedFields, key) => {
-      const field = json[key]
-
-      if (Array.isArray(field)) {
-        parsedFields[key] = field.map(item => serializeField(item))
-      } else {
-        parsedFields[key] = serializeField(field)
-      }
-
-      return parsedFields
-    }, {})
-
     if (!undefs) {
       json = _.pickBy(json, (val, key) => !_.isUndefined(val))
     }
+
+    json = _.reduce(json, (serialized, value, propName) => {
+      serialized[propName] = _serialize(value)
+
+      return serialized
+    }, {})
+
 
     return json
   }

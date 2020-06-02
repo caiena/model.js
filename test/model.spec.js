@@ -123,40 +123,68 @@ describe('model', () => {
 
 
   describe('serialization', () => {
-    it('ignores "methods" (functions)', () => {
-      let user = new User()
+    let user
 
+    beforeEach(() => {
+      user = new User({ name: 'First man' })
+    })
+
+    it('ignores "methods" (functions)', () => {
       expect(user.toJSON({ virtuals: true, undefs: true })).not.to.have.key("wasDisabledBefore")
     })
 
-    it('serializes fields of Model instance', () => {
-      const photo = new Photo({ filename: 'avatar-23.jpg' })
+    it('serializes props from include option', () => {
+      const photo = new Photo({ filename: 'avatar.jpg' })
+      user.photo = photo
+
+      expect(user.toJSON({ include: ['photo'] })).to.deep.equal({
+        name: 'First man', photo: { filename: 'avatar.jpg' }
+      })
+    })
+
+    it('serializes realtions', () => {
       const purchase1 = new Purchase({ status: 'approved' })
       const purchase2 = new Purchase({ id: 12, status: 'delivered' })
+      const photo = new Photo({ filename: 'avatar.jpg' })
 
-      let user = new User({
+      user.purchases = [purchase1, purchase2]
+      user.photo = photo
+
+      expect(user.toJSON({ relations: true })).to.deep.equal({
         name: 'First man',
-        status: 'success',
-        photo,
-        purchases: [purchase1, purchase2]
-      })
-
-      const serializedData = user.toJSON({ include: ['purchases', 'photo'] })
-
-      expect(serializedData).to.deep.equal({
-        name: 'First man',
-        status: 'success',
-
-        photo: {
-          filename: 'avatar-23.jpg'
-        },
-
+        photo: { filename: 'avatar.jpg' },
         purchases: [
           { status: 'approved' },
           { status: 'delivered', id: 12 }
         ]
       })
+    })
 
+    it('serializes nested elements', () => {
+      const photo = new Photo({ filename: 'avatar.jpg' })
+      user.photo = photo
+
+      const serializedData = user.toJSON({ include: ['oldPhotos'] })
+
+      expect(serializedData).to.deep.equal({
+        name: 'First man',
+        oldPhotos: {
+          photos: [{
+            filename: 'avatar.jpg'
+          }],
+        }
+      })
+
+    })
+
+    it('serializes Date props', () => {
+      const disabledAt = new Date()
+      user.disabledAt = disabledAt
+
+      expect(user.toJSON()).to.deep.equal({
+        name: 'First man',
+        disabledAt: disabledAt.toJSON(),
+      })
     })
   })
 
