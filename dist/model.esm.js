@@ -829,12 +829,21 @@ function Validatable(Class) {var
   return ValidatableClass;
 }
 
-function serializeField(field) {
-  if (field instanceof Model) {
-    return field.toJSON();
+function _serializeObject(obj) {
+  return _.reduce(obj, function (serialized, value, key) {
+    serialized[key] = _serialize(value);
+    return serialized;
+  }, {});
+}
+
+function _serialize(value) {
+  if (Array.isArray(value)) return value.map(_serialize);
+
+  if (_.isObjectLike(value)) {
+    return typeof value.toJSON === 'function' ? value.toJSON() : _serializeObject(value);
   }
 
-  return field;
+  return value;
 }var
 
 Base = /*#__PURE__*/function () {function Base() {_classCallCheck(this, Base);}_createClass(Base, null, [{ key: "$lookupModel", value: function $lookupModel(
@@ -900,15 +909,16 @@ Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Mo
         _.merge(json, _.pick(this, this.constructor.virtuals));
       }
 
-      if (relations) {// TODO: test it
-        _.merge(json, _.pick(this, this.constructor.$relations));
+      if (relations) {
+        var modelRelations = Object.keys(this.$relations);
+        _.merge(json, _.pick(this, modelRelations));
       }
 
       if (_.present(pick)) {
         json = _.pick(json, pick);
       }
 
-      if (_.present(include)) {// TODO: test it
+      if (_.present(include)) {
         json = _.merge(json, _.pick(this, include));
       }
 
@@ -916,22 +926,16 @@ Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Mo
         json = _.omit(json, omit);
       }
 
-
-      json = Object.keys(json).reduce(function (parsedFields, key) {
-        var field = json[key];
-
-        if (Array.isArray(field)) {
-          parsedFields[key] = field.map(function (item) {return serializeField(item);});
-        } else {
-          parsedFields[key] = serializeField(field);
-        }
-
-        return parsedFields;
-      }, {});
-
       if (!undefs) {
         json = _.pickBy(json, function (val, key) {return !_.isUndefined(val);});
       }
+
+      json = _.reduce(json, function (serialized, value, propName) {
+        serialized[propName] = _serialize(value);
+
+        return serialized;
+      }, {});
+
 
       return json;
     } }, { key: "$serialize", value: function $serialize()

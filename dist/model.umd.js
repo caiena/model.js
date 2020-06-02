@@ -29341,12 +29341,21 @@
     return ValidatableClass;
   }
 
-  function serializeField(field) {
-    if (field instanceof Model) {
-      return field.toJSON();
+  function _serializeObject(obj) {
+    return lodashExt.reduce(obj, function (serialized, value, key) {
+      serialized[key] = _serialize(value);
+      return serialized;
+    }, {});
+  }
+
+  function _serialize(value) {
+    if (Array.isArray(value)) return value.map(_serialize);
+
+    if (lodashExt.isObjectLike(value)) {
+      return typeof value.toJSON === 'function' ? value.toJSON() : _serializeObject(value);
     }
 
-    return field;
+    return value;
   }var
 
   Base = /*#__PURE__*/function () {function Base() {_classCallCheck(this, Base);}_createClass(Base, null, [{ key: "$lookupModel", value: function $lookupModel(
@@ -29412,15 +29421,16 @@
           lodashExt.merge(json, lodashExt.pick(this, this.constructor.virtuals));
         }
 
-        if (relations) {// TODO: test it
-          lodashExt.merge(json, lodashExt.pick(this, this.constructor.$relations));
+        if (relations) {
+          var modelRelations = Object.keys(this.$relations);
+          lodashExt.merge(json, lodashExt.pick(this, modelRelations));
         }
 
         if (lodashExt.present(pick)) {
           json = lodashExt.pick(json, pick);
         }
 
-        if (lodashExt.present(include)) {// TODO: test it
+        if (lodashExt.present(include)) {
           json = lodashExt.merge(json, lodashExt.pick(this, include));
         }
 
@@ -29428,22 +29438,16 @@
           json = lodashExt.omit(json, omit);
         }
 
-
-        json = Object.keys(json).reduce(function (parsedFields, key) {
-          var field = json[key];
-
-          if (Array.isArray(field)) {
-            parsedFields[key] = field.map(function (item) {return serializeField(item);});
-          } else {
-            parsedFields[key] = serializeField(field);
-          }
-
-          return parsedFields;
-        }, {});
-
         if (!undefs) {
           json = lodashExt.pickBy(json, function (val, key) {return !lodashExt.isUndefined(val);});
         }
+
+        json = lodashExt.reduce(json, function (serialized, value, propName) {
+          serialized[propName] = _serialize(value);
+
+          return serialized;
+        }, {});
+
 
         return json;
       } }, { key: "$serialize", value: function $serialize()
