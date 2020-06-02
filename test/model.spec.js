@@ -134,7 +134,7 @@ describe('model', () => {
     })
 
     it('serializes props from include option', () => {
-      const photo = new Photo({ filename: 'avatar.jpg' })
+      let photo = new Photo({ filename: 'avatar.jpg' })
       user.photo = photo
 
       expect(user.toJSON({ include: ['photo'] })).to.deep.equal({
@@ -143,9 +143,9 @@ describe('model', () => {
     })
 
     it('serializes realtions', () => {
-      const purchase1 = new Purchase({ status: 'approved' })
-      const purchase2 = new Purchase({ id: 12, status: 'delivered' })
-      const photo = new Photo({ filename: 'avatar.jpg' })
+      let purchase1 = new Purchase({ status: 'approved' })
+      let purchase2 = new Purchase({ id: 12, status: 'delivered' })
+      let photo = new Photo({ filename: 'avatar.jpg' })
 
       user.purchases = [purchase1, purchase2]
       user.photo = photo
@@ -161,10 +161,10 @@ describe('model', () => {
     })
 
     it('serializes nested elements', () => {
-      const photo = new Photo({ filename: 'avatar.jpg' })
+      let photo = new Photo({ filename: 'avatar.jpg' })
       user.photo = photo
 
-      const serializedData = user.toJSON({ include: ['oldPhotos'] })
+      let serializedData = user.toJSON({ include: ['oldPhotos'] })
 
       expect(serializedData).to.deep.equal({
         name: 'First man',
@@ -178,7 +178,7 @@ describe('model', () => {
     })
 
     it('serializes Date props', () => {
-      const disabledAt = new Date()
+      let disabledAt = new Date()
       user.disabledAt = disabledAt
 
       expect(user.toJSON()).to.deep.equal({
