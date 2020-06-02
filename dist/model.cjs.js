@@ -714,6 +714,14 @@ function Validatable(Class) {
   return ValidatableClass;
 }
 
+function serializeField(field) {
+  if (field instanceof Model) {
+    return field.toJSON();
+  }
+
+  return field;
+}
+
 class Base {
   static get $modelNameAdapter() {return _.camelize;}
   static get $modelName() {return this.$modelNameAdapter(this.name);}
@@ -772,9 +780,6 @@ class Model extends mixin(Base, [Attributable, Relatable, Translatable, Validata
   toJSON({ pick = [], include = [], omit = [], virtuals = false, relations = false, undefs = false } = {}) {
     let json = _.clone(this.$attrs);
 
-    if (!undefs) {
-      json = _.pickBy(json, (val, key) => !_.isUndefined(val));
-    }
 
     if (virtuals) {
       _.merge(json, _.pick(this, this.constructor.virtuals));
@@ -788,28 +793,29 @@ class Model extends mixin(Base, [Attributable, Relatable, Translatable, Validata
       json = _.pick(json, pick);
     }
 
-    if (_.present(include)) {
-      const includedFields = include.reduce((parsedFields, key) => {
-        const field = this[key];
-
-        if (Array.isArray(field)) {
-          parsedFields[key] = field.map(rel => rel.toJSON());
-
-        } else if (_.present(field)) {
-          parsedFields[key] = field.toJSON();
-
-        } else {
-          parsedFields[key] = field;
-        }
-
-        return parsedFields;
-      }, {});
-
-      Object.assign(json, includedFields);
+    if (_.present(include)) {// TODO: test it
+      json = _.merge(json, _.pick(this, include));
     }
 
     if (_.present(omit)) {
       json = _.omit(json, omit);
+    }
+
+
+    json = Object.keys(json).reduce((parsedFields, key) => {
+      const field = json[key];
+
+      if (Array.isArray(field)) {
+        parsedFields[key] = field.map(item => serializeField(item));
+      } else {
+        parsedFields[key] = serializeField(field);
+      }
+
+      return parsedFields;
+    }, {});
+
+    if (!undefs) {
+      json = _.pickBy(json, (val, key) => !_.isUndefined(val));
     }
 
     return json;

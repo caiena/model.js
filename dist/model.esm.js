@@ -2,7 +2,7 @@ import _ from '@caiena/lodash-ext';
 import 'core-js/modules/es.array.map';
 import 'core-js/modules/es.date.to-json';
 import 'core-js/modules/es.function.name';
-import 'core-js/modules/es.object.assign';
+import 'core-js/modules/es.object.keys';
 import 'core-js/modules/web.url.to-json';
 import 'core-js/modules/es.array.concat';
 import 'core-js/modules/es.array.filter';
@@ -829,8 +829,13 @@ function Validatable(Class) {var
   return ValidatableClass;
 }
 
-var
+function serializeField(field) {
+  if (field instanceof Model) {
+    return field.toJSON();
+  }
 
+  return field;
+}var
 
 Base = /*#__PURE__*/function () {function Base() {_classCallCheck(this, Base);}_createClass(Base, null, [{ key: "$lookupModel", value: function $lookupModel(
 
@@ -887,12 +892,9 @@ Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Mo
       // override it in subclasses
     } }, { key: "toJSON", value: function toJSON()
 
-    {var _this4 = this;var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref2$pick = _ref2.pick,pick = _ref2$pick === void 0 ? [] : _ref2$pick,_ref2$include = _ref2.include,include = _ref2$include === void 0 ? [] : _ref2$include,_ref2$omit = _ref2.omit,omit = _ref2$omit === void 0 ? [] : _ref2$omit,_ref2$virtuals = _ref2.virtuals,virtuals = _ref2$virtuals === void 0 ? false : _ref2$virtuals,_ref2$relations = _ref2.relations,relations = _ref2$relations === void 0 ? false : _ref2$relations,_ref2$undefs = _ref2.undefs,undefs = _ref2$undefs === void 0 ? false : _ref2$undefs;
+    {var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref2$pick = _ref2.pick,pick = _ref2$pick === void 0 ? [] : _ref2$pick,_ref2$include = _ref2.include,include = _ref2$include === void 0 ? [] : _ref2$include,_ref2$omit = _ref2.omit,omit = _ref2$omit === void 0 ? [] : _ref2$omit,_ref2$virtuals = _ref2.virtuals,virtuals = _ref2$virtuals === void 0 ? false : _ref2$virtuals,_ref2$relations = _ref2.relations,relations = _ref2$relations === void 0 ? false : _ref2$relations,_ref2$undefs = _ref2.undefs,undefs = _ref2$undefs === void 0 ? false : _ref2$undefs;
       var json = _.clone(this.$attrs);
 
-      if (!undefs) {
-        json = _.pickBy(json, function (val, key) {return !_.isUndefined(val);});
-      }
 
       if (virtuals) {
         _.merge(json, _.pick(this, this.constructor.virtuals));
@@ -906,28 +908,29 @@ Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Mo
         json = _.pick(json, pick);
       }
 
-      if (_.present(include)) {
-        var includedFields = include.reduce(function (parsedFields, key) {
-          var field = _this4[key];
-
-          if (Array.isArray(field)) {
-            parsedFields[key] = field.map(function (rel) {return rel.toJSON();});
-
-          } else if (_.present(field)) {
-            parsedFields[key] = field.toJSON();
-
-          } else {
-            parsedFields[key] = field;
-          }
-
-          return parsedFields;
-        }, {});
-
-        Object.assign(json, includedFields);
+      if (_.present(include)) {// TODO: test it
+        json = _.merge(json, _.pick(this, include));
       }
 
       if (_.present(omit)) {
         json = _.omit(json, omit);
+      }
+
+
+      json = Object.keys(json).reduce(function (parsedFields, key) {
+        var field = json[key];
+
+        if (Array.isArray(field)) {
+          parsedFields[key] = field.map(function (item) {return serializeField(item);});
+        } else {
+          parsedFields[key] = serializeField(field);
+        }
+
+        return parsedFields;
+      }, {});
+
+      if (!undefs) {
+        json = _.pickBy(json, function (val, key) {return !_.isUndefined(val);});
       }
 
       return json;

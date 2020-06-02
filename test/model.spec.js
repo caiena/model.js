@@ -129,7 +129,7 @@ describe('model', () => {
       expect(user.toJSON({ virtuals: true, undefs: true })).not.to.have.key("wasDisabledBefore")
     })
 
-    it('serializes "include" fields', () => {
+    it('serializes fields of Model instance', () => {
       const photo = new Photo({ filename: 'avatar-23.jpg' })
       const purchase1 = new Purchase({ status: 'approved' })
       const purchase2 = new Purchase({ id: 12, status: 'delivered' })

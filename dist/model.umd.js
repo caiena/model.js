@@ -19345,43 +19345,14 @@
     });
   }
 
-  var nativeAssign = Object.assign;
+  var FAILS_ON_PRIMITIVES = fails(function () { objectKeys(1); });
 
-  // `Object.assign` method
-  // https://tc39.github.io/ecma262/#sec-object.assign
-  // should work with symbols and should have deterministic property order (V8 bug)
-  var objectAssign = !nativeAssign || fails(function () {
-    var A = {};
-    var B = {};
-    // eslint-disable-next-line no-undef
-    var symbol = Symbol();
-    var alphabet = 'abcdefghijklmnopqrst';
-    A[symbol] = 7;
-    alphabet.split('').forEach(function (chr) { B[chr] = chr; });
-    return nativeAssign({}, A)[symbol] != 7 || objectKeys(nativeAssign({}, B)).join('') != alphabet;
-  }) ? function assign(target, source) { // eslint-disable-line no-unused-vars
-    var T = toObject(target);
-    var argumentsLength = arguments.length;
-    var index = 1;
-    var getOwnPropertySymbols = objectGetOwnPropertySymbols.f;
-    var propertyIsEnumerable = objectPropertyIsEnumerable.f;
-    while (argumentsLength > index) {
-      var S = indexedObject(arguments[index++]);
-      var keys = getOwnPropertySymbols ? objectKeys(S).concat(getOwnPropertySymbols(S)) : objectKeys(S);
-      var length = keys.length;
-      var j = 0;
-      var key;
-      while (length > j) {
-        key = keys[j++];
-        if (!descriptors || propertyIsEnumerable.call(S, key)) T[key] = S[key];
-      }
-    } return T;
-  } : nativeAssign;
-
-  // `Object.assign` method
-  // https://tc39.github.io/ecma262/#sec-object.assign
-  _export({ target: 'Object', stat: true, forced: Object.assign !== objectAssign }, {
-    assign: objectAssign
+  // `Object.keys` method
+  // https://tc39.github.io/ecma262/#sec-object.keys
+  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES }, {
+    keys: function keys(it) {
+      return objectKeys(toObject(it));
+    }
   });
 
   // `URL.prototype.toJSON` method
@@ -19487,8 +19458,8 @@
   var nativeGetOwnPropertyDescriptor$1 = objectGetOwnPropertyDescriptor.f;
 
 
-  var FAILS_ON_PRIMITIVES = fails(function () { nativeGetOwnPropertyDescriptor$1(1); });
-  var FORCED$3 = !descriptors || FAILS_ON_PRIMITIVES;
+  var FAILS_ON_PRIMITIVES$1 = fails(function () { nativeGetOwnPropertyDescriptor$1(1); });
+  var FORCED$3 = !descriptors || FAILS_ON_PRIMITIVES$1;
 
   // `Object.getOwnPropertyDescriptor` method
   // https://tc39.github.io/ecma262/#sec-object.getownpropertydescriptor
@@ -19526,19 +19497,19 @@
 
   var nativeGetOwnPropertyNames$1 = objectGetOwnPropertyNamesExternal.f;
 
-  var FAILS_ON_PRIMITIVES$1 = fails(function () { return !Object.getOwnPropertyNames(1); });
+  var FAILS_ON_PRIMITIVES$2 = fails(function () { return !Object.getOwnPropertyNames(1); });
 
   // `Object.getOwnPropertyNames` method
   // https://tc39.github.io/ecma262/#sec-object.getownpropertynames
-  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES$1 }, {
+  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES$2 }, {
     getOwnPropertyNames: nativeGetOwnPropertyNames$1
   });
 
-  var FAILS_ON_PRIMITIVES$2 = fails(function () { objectGetPrototypeOf(1); });
+  var FAILS_ON_PRIMITIVES$3 = fails(function () { objectGetPrototypeOf(1); });
 
   // `Object.getPrototypeOf` method
   // https://tc39.github.io/ecma262/#sec-object.getprototypeof
-  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES$2, sham: !correctPrototypeGetter }, {
+  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES$3, sham: !correctPrototypeGetter }, {
     getPrototypeOf: function getPrototypeOf(it) {
       return objectGetPrototypeOf(toObject(it));
     }
@@ -19683,23 +19654,13 @@
   var onFreeze = internalMetadata.onFreeze;
 
   var nativeFreeze = Object.freeze;
-  var FAILS_ON_PRIMITIVES$3 = fails(function () { nativeFreeze(1); });
+  var FAILS_ON_PRIMITIVES$4 = fails(function () { nativeFreeze(1); });
 
   // `Object.freeze` method
   // https://tc39.github.io/ecma262/#sec-object.freeze
-  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES$3, sham: !freezing }, {
+  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES$4, sham: !freezing }, {
     freeze: function freeze(it) {
       return nativeFreeze && isObject(it) ? nativeFreeze(onFreeze(it)) : it;
-    }
-  });
-
-  var FAILS_ON_PRIMITIVES$4 = fails(function () { objectKeys(1); });
-
-  // `Object.keys` method
-  // https://tc39.github.io/ecma262/#sec-object.keys
-  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES$4 }, {
-    keys: function keys(it) {
-      return objectKeys(toObject(it));
     }
   });
 
@@ -29380,8 +29341,13 @@
     return ValidatableClass;
   }
 
-  var
+  function serializeField(field) {
+    if (field instanceof Model) {
+      return field.toJSON();
+    }
 
+    return field;
+  }var
 
   Base = /*#__PURE__*/function () {function Base() {_classCallCheck(this, Base);}_createClass(Base, null, [{ key: "$lookupModel", value: function $lookupModel(
 
@@ -29438,12 +29404,9 @@
         // override it in subclasses
       } }, { key: "toJSON", value: function toJSON()
 
-      {var _this4 = this;var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref2$pick = _ref2.pick,pick = _ref2$pick === void 0 ? [] : _ref2$pick,_ref2$include = _ref2.include,include = _ref2$include === void 0 ? [] : _ref2$include,_ref2$omit = _ref2.omit,omit = _ref2$omit === void 0 ? [] : _ref2$omit,_ref2$virtuals = _ref2.virtuals,virtuals = _ref2$virtuals === void 0 ? false : _ref2$virtuals,_ref2$relations = _ref2.relations,relations = _ref2$relations === void 0 ? false : _ref2$relations,_ref2$undefs = _ref2.undefs,undefs = _ref2$undefs === void 0 ? false : _ref2$undefs;
+      {var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref2$pick = _ref2.pick,pick = _ref2$pick === void 0 ? [] : _ref2$pick,_ref2$include = _ref2.include,include = _ref2$include === void 0 ? [] : _ref2$include,_ref2$omit = _ref2.omit,omit = _ref2$omit === void 0 ? [] : _ref2$omit,_ref2$virtuals = _ref2.virtuals,virtuals = _ref2$virtuals === void 0 ? false : _ref2$virtuals,_ref2$relations = _ref2.relations,relations = _ref2$relations === void 0 ? false : _ref2$relations,_ref2$undefs = _ref2.undefs,undefs = _ref2$undefs === void 0 ? false : _ref2$undefs;
         var json = lodashExt.clone(this.$attrs);
 
-        if (!undefs) {
-          json = lodashExt.pickBy(json, function (val, key) {return !lodashExt.isUndefined(val);});
-        }
 
         if (virtuals) {
           lodashExt.merge(json, lodashExt.pick(this, this.constructor.virtuals));
@@ -29457,28 +29420,29 @@
           json = lodashExt.pick(json, pick);
         }
 
-        if (lodashExt.present(include)) {
-          var includedFields = include.reduce(function (parsedFields, key) {
-            var field = _this4[key];
-
-            if (Array.isArray(field)) {
-              parsedFields[key] = field.map(function (rel) {return rel.toJSON();});
-
-            } else if (lodashExt.present(field)) {
-              parsedFields[key] = field.toJSON();
-
-            } else {
-              parsedFields[key] = field;
-            }
-
-            return parsedFields;
-          }, {});
-
-          Object.assign(json, includedFields);
+        if (lodashExt.present(include)) {// TODO: test it
+          json = lodashExt.merge(json, lodashExt.pick(this, include));
         }
 
         if (lodashExt.present(omit)) {
           json = lodashExt.omit(json, omit);
+        }
+
+
+        json = Object.keys(json).reduce(function (parsedFields, key) {
+          var field = json[key];
+
+          if (Array.isArray(field)) {
+            parsedFields[key] = field.map(function (item) {return serializeField(item);});
+          } else {
+            parsedFields[key] = serializeField(field);
+          }
+
+          return parsedFields;
+        }, {});
+
+        if (!undefs) {
+          json = lodashExt.pickBy(json, function (val, key) {return !lodashExt.isUndefined(val);});
         }
 
         return json;
