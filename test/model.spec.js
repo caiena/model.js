@@ -6,6 +6,8 @@ import Model    from '../src/model'
 // support models
 import User  from './support/app/models/user'
 import Admin from './support/app/models/admin'
+import Purchase from './support/app/models/purchase'
+import Photo from './support/app/models/photo'
 
 
 describe('model', () => {
@@ -121,10 +123,68 @@ describe('model', () => {
 
 
   describe('serialization', () => {
-    it('ignores "methods" (functions)', () => {
-      let user = new User()
+    let user
 
+    beforeEach(() => {
+      user = new User({ name: 'First man' })
+    })
+
+    it('ignores "methods" (functions)', () => {
       expect(user.toJSON({ virtuals: true, undefs: true })).not.to.have.key("wasDisabledBefore")
+    })
+
+    it('serializes props from include option', () => {
+      let photo = new Photo({ filename: 'avatar.jpg' })
+      user.photo = photo
+
+      expect(user.toJSON({ include: ['photo'] })).to.deep.equal({
+        name: 'First man', photo: { filename: 'avatar.jpg' }
+      })
+    })
+
+    it('serializes realtions', () => {
+      let purchase1 = new Purchase({ status: 'approved' })
+      let purchase2 = new Purchase({ id: 12, status: 'delivered' })
+      let photo = new Photo({ filename: 'avatar.jpg' })
+
+      user.purchases = [purchase1, purchase2]
+      user.photo = photo
+
+      expect(user.toJSON({ relations: true })).to.deep.equal({
+        name: 'First man',
+        photo: { filename: 'avatar.jpg' },
+        purchases: [
+          { status: 'approved' },
+          { status: 'delivered', id: 12 }
+        ]
+      })
+    })
+
+    it('serializes nested elements', () => {
+      let photo = new Photo({ filename: 'avatar.jpg' })
+      user.photo = photo
+
+      let serializedData = user.toJSON({ include: ['oldPhotos'] })
+
+      expect(serializedData).to.deep.equal({
+        name: 'First man',
+        oldPhotos: {
+          photos: [{
+            filename: 'avatar.jpg'
+          }],
+        }
+      })
+
+    })
+
+    it('serializes Date props', () => {
+      let disabledAt = new Date()
+      user.disabledAt = disabledAt
+
+      expect(user.toJSON()).to.deep.equal({
+        name: 'First man',
+        disabledAt: disabledAt.toJSON(),
+      })
     })
   })
 

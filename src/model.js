@@ -6,6 +6,22 @@ import Relatable             from './mixins/relatable'
 import Translatable          from './mixins/translatable'
 import Validatable           from './mixins/validatable'
 
+function _serializeObject(obj) {
+  return _.reduce(obj, (serialized, value, key) => {
+    serialized[key] = _serialize(value)
+    return serialized
+  }, {})
+}
+
+function _serialize(value) {
+  if (Array.isArray(value)) return value.map(_serialize)
+
+  if (_.isObjectLike(value)) {
+    return (typeof value.toJSON === 'function') ? value.toJSON() : _serializeObject(value)
+  }
+
+  return value
+}
 
 class Base {
   static get $modelNameAdapter() { return _.camelize }
@@ -65,29 +81,38 @@ class Model extends mixin(Base, [Attributable, Relatable, Translatable, Validata
   toJSON({ pick = [], include = [], omit = [], virtuals = false, relations = false, undefs = false } = {}) {
     let json = _.clone(this.$attrs)
 
-    if (!undefs) {
-      json = _.pickBy(json, (val, key) => !_.isUndefined(val))
-    }
 
     if (virtuals) {
       _.merge(json, _.pick(this, this.constructor.virtuals))
     }
 
-    if (relations) { // TODO: test it
-      _.merge(json, _.pick(this, this.constructor.$relations))
+    if (relations) {
+      let  modelRelations = Object.keys(this.$relations)
+      _.merge(json, _.pick(this, modelRelations))
     }
 
     if (_.present(pick)) {
       json = _.pick(json, pick)
     }
 
-    if (_.present(include)) {  // TODO: test it
+    if (_.present(include)) {
       json = _.merge(json, _.pick(this, include))
     }
 
     if (_.present(omit)) {
       json = _.omit(json, omit)
     }
+
+    if (!undefs) {
+      json = _.pickBy(json, (val, key) => !_.isUndefined(val))
+    }
+
+    json = _.reduce(json, (serialized, value, propName) => {
+      serialized[propName] = _serialize(value)
+
+      return serialized
+    }, {})
+
 
     return json
   }

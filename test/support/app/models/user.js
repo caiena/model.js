@@ -40,7 +40,9 @@ class User extends Model {
   static get virtuals() {
     return [
       'disabled',
-      'password'
+      'password',
+
+      'oldPhoto'
     ]
   }
 
@@ -63,6 +65,13 @@ class User extends Model {
       this.disabledAt = moment().format('YYYY-MM-DD')
     } else {
       this.disabledAt = null
+    }
+  }
+
+  // Just to test deep .toJSON()
+  get oldPhotos() {
+    return {
+      photos: [this.photo]
     }
   }
 

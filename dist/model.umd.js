@@ -19345,6 +19345,16 @@
     });
   }
 
+  var FAILS_ON_PRIMITIVES = fails(function () { objectKeys(1); });
+
+  // `Object.keys` method
+  // https://tc39.github.io/ecma262/#sec-object.keys
+  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES }, {
+    keys: function keys(it) {
+      return objectKeys(toObject(it));
+    }
+  });
+
   // `URL.prototype.toJSON` method
   // https://url.spec.whatwg.org/#dom-url-tojson
   _export({ target: 'URL', proto: true, enumerable: true }, {
@@ -19448,8 +19458,8 @@
   var nativeGetOwnPropertyDescriptor$1 = objectGetOwnPropertyDescriptor.f;
 
 
-  var FAILS_ON_PRIMITIVES = fails(function () { nativeGetOwnPropertyDescriptor$1(1); });
-  var FORCED$3 = !descriptors || FAILS_ON_PRIMITIVES;
+  var FAILS_ON_PRIMITIVES$1 = fails(function () { nativeGetOwnPropertyDescriptor$1(1); });
+  var FORCED$3 = !descriptors || FAILS_ON_PRIMITIVES$1;
 
   // `Object.getOwnPropertyDescriptor` method
   // https://tc39.github.io/ecma262/#sec-object.getownpropertydescriptor
@@ -19487,19 +19497,19 @@
 
   var nativeGetOwnPropertyNames$1 = objectGetOwnPropertyNamesExternal.f;
 
-  var FAILS_ON_PRIMITIVES$1 = fails(function () { return !Object.getOwnPropertyNames(1); });
+  var FAILS_ON_PRIMITIVES$2 = fails(function () { return !Object.getOwnPropertyNames(1); });
 
   // `Object.getOwnPropertyNames` method
   // https://tc39.github.io/ecma262/#sec-object.getownpropertynames
-  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES$1 }, {
+  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES$2 }, {
     getOwnPropertyNames: nativeGetOwnPropertyNames$1
   });
 
-  var FAILS_ON_PRIMITIVES$2 = fails(function () { objectGetPrototypeOf(1); });
+  var FAILS_ON_PRIMITIVES$3 = fails(function () { objectGetPrototypeOf(1); });
 
   // `Object.getPrototypeOf` method
   // https://tc39.github.io/ecma262/#sec-object.getprototypeof
-  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES$2, sham: !correctPrototypeGetter }, {
+  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES$3, sham: !correctPrototypeGetter }, {
     getPrototypeOf: function getPrototypeOf(it) {
       return objectGetPrototypeOf(toObject(it));
     }
@@ -19644,23 +19654,13 @@
   var onFreeze = internalMetadata.onFreeze;
 
   var nativeFreeze = Object.freeze;
-  var FAILS_ON_PRIMITIVES$3 = fails(function () { nativeFreeze(1); });
+  var FAILS_ON_PRIMITIVES$4 = fails(function () { nativeFreeze(1); });
 
   // `Object.freeze` method
   // https://tc39.github.io/ecma262/#sec-object.freeze
-  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES$3, sham: !freezing }, {
+  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES$4, sham: !freezing }, {
     freeze: function freeze(it) {
       return nativeFreeze && isObject(it) ? nativeFreeze(onFreeze(it)) : it;
-    }
-  });
-
-  var FAILS_ON_PRIMITIVES$4 = fails(function () { objectKeys(1); });
-
-  // `Object.keys` method
-  // https://tc39.github.io/ecma262/#sec-object.keys
-  _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES$4 }, {
-    keys: function keys(it) {
-      return objectKeys(toObject(it));
     }
   });
 
@@ -21318,9 +21318,9 @@
     };
 
     // Set aliases, so we can save some typing.
-    I18n.t = I18n.translate;
-    I18n.l = I18n.localize;
-    I18n.p = I18n.pluralize;
+    I18n.t = I18n.translate.bind(I18n);
+    I18n.l = I18n.localize.bind(I18n);
+    I18n.p = I18n.pluralize.bind(I18n);
 
     return I18n;
   }));
@@ -29341,8 +29341,22 @@
     return ValidatableClass;
   }
 
-  var
+  function _serializeObject(obj) {
+    return lodashExt.reduce(obj, function (serialized, value, key) {
+      serialized[key] = _serialize(value);
+      return serialized;
+    }, {});
+  }
 
+  function _serialize(value) {
+    if (Array.isArray(value)) return value.map(_serialize);
+
+    if (lodashExt.isObjectLike(value)) {
+      return typeof value.toJSON === 'function' ? value.toJSON() : _serializeObject(value);
+    }
+
+    return value;
+  }var
 
   Base = /*#__PURE__*/function () {function Base() {_classCallCheck(this, Base);}_createClass(Base, null, [{ key: "$lookupModel", value: function $lookupModel(
 
@@ -29402,29 +29416,38 @@
       {var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref2$pick = _ref2.pick,pick = _ref2$pick === void 0 ? [] : _ref2$pick,_ref2$include = _ref2.include,include = _ref2$include === void 0 ? [] : _ref2$include,_ref2$omit = _ref2.omit,omit = _ref2$omit === void 0 ? [] : _ref2$omit,_ref2$virtuals = _ref2.virtuals,virtuals = _ref2$virtuals === void 0 ? false : _ref2$virtuals,_ref2$relations = _ref2.relations,relations = _ref2$relations === void 0 ? false : _ref2$relations,_ref2$undefs = _ref2.undefs,undefs = _ref2$undefs === void 0 ? false : _ref2$undefs;
         var json = lodashExt.clone(this.$attrs);
 
-        if (!undefs) {
-          json = lodashExt.pickBy(json, function (val, key) {return !lodashExt.isUndefined(val);});
-        }
 
         if (virtuals) {
           lodashExt.merge(json, lodashExt.pick(this, this.constructor.virtuals));
         }
 
-        if (relations) {// TODO: test it
-          lodashExt.merge(json, lodashExt.pick(this, this.constructor.$relations));
+        if (relations) {
+          var modelRelations = Object.keys(this.$relations);
+          lodashExt.merge(json, lodashExt.pick(this, modelRelations));
         }
 
         if (lodashExt.present(pick)) {
           json = lodashExt.pick(json, pick);
         }
 
-        if (lodashExt.present(include)) {// TODO: test it
+        if (lodashExt.present(include)) {
           json = lodashExt.merge(json, lodashExt.pick(this, include));
         }
 
         if (lodashExt.present(omit)) {
           json = lodashExt.omit(json, omit);
         }
+
+        if (!undefs) {
+          json = lodashExt.pickBy(json, function (val, key) {return !lodashExt.isUndefined(val);});
+        }
+
+        json = lodashExt.reduce(json, function (serialized, value, propName) {
+          serialized[propName] = _serialize(value);
+
+          return serialized;
+        }, {});
+
 
         return json;
       } }, { key: "$serialize", value: function $serialize()
