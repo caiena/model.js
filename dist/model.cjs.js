@@ -795,7 +795,7 @@ class Model extends mixin(Base, [Attributable, Relatable, Translatable, Validata
     }
 
     if (relations) {
-      const modelRelations = Object.keys(this.$relations);
+      let modelRelations = Object.keys(this.$relations);
       _.merge(json, _.pick(this, modelRelations));
     }
 
