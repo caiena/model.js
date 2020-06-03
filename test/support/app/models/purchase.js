@@ -50,6 +50,7 @@ class Purchase extends Model {
   static get constraints() {
     return {
       status: {
+        presence: true,
         inclusion: this.$enums.status.keys
       },
       approvedAt(value, attrs, attrName, options, constraints) {

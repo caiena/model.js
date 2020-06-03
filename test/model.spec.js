@@ -57,6 +57,19 @@ describe('model', () => {
   })
 
   describe('validation', () => {
+    it('validates relations', async () => {
+      let purchase1 = new Purchase({ status: 'approved' })
+      let purchase2 = new Purchase({ id: 12 })
+      let photo = new Photo({ filename: 'avatar.jpg', size: -2 })
+      let user = new User({ name: '', photo, purchases: [ purchase1, purchase2 ] })
+
+      expect(await user.$validate({ relations: true })).to.be.false
+
+      expect(user.$errors).to.have.property('name')
+      expect(user.$errors).to.have.nested.property('photo.size')
+      expect(user.$errors).to.have.nested.property('purchases[1].status')
+    })
+
     it('provides an async $validate() method to perform validation', async () => {
       let user = new User({ name: '' })
 

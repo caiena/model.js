@@ -89,6 +89,7 @@ describe('Purchase', () => {
     context('approvedAt', () => {
       it('cannot be after createdAt', async () => {
         let purchase = new Purchase({
+          status:     'approved',
           createdAt:  moment.utc().format(),
           approvedAt: moment.utc().subtract(1, 'hour').format()
         })

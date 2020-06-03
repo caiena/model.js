@@ -74,6 +74,44 @@ function transformErrors(i18nScope, errors) {
   return transformedErrors
 }
 
+function validateRelations(relations) {
+  let promises = []
+
+  _.each(relations, (value, key) => {
+
+    if (Array.isArray(value)) {
+      let relationPromises = value.map(relation => relation.$validateModel())
+      promises = [...promises, ...relationPromises]
+
+    } else if (_.isObjectLike(value)) {
+
+      if (typeof value.$validateModel === 'function') {
+        promises.push(value.$validateModel())
+      }
+
+    }
+  })
+
+  return promises
+}
+
+function getRelationsErrors(relations) {
+  let relationErrors = {}
+
+  _.each(relations, (value, key) => {
+
+    if (Array.isArray(value)) {
+      relationErrors[key] = value.map(relation => relation.$errors)
+
+    } else if (_.isObjectLike(value)) {
+      relationErrors[key] = value.$errors
+    }
+  })
+
+  return relationErrors
+}
+
+
 
 function Validatable(Class) {
 
@@ -98,7 +136,7 @@ function Validatable(Class) {
       return this.$$constraints
     }
 
-    async $validate() {
+    async $validateModel() {
       let constraints = this.constructor.constraints
       let instance = this
 
@@ -132,6 +170,39 @@ function Validatable(Class) {
               }
             })
       })
+    }
+
+    async $validate({ relations = false } = {}) {
+      let instance = this
+      let modelPromise = instance.$validateModel()
+
+      // Non Recursive
+      if (!relations) {
+        return modelPromise
+      }
+
+      // Recursive
+      let relationsKeys = Object.keys(instance.$relations)
+      let modelRelations = _.pick(instance, relationsKeys)
+
+      let promises = [modelPromise, ...validateRelations(modelRelations)]
+
+      try {
+        let responses = await Promise.all(promises)
+        let hasErrors = responses.includes(false)
+
+        if (hasErrors) {
+          let relationErrors = getRelationsErrors(modelRelations)
+          instance.$$errors = { ...instance.$$errors, ...relationErrors }
+
+          return Promise.resolve(false)
+        }
+
+        return Promise.resolve(true)
+
+      } catch (error) {
+        return Promise.reject(error)
+      }
     }
   }
 

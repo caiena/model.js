@@ -137,6 +137,26 @@
     return _get(target, property, receiver || target);
   }
 
+  function _toConsumableArray(arr) {
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+  }
+
+  function _arrayWithoutHoles(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+      return arr2;
+    }
+  }
+
+  function _iterableToArray(iter) {
+    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+  }
+
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance");
+  }
+
   var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
   function commonjsRequire () {
@@ -29277,6 +29297,44 @@
     return transformedErrors;
   }
 
+  function validateRelations(relations) {
+    var promises = [];
+
+    lodashExt.each(relations, function (value, key) {
+
+      if (Array.isArray(value)) {
+        var relationPromises = value.map(function (relation) {return relation.$validateModel();});
+        promises = [].concat(_toConsumableArray(promises), _toConsumableArray(relationPromises));
+
+      } else if (lodashExt.isObjectLike(value)) {
+
+        if (typeof value.$validateModel === 'function') {
+          promises.push(value.$validateModel());
+        }
+
+      }
+    });
+
+    return promises;
+  }
+
+  function getRelationsErrors(relations) {
+    var relationErrors = {};
+
+    lodashExt.each(relations, function (value, key) {
+
+      if (Array.isArray(value)) {
+        relationErrors[key] = value.map(function (relation) {return relation.$errors;});
+
+      } else if (lodashExt.isObjectLike(value)) {
+        relationErrors[key] = value.$errors;
+      }
+    });
+
+    return relationErrors;
+  }
+
+
 
   function Validatable(Class) {var
 
@@ -29285,7 +29343,7 @@
       function ValidatableClass() {var _getPrototypeOf2;var _this;_classCallCheck(this, ValidatableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
         _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(ValidatableClass)).call.apply(_getPrototypeOf2, [this].concat(args)));
         defineInternalProp(_assertThisInitialized(_this), '$$errors', {});return _this;
-      }_createClass(ValidatableClass, [{ key: "$validate", value: function $validate() {var _this2 = this;var constraints, instance;return regeneratorRuntime.async(function $validate$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:
+      }_createClass(ValidatableClass, [{ key: "$validateModel", value: function $validateModel() {var _this2 = this;var constraints, instance;return regeneratorRuntime.async(function $validateModel$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:
 
 
 
@@ -29334,9 +29392,42 @@
                         resolve(false);
                       }
                     });
-                  }));case 3:case "end":return _context.stop();}}}, null, this);} }, { key: "$errors", get: function get() {return this.$$errors;} }], [{ key: "$constraints", get: function get() {// avoiding static property inheritance
+                  }));case 3:case "end":return _context.stop();}}}, null, this);} }, { key: "$validate", value: function $validate() {var _ref,_ref$relations,relations,instance,modelPromise,relationsKeys,modelRelations,promises,responses,hasErrors,relationErrors,_args2 = arguments;return regeneratorRuntime.async(function $validate$(_context2) {while (1) {switch (_context2.prev = _context2.next) {case 0:_ref = _args2.length > 0 && _args2[0] !== undefined ? _args2[0] :
+
+
+                  {}, _ref$relations = _ref.relations, relations = _ref$relations === void 0 ? false : _ref$relations;
+                  instance = this;
+                  modelPromise = instance.$validateModel();
+
+                  // Non Recursive
+                  if (relations) {_context2.next = 5;break;}return _context2.abrupt("return",
+                  modelPromise);case 5:
+
+
+                  // Recursive
+                  relationsKeys = Object.keys(instance.$relations);
+                  modelRelations = lodashExt.pick(instance, relationsKeys);
+
+                  promises = [modelPromise].concat(_toConsumableArray(validateRelations(modelRelations)));_context2.prev = 8;_context2.next = 11;return regeneratorRuntime.awrap(
+
+
+                  Promise.all(promises));case 11:responses = _context2.sent;
+                  hasErrors = responses.includes(false);if (!
+
+                  hasErrors) {_context2.next = 17;break;}
+                  relationErrors = getRelationsErrors(modelRelations);
+                  instance.$$errors = _objectSpread({}, instance.$$errors, {}, relationErrors);return _context2.abrupt("return",
+
+                  Promise.resolve(false));case 17:return _context2.abrupt("return",
+
+
+                  Promise.resolve(true));case 20:_context2.prev = 20;_context2.t0 = _context2["catch"](8);return _context2.abrupt("return",
+
+
+                  Promise.reject(_context2.t0));case 23:case "end":return _context2.stop();}}}, null, this, [[8, 20]]);} }, { key: "$errors", get: function get() {return this.$$errors;} }], [{ key: "$constraints", get: function get() {// avoiding static property inheritance
           // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
           if (!this.hasOwnProperty('$$constraints')) {this.$$constraints = lodashExt.clone(this.constraints);}return this.$$constraints;} }]);return ValidatableClass;}(Class);
+
 
     return ValidatableClass;
   }
