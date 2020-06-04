@@ -66,8 +66,8 @@ describe('model', () => {
       expect(await user.$validate({ relations: true })).to.be.false
 
       expect(user.$errors).to.have.property('name')
-      expect(user.$errors).to.have.nested.property('photo.size')
-      expect(user.$errors).to.have.nested.property('purchases[1].status')
+      expect(user.purchases[1].$errors).to.have.property('status')
+      expect(user.photo.$errors).to.have.property('size')
     })
 
     it('provides an async $validate() method to perform validation', async () => {
