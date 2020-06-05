@@ -21318,9 +21318,9 @@
     };
 
     // Set aliases, so we can save some typing.
-    I18n.t = I18n.translate.bind(I18n);
-    I18n.l = I18n.localize.bind(I18n);
-    I18n.p = I18n.pluralize.bind(I18n);
+    I18n.t = I18n.translate;
+    I18n.l = I18n.localize;
+    I18n.p = I18n.pluralize;
 
     return I18n;
   }));
@@ -22590,6 +22590,26 @@
     state.index += point.length;
     return { value: point, done: false };
   });
+
+  var $forEach$1 = arrayIteration.forEach;
+
+
+  // `Array.prototype.forEach` method implementation
+  // https://tc39.github.io/ecma262/#sec-array.prototype.foreach
+  var arrayForEach = sloppyArrayMethod('forEach') ? function forEach(callbackfn /* , thisArg */) {
+    return $forEach$1(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  } : [].forEach;
+
+  for (var COLLECTION_NAME$1 in domIterables) {
+    var Collection$1 = global_1[COLLECTION_NAME$1];
+    var CollectionPrototype$1 = Collection$1 && Collection$1.prototype;
+    // some Chrome versions have non-configurable methods on DOMTokenList
+    if (CollectionPrototype$1 && CollectionPrototype$1.forEach !== arrayForEach) try {
+      createNonEnumerableProperty(CollectionPrototype$1, 'forEach', arrayForEach);
+    } catch (error) {
+      CollectionPrototype$1.forEach = arrayForEach;
+    }
+  }
 
   var runtime_1 = createCommonjsModule(function (module) {
   /**
@@ -29212,7 +29232,7 @@
   // @see http://validatejs.org/#validate-error-formatting
   function transformErrors(i18nScope, errors) {
     // errors sample:
-    // // => [
+    // [
     //   {
     //     "attribute": "username",
     //     "value": "nicklas",
@@ -29278,6 +29298,43 @@
   }
 
 
+  function _validate(instance) {
+    var constraints = instance.constructor.constraints;
+    // let instance = instance
+
+    // adapting api to .then(success, error) to .then(success).catch(error)
+    return new Promise(function (resolve, reject) {
+      // - cleanAttributes: false - to tell validatejs not to delete empty or without constraint attributes
+      // @see https://validatejs.org/#validate-async
+      //   > Besides accepting all options as the non async validation function it also accepts
+      //   > two additional options; cleanAttributes which, unless false, makes validate.async
+      //   > call validate.cleanAttributes before resolving the promise (...)
+      // @see https://validatejs.org/#utilities-clean-attributes
+      validate.async(instance, constraints, { format: 'detailed', cleanAttributes: false }).
+      then(
+      function success(attributes) {
+        // reset errors
+        instance.$$errors = {};
+        resolve(true);
+      },
+
+      function error(errors) {
+        if (errors instanceof Error) {
+          // runtime Error. Just throw it
+          // reset errors
+          instance.$$errors = {};
+          reject(errors);
+        } else {
+          // validation error.
+          // assign to $errors
+          instance.$$errors = transformErrors(instance.constructor.i18nScope, errors);
+          resolve(false);
+        }
+      });
+    });
+  }
+
+
   function Validatable(Class) {var
 
     ValidatableClass = /*#__PURE__*/function (_Class) {_inherits(ValidatableClass, _Class);
@@ -29285,7 +29342,7 @@
       function ValidatableClass() {var _getPrototypeOf2;var _this;_classCallCheck(this, ValidatableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
         _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(ValidatableClass)).call.apply(_getPrototypeOf2, [this].concat(args)));
         defineInternalProp(_assertThisInitialized(_this), '$$errors', {});return _this;
-      }_createClass(ValidatableClass, [{ key: "$validate", value: function $validate() {var _this2 = this;var constraints, instance;return regeneratorRuntime.async(function $validate$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:
+      }_createClass(ValidatableClass, [{ key: "$validate", value: function $validate() {var _ref,_ref$relations,relations,instance,promises,relationNames,_relations,responses,hasError,_args = arguments;return regeneratorRuntime.async(function $validate$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:_ref = _args.length > 0 && _args[0] !== undefined ? _args[0] :
 
 
 
@@ -29301,42 +29358,40 @@
 
 
 
-
-                  constraints = this.constructor.constraints;
+                  {}, _ref$relations = _ref.relations, relations = _ref$relations === void 0 ? false : _ref$relations;
                   instance = this;
+                  promises = [];
 
-                  // adapting api to .then(success, error) to .then(success).catch(error)
-                  return _context.abrupt("return", new Promise(function (resolve, reject) {
-                    // - cleanAttributes: false - to tell validatejs not to delete empty or without constraint attributes
-                    // @see https://validatejs.org/#validate-async
-                    //   > Besides accepting all options as the non async validation function it also accepts
-                    //   > two additional options; cleanAttributes which, unless false, makes validate.async
-                    //   > call validate.cleanAttributes before resolving the promise (...)
-                    // @see https://validatejs.org/#utilities-clean-attributes
-                    validate.async(_this2, constraints, { format: 'detailed', cleanAttributes: false }).
-                    then(
-                    function success(attributes) {
-                      // reset errors
-                      instance.$$errors = {};
-                      resolve(true);
-                    },
+                  promises.push(_validate(instance));
 
-                    function error(errors) {
-                      if (errors instanceof Error) {
-                        // runtime Error. Just throw it
-                        // reset errors
-                        instance.$$errors = {};
-                        reject(errors);
+                  if (relations) {
+                    relationNames = Object.keys(instance.$relations);
+                    _relations = lodashExt.pickBy(instance, function (relationData, relationName) {
+                      return relationNames.includes(relationName) && lodashExt.present(relationData);
+                    });
+
+                    lodashExt.each(_relations, function (relationData, _relationName) {
+
+                      if (Array.isArray(relationData)) {
+                        relationData.forEach(function (relatedInstance) {return promises.push(_validate(relatedInstance));});
+
                       } else {
-                        // validation error.
-                        // assign to $errors
-                        instance.$$errors = transformErrors(instance.constructor.i18nScope, errors);
-                        resolve(false);
+                        promises.push(_validate(relationData));
                       }
                     });
-                  }));case 3:case "end":return _context.stop();}}}, null, this);} }, { key: "$errors", get: function get() {return this.$$errors;} }], [{ key: "$constraints", get: function get() {// avoiding static property inheritance
+                  }_context.prev = 5;_context.next = 8;return regeneratorRuntime.awrap(
+
+
+                  Promise.all(promises));case 8:responses = _context.sent;
+                  hasError = responses.includes(false);return _context.abrupt("return",
+
+                  hasError ? Promise.resolve(false) : Promise.resolve(true));case 13:_context.prev = 13;_context.t0 = _context["catch"](5);return _context.abrupt("return",
+
+
+                  Promise.reject(_context.t0));case 16:case "end":return _context.stop();}}}, null, this, [[5, 13]]);} }, { key: "$errors", get: function get() {return this.$$errors;} }], [{ key: "$constraints", get: function get() {// avoiding static property inheritance
           // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
           if (!this.hasOwnProperty('$$constraints')) {this.$$constraints = lodashExt.clone(this.constraints);}return this.$$constraints;} }]);return ValidatableClass;}(Class);
+
 
     return ValidatableClass;
   }
