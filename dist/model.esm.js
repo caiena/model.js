@@ -22,6 +22,7 @@ import 'core-js/modules/es.array.iterator';
 import 'core-js/modules/es.object.to-string';
 import 'core-js/modules/es.promise';
 import 'core-js/modules/es.string.iterator';
+import 'core-js/modules/web.dom-collections.for-each';
 import 'core-js/modules/web.dom-collections.iterator';
 import 'regenerator-runtime/runtime';
 import validate from 'validate.js';
@@ -159,26 +160,6 @@ function _get(target, property, receiver) {
   }
 
   return _get(target, property, receiver || target);
-}
-
-function _toConsumableArray(arr) {
-  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
-}
-
-function _arrayWithoutHoles(arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  }
-}
-
-function _iterableToArray(iter) {
-  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
-}
-
-function _nonIterableSpread() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance");
 }
 
 function defineInternalProp(obj, prop, value) {
@@ -720,7 +701,7 @@ validate.validators.presence = presence;
 // @see http://validatejs.org/#validate-error-formatting
 function transformErrors(i18nScope, errors) {
   // errors sample:
-  // // => [
+  // [
   //   {
   //     "attribute": "username",
   //     "value": "nicklas",
@@ -785,43 +766,42 @@ function transformErrors(i18nScope, errors) {
   return transformedErrors;
 }
 
-function validateRelations(relations) {
-  var promises = [];
 
-  _.each(relations, function (value, key) {
+function _validate(instance) {
+  var constraints = instance.constructor.constraints;
+  // let instance = instance
 
-    if (Array.isArray(value)) {
-      var relationPromises = value.map(function (relation) {return relation.$validateModel();});
-      promises = [].concat(_toConsumableArray(promises), _toConsumableArray(relationPromises));
+  // adapting api to .then(success, error) to .then(success).catch(error)
+  return new Promise(function (resolve, reject) {
+    // - cleanAttributes: false - to tell validatejs not to delete empty or without constraint attributes
+    // @see https://validatejs.org/#validate-async
+    //   > Besides accepting all options as the non async validation function it also accepts
+    //   > two additional options; cleanAttributes which, unless false, makes validate.async
+    //   > call validate.cleanAttributes before resolving the promise (...)
+    // @see https://validatejs.org/#utilities-clean-attributes
+    validate.async(instance, constraints, { format: 'detailed', cleanAttributes: false }).
+    then(
+    function success(attributes) {
+      // reset errors
+      instance.$$errors = {};
+      resolve(true);
+    },
 
-    } else if (_.isObjectLike(value)) {
-
-      if (typeof value.$validateModel === 'function') {
-        promises.push(value.$validateModel());
+    function error(errors) {
+      if (errors instanceof Error) {
+        // runtime Error. Just throw it
+        // reset errors
+        instance.$$errors = {};
+        reject(errors);
+      } else {
+        // validation error.
+        // assign to $errors
+        instance.$$errors = transformErrors(instance.constructor.i18nScope, errors);
+        resolve(false);
       }
-
-    }
+    });
   });
-
-  return promises;
 }
-
-function getRelationsErrors(relations) {
-  var relationErrors = {};
-
-  _.each(relations, function (value, key) {
-
-    if (Array.isArray(value)) {
-      relationErrors[key] = value.map(function (relation) {return relation.$errors;});
-
-    } else if (_.isObjectLike(value)) {
-      relationErrors[key] = value.$errors;
-    }
-  });
-
-  return relationErrors;
-}
-
 
 
 function Validatable(Class) {var
@@ -831,7 +811,7 @@ function Validatable(Class) {var
     function ValidatableClass() {var _getPrototypeOf2;var _this;_classCallCheck(this, ValidatableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
       _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(ValidatableClass)).call.apply(_getPrototypeOf2, [this].concat(args)));
       defineInternalProp(_assertThisInitialized(_this), '$$errors', {});return _this;
-    }_createClass(ValidatableClass, [{ key: "$validateModel", value: function $validateModel() {var _this2 = this;var constraints, instance;return regeneratorRuntime.async(function $validateModel$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:
+    }_createClass(ValidatableClass, [{ key: "$validate", value: function $validate() {var _ref,_ref$relations,relations,instance,promises,relationNames,_relations,responses,hasError,_args = arguments;return regeneratorRuntime.async(function $validate$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:_ref = _args.length > 0 && _args[0] !== undefined ? _args[0] :
 
 
 
@@ -845,74 +825,39 @@ function Validatable(Class) {var
 
 
 
-
-
-
-                constraints = this.constructor.constraints;
-                instance = this;
-
-                // adapting api to .then(success, error) to .then(success).catch(error)
-                return _context.abrupt("return", new Promise(function (resolve, reject) {
-                  // - cleanAttributes: false - to tell validatejs not to delete empty or without constraint attributes
-                  // @see https://validatejs.org/#validate-async
-                  //   > Besides accepting all options as the non async validation function it also accepts
-                  //   > two additional options; cleanAttributes which, unless false, makes validate.async
-                  //   > call validate.cleanAttributes before resolving the promise (...)
-                  // @see https://validatejs.org/#utilities-clean-attributes
-                  validate.async(_this2, constraints, { format: 'detailed', cleanAttributes: false }).
-                  then(
-                  function success(attributes) {
-                    // reset errors
-                    instance.$$errors = {};
-                    resolve(true);
-                  },
-
-                  function error(errors) {
-                    if (errors instanceof Error) {
-                      // runtime Error. Just throw it
-                      // reset errors
-                      instance.$$errors = {};
-                      reject(errors);
-                    } else {
-                      // validation error.
-                      // assign to $errors
-                      instance.$$errors = transformErrors(instance.constructor.i18nScope, errors);
-                      resolve(false);
-                    }
-                  });
-                }));case 3:case "end":return _context.stop();}}}, null, this);} }, { key: "$validate", value: function $validate() {var _ref,_ref$relations,relations,instance,modelPromise,relationsKeys,modelRelations,promises,responses,hasErrors,relationErrors,_args2 = arguments;return regeneratorRuntime.async(function $validate$(_context2) {while (1) {switch (_context2.prev = _context2.next) {case 0:_ref = _args2.length > 0 && _args2[0] !== undefined ? _args2[0] :
 
 
                 {}, _ref$relations = _ref.relations, relations = _ref$relations === void 0 ? false : _ref$relations;
                 instance = this;
-                modelPromise = instance.$validateModel();
+                promises = [];
 
-                // Non Recursive
-                if (relations) {_context2.next = 5;break;}return _context2.abrupt("return",
-                modelPromise);case 5:
+                promises.push(_validate(instance));
 
+                if (relations) {
+                  relationNames = Object.keys(instance.$relations);
+                  _relations = _.pickBy(instance, function (relationData, relationName) {
+                    return relationNames.includes(relationName) && _.present(relationData);
+                  });
 
-                // Recursive
-                relationsKeys = Object.keys(instance.$relations);
-                modelRelations = _.pick(instance, relationsKeys);
+                  _.each(_relations, function (relationData, _relationName) {
 
-                promises = [modelPromise].concat(_toConsumableArray(validateRelations(modelRelations)));_context2.prev = 8;_context2.next = 11;return regeneratorRuntime.awrap(
+                    if (Array.isArray(relationData)) {
+                      relationData.forEach(function (relatedInstance) {return promises.push(_validate(relatedInstance));});
 
-
-                Promise.all(promises));case 11:responses = _context2.sent;
-                hasErrors = responses.includes(false);if (!
-
-                hasErrors) {_context2.next = 17;break;}
-                relationErrors = getRelationsErrors(modelRelations);
-                instance.$$errors = _objectSpread({}, instance.$$errors, {}, relationErrors);return _context2.abrupt("return",
-
-                Promise.resolve(false));case 17:return _context2.abrupt("return",
+                    } else {
+                      promises.push(_validate(relationData));
+                    }
+                  });
+                }_context.prev = 5;_context.next = 8;return regeneratorRuntime.awrap(
 
 
-                Promise.resolve(true));case 20:_context2.prev = 20;_context2.t0 = _context2["catch"](8);return _context2.abrupt("return",
+                Promise.all(promises));case 8:responses = _context.sent;
+                hasError = responses.includes(false);return _context.abrupt("return",
+
+                hasError ? Promise.resolve(false) : Promise.resolve(true));case 13:_context.prev = 13;_context.t0 = _context["catch"](5);return _context.abrupt("return",
 
 
-                Promise.reject(_context2.t0));case 23:case "end":return _context2.stop();}}}, null, this, [[8, 20]]);} }, { key: "$errors", get: function get() {return this.$$errors;} }], [{ key: "$constraints", get: function get() {// avoiding static property inheritance
+                Promise.reject(_context.t0));case 16:case "end":return _context.stop();}}}, null, this, [[5, 13]]);} }, { key: "$errors", get: function get() {return this.$$errors;} }], [{ key: "$constraints", get: function get() {// avoiding static property inheritance
         // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
         if (!this.hasOwnProperty('$$constraints')) {this.$$constraints = _.clone(this.constraints);}return this.$$constraints;} }]);return ValidatableClass;}(Class);
 

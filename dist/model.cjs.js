@@ -585,7 +585,7 @@ validate.validators.presence = presence;
 // @see http://validatejs.org/#validate-error-formatting
 function transformErrors(i18nScope, errors) {
   // errors sample:
-  // // => [
+  // [
   //   {
   //     "attribute": "username",
   //     "value": "nicklas",
@@ -650,43 +650,42 @@ function transformErrors(i18nScope, errors) {
   return transformedErrors;
 }
 
-function validateRelations(relations) {
-  let promises = [];
 
-  _.each(relations, (value, key) => {
+function _validate(instance) {
+  let constraints = instance.constructor.constraints;
+  // let instance = instance
 
-    if (Array.isArray(value)) {
-      let relationPromises = value.map(relation => relation.$validateModel());
-      promises = [...promises, ...relationPromises];
+  // adapting api to .then(success, error) to .then(success).catch(error)
+  return new Promise((resolve, reject) => {
+    // - cleanAttributes: false - to tell validatejs not to delete empty or without constraint attributes
+    // @see https://validatejs.org/#validate-async
+    //   > Besides accepting all options as the non async validation function it also accepts
+    //   > two additional options; cleanAttributes which, unless false, makes validate.async
+    //   > call validate.cleanAttributes before resolving the promise (...)
+    // @see https://validatejs.org/#utilities-clean-attributes
+    validate.async(instance, constraints, { format: 'detailed', cleanAttributes: false }).
+    then(
+    function success(attributes) {
+      // reset errors
+      instance.$$errors = {};
+      resolve(true);
+    },
 
-    } else if (_.isObjectLike(value)) {
-
-      if (typeof value.$validateModel === 'function') {
-        promises.push(value.$validateModel());
+    function error(errors) {
+      if (errors instanceof Error) {
+        // runtime Error. Just throw it
+        // reset errors
+        instance.$$errors = {};
+        reject(errors);
+      } else {
+        // validation error.
+        // assign to $errors
+        instance.$$errors = transformErrors(instance.constructor.i18nScope, errors);
+        resolve(false);
       }
-
-    }
+    });
   });
-
-  return promises;
 }
-
-function getRelationsErrors(relations) {
-  let relationErrors = {};
-
-  _.each(relations, (value, key) => {
-
-    if (Array.isArray(value)) {
-      relationErrors[key] = value.map(relation => relation.$errors);
-
-    } else if (_.isObjectLike(value)) {
-      relationErrors[key] = value.$errors;
-    }
-  });
-
-  return relationErrors;
-}
-
 
 
 function Validatable(Class) {
@@ -712,69 +711,34 @@ function Validatable(Class) {
       return this.$$constraints;
     }
 
-    async $validateModel() {
-      let constraints = this.constructor.constraints;
-      let instance = this;
-
-      // adapting api to .then(success, error) to .then(success).catch(error)
-      return new Promise((resolve, reject) => {
-        // - cleanAttributes: false - to tell validatejs not to delete empty or without constraint attributes
-        // @see https://validatejs.org/#validate-async
-        //   > Besides accepting all options as the non async validation function it also accepts
-        //   > two additional options; cleanAttributes which, unless false, makes validate.async
-        //   > call validate.cleanAttributes before resolving the promise (...)
-        // @see https://validatejs.org/#utilities-clean-attributes
-        validate.async(this, constraints, { format: 'detailed', cleanAttributes: false }).
-        then(
-        function success(attributes) {
-          // reset errors
-          instance.$$errors = {};
-          resolve(true);
-        },
-
-        function error(errors) {
-          if (errors instanceof Error) {
-            // runtime Error. Just throw it
-            // reset errors
-            instance.$$errors = {};
-            reject(errors);
-          } else {
-            // validation error.
-            // assign to $errors
-            instance.$$errors = transformErrors(instance.constructor.i18nScope, errors);
-            resolve(false);
-          }
-        });
-      });
-    }
-
     async $validate({ relations = false } = {}) {
       let instance = this;
-      let modelPromise = instance.$validateModel();
+      let promises = [];
 
-      // Non Recursive
-      if (!relations) {
-        return modelPromise;
+      promises.push(_validate(instance));
+
+      if (relations) {
+        let relationNames = Object.keys(instance.$relations);
+        let relations = _.pickBy(instance, function (relationData, relationName) {
+          return relationNames.includes(relationName) && _.present(relationData);
+        });
+
+        _.each(relations, (relationData, _relationName) => {
+
+          if (Array.isArray(relationData)) {
+            relationData.forEach(relatedInstance => promises.push(_validate(relatedInstance)));
+
+          } else {
+            promises.push(_validate(relationData));
+          }
+        });
       }
-
-      // Recursive
-      let relationsKeys = Object.keys(instance.$relations);
-      let modelRelations = _.pick(instance, relationsKeys);
-
-      let promises = [modelPromise, ...validateRelations(modelRelations)];
 
       try {
         let responses = await Promise.all(promises);
-        let hasErrors = responses.includes(false);
+        let hasError = responses.includes(false);
 
-        if (hasErrors) {
-          let relationErrors = getRelationsErrors(modelRelations);
-          instance.$$errors = _objectSpread({}, instance.$$errors, {}, relationErrors);
-
-          return Promise.resolve(false);
-        }
-
-        return Promise.resolve(true);
+        return hasError ? Promise.resolve(false) : Promise.resolve(true);
 
       } catch (error) {
         return Promise.reject(error);
