@@ -34,6 +34,20 @@ describe('model', () => {
       expect(User.$enums.status.key(user.status)).to.equal('failure')
       expect(user.$enumValue('status')).to.equal(-1)
     })
+
+    it('handles enums, ignoring invalid keys', () => {
+      let user = new User({ name: 'Forkbomb', status: -1 })
+      user.status = 'invalid_key'
+
+      expect(user.status).to.be.undefined
+    })
+
+    it('handles enums, accepting null value', () => {
+      let user = new User({ name: 'Forkbomb', status: -1 })
+      user.status = null
+
+      expect(user.status).to.be.null
+    })
   })
 
 

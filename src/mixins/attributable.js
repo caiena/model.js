@@ -30,6 +30,10 @@ function defineEnum(obj, enumName, { get = null, set = null } = {}) {
   // custom setter for enums
   if (!set) {
     set = function set(value) {
+      if (value === null) {
+        return this.$attrs[enumName] = null
+      }
+
       // ensures setting the key as attr value
       let key = this.constructor.$enums[enumName].key(value)
       return this.$attrs[enumName] = key
