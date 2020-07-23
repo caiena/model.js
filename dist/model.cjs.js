@@ -122,6 +122,9 @@ function defineEnum(obj, enumName, { get = null, set = null } = {}) {
   // custom setter for enums
   if (!set) {
     set = function set(value) {
+      // accepts null value
+      if (value === null) return this.$attrs[enumName] = null;
+
       // ensures setting the key as attr value
       let key = this.constructor.$enums[enumName].key(value);
       return this.$attrs[enumName] = key;
@@ -651,6 +654,9 @@ function transformErrors(i18nScope, errors) {
 }
 
 
+// validates a Model instance
+// extracted to this private function because we can use it recursively on any related model
+// if options and configurations demands it. (like `instance.$validate({ relations: true })`)
 function _validate(instance) {
   let constraints = instance.constructor.constraints;
   // let instance = instance
