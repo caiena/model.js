@@ -1,0 +1,20 @@
+---
+
+en-US:
+  models:
+    photo:
+      zero:  Photo
+      one:   Photo
+      other: Photos
+
+      attributes:
+        id:       ID
+        filename: Filename
+        mimetype: Mimetype
+        size:     Size
+
+      errors:
+        size:
+          numericality: must be a number
+          notInteger: must be a whole number
+          notGreaterThan: must be greater than %{value}

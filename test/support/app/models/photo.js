@@ -1,4 +1,5 @@
 import _     from '@caiena/lodash-ext'
+import { i18n } from '@caiena/i18n'
 import Model from '../../../../src/model'
 
 import User from './user'
@@ -22,7 +23,14 @@ class Photo extends Model {
   static get constraints() {
     return {
       filename: { presence: true },
-      size:     { numericality: { onlyInteger: true, greaterThan: 0 } }
+      size:     {
+        numericality: {
+          onlyInteger:    true,
+          greaterThan:    0,
+          notInteger:     i18n.t('models.photo.errors.size.notInteger'),
+          notGreaterThan: i18n.t('models.photo.errors.size.notGreaterThan', { value: 0 })
+        }
+      }
     }
   }
 }

@@ -1,8 +1,5 @@
 import _        from '@caiena/lodash-ext'
-import { i18n } from '@caiena/i18n'
-import Enum     from '@caiena/enum'
 import moment   from 'moment'
-import Model    from '../../../src/model'
 
 // support models
 import Admin        from '../../support/app/models/admin'

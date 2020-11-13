@@ -1,0 +1,19 @@
+---
+
+pt-BR:
+  models:
+    photo:
+      zero:  Foto
+      one:   Foto
+      other: Fotos
+
+      attributes:
+        id:       ID
+        filename: Nome do arquivo
+        mimetype: Tipo de arquivo
+        size:     Tamanho
+
+      errors:
+        size:
+          notInteger: deve ser um número inteiro
+          notGreaterThan: deve ser maior que %{value}

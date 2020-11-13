@@ -5,6 +5,11 @@ import validate from 'validate.js'
 import '../validators/register'
 
 
+// overrides default text processing behavior
+// @see https://validatejs.org/docs/validate.html#section-47
+validate.convertErrorMessages = (errors) => errors
+
+
 // custom error formatter, creating a code/values interpolation scheme with i18n
 // @see http://validatejs.org/#validate-error-formatting
 function transformErrors(i18nScope, errors) {
@@ -54,7 +59,24 @@ function transformErrors(i18nScope, errors) {
     transformedErrors[attr] = []
 
     for (let error of errors[attr]) {
-      let code = error.validator
+      const {
+        options,
+        validator: code,
+        error: errorMessage
+      } = error
+
+      // allowing custom messages when validator has options
+      if (_.isPlainObject(options)) {
+        for(const option in options) {
+          const customMessage = options[option]
+
+          if (errorMessage === customMessage) {
+            options.message = customMessage
+            break
+          }
+        }
+      }
+
       let message = _.get(error, 'options.message') ||
         i18n.t(`errors.${code}`, {
           scope: i18nScope,

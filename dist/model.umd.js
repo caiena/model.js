@@ -29231,6 +29231,11 @@
 
   validate.validators.presence = presence;
 
+  // overrides default text processing behavior
+  // @see https://validatejs.org/docs/validate.html#section-47
+  validate.convertErrorMessages = function (errors) {return errors;};
+
+
   // custom error formatter, creating a code/values interpolation scheme with i18n
   // @see http://validatejs.org/#validate-error-formatting
   function transformErrors(i18nScope, errors) {
@@ -29279,8 +29284,25 @@
     for (var attr in errors) {
       transformedErrors[attr] = [];var _iteratorNormalCompletion = true;var _didIteratorError = false;var _iteratorError = undefined;try {
 
-        for (var _iterator = errors[attr][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {var error = _step.value;
-          var code = error.validator;
+        for (var _iterator = errors[attr][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {var error = _step.value;var
+
+          options =
+
+
+          error.options,code = error.validator,errorMessage = error.error;
+
+          // allowing custom messages when validator has options
+          if (lodashExt.isPlainObject(options)) {
+            for (var option in options) {
+              var customMessage = options[option];
+
+              if (errorMessage === customMessage) {
+                options.message = customMessage;
+                break;
+              }
+            }
+          }
+
           var message = lodashExt.get(error, 'options.message') ||
           i18n$1.t("errors.".concat(code), {
             scope: i18nScope,
