@@ -1,33 +1,82 @@
 import _ from '@caiena/lodash-ext';
-import 'core-js/modules/es.array.map';
-import 'core-js/modules/es.date.to-json';
-import 'core-js/modules/es.function.name';
-import 'core-js/modules/es.object.keys';
-import 'core-js/modules/web.url.to-json';
-import 'core-js/modules/es.array.concat';
-import 'core-js/modules/es.array.filter';
-import 'core-js/modules/es.array.includes';
-import 'core-js/modules/es.array.sort';
-import 'core-js/modules/es.object.get-own-property-descriptor';
-import 'core-js/modules/es.object.get-own-property-names';
-import 'core-js/modules/es.object.get-prototype-of';
-import 'core-js/modules/es.string.includes';
-import 'core-js/modules/es.string.starts-with';
 import Enum from '@caiena/enum';
 import { i18n } from '@caiena/i18n';
-import 'core-js/modules/es.symbol';
-import 'core-js/modules/es.symbol.description';
-import 'core-js/modules/es.symbol.iterator';
-import 'core-js/modules/es.array.iterator';
-import 'core-js/modules/es.object.to-string';
-import 'core-js/modules/es.promise';
-import 'core-js/modules/es.string.iterator';
-import 'core-js/modules/web.dom-collections.for-each';
-import 'core-js/modules/web.dom-collections.iterator';
-import 'regenerator-runtime/runtime';
 import validate from 'validate.js';
 import moment from 'moment';
-import 'core-js/modules/es.object.freeze';
+
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+
+    if (enumerableOnly) {
+      symbols = symbols.filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      });
+    }
+
+    keys.push.apply(keys, symbols);
+  }
+
+  return keys;
+}
+
+function _objectSpread2(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i] != null ? arguments[i] : {};
+
+    if (i % 2) {
+      ownKeys(Object(source), true).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
+    }
+  }
+
+  return target;
+}
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+    var info = gen[key](arg);
+    var value = info.value;
+  } catch (error) {
+    reject(error);
+    return;
+  }
+
+  if (info.done) {
+    resolve(value);
+  } else {
+    Promise.resolve(value).then(_next, _throw);
+  }
+}
+
+function _asyncToGenerator(fn) {
+  return function () {
+    var self = this,
+        args = arguments;
+    return new Promise(function (resolve, reject) {
+      var gen = fn.apply(self, args);
+
+      function _next(value) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+      }
+
+      function _throw(err) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+      }
+
+      _next(undefined);
+    });
+  };
+}
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -66,25 +115,6 @@ function _defineProperty(obj, key, value) {
   return obj;
 }
 
-function _objectSpread(target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i] != null ? arguments[i] : {};
-    var ownKeys = Object.keys(source);
-
-    if (typeof Object.getOwnPropertySymbols === 'function') {
-      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-      }));
-    }
-
-    ownKeys.forEach(function (key) {
-      _defineProperty(target, key, source[key]);
-    });
-  }
-
-  return target;
-}
-
 function _inherits(subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
     throw new TypeError("Super expression must either be null or a function");
@@ -116,6 +146,19 @@ function _setPrototypeOf(o, p) {
   return _setPrototypeOf(o, p);
 }
 
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+
+  try {
+    Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -127,9 +170,30 @@ function _assertThisInitialized(self) {
 function _possibleConstructorReturn(self, call) {
   if (call && (typeof call === "object" || typeof call === "function")) {
     return call;
+  } else if (call !== void 0) {
+    throw new TypeError("Derived constructors may only return object or undefined");
   }
 
   return _assertThisInitialized(self);
+}
+
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived),
+        result;
+
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+
+    return _possibleConstructorReturn(this, result);
+  };
 }
 
 function _superPropBase(object, property) {
@@ -161,6 +225,83 @@ function _get(target, property, receiver) {
 
   return _get(target, property, receiver || target);
 }
+
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+  return arr2;
+}
+
+function _createForOfIteratorHelper(o, allowArrayLike) {
+  var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"];
+
+  if (!it) {
+    if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+      if (it) o = it;
+      var i = 0;
+
+      var F = function () {};
+
+      return {
+        s: F,
+        n: function () {
+          if (i >= o.length) return {
+            done: true
+          };
+          return {
+            done: false,
+            value: o[i++]
+          };
+        },
+        e: function (e) {
+          throw e;
+        },
+        f: F
+      };
+    }
+
+    throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+
+  var normalCompletion = true,
+      didErr = false,
+      err;
+  return {
+    s: function () {
+      it = it.call(o);
+    },
+    n: function () {
+      var step = it.next();
+      normalCompletion = step.done;
+      return step;
+    },
+    e: function (e) {
+      didErr = true;
+      err = e;
+    },
+    f: function () {
+      try {
+        if (!normalCompletion && it.return != null) it.return();
+      } finally {
+        if (didErr) throw err;
+      }
+    }
+  };
+}
+
+// utility function for metaprogramming
+
 
 function defineInternalProp(obj, prop, value) {
   Object.defineProperty(obj, prop, {
@@ -253,54 +394,54 @@ function defineEnum(obj, enumName) {var _ref2 = arguments.length > 2 && argument
 
 function Attributable(Class) {var
 
-  AttributableClass = /*#__PURE__*/function (_Class) {_inherits(AttributableClass, _Class);_createClass(AttributableClass, null, [{ key: "$enums",
-
-      // lazy evaluated $enums, using @caiena/enum
-      get: function get() {
-        // avoiding static property inheritance
-        // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
-        if (!this.hasOwnProperty('$$enums')) {
-          this.$$enums = _.reduce(this.enums, function (result, enumeration, enumName) {
-            // transform to Enum instance, if needed
-            result[enumName] = enumeration instanceof Enum ? enumeration : new Enum(enumeration);
-
-            return result;
-          }, {});
-        }
-
-        return this.$$enums;
-      }
-
-      // lazy evaluated $attrs
-      // for now we're only keeping the API consistent, adding a '$methodName' getter
-      // TODO: define types and create "intelligent" setters? (with constraints)
-    }, { key: "$attrs", get: function get() {
-        // avoiding static property inheritance
-        // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
-        if (!this.hasOwnProperty('$$attrs')) {
-          this.$$attrs = _.clone(this.attrs);
-        }
-
-        return this.$$attrs;
-      }
+  AttributableClass = /*#__PURE__*/function (_Class) {_inherits(AttributableClass, _Class);var _super = _createSuper(AttributableClass);
 
 
-      // lazy evaluated $virtuals
-      // for now we're only keeping the API consistent, adding a '$methodName' getter
-      // TODO: define types and create "intelligent" setters? (with constraints)
-    }, { key: "$virtuals", get: function get() {
-        // avoiding static property inheritance
-        // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
-        if (!this.hasOwnProperty('$$virtuals')) {
-          this.$$virtuals = _.clone(this.virtuals);
-        }
-
-        return this.$$virtuals;
-      } }]);
 
 
-    function AttributableClass() {var _getPrototypeOf2;var _this;_classCallCheck(this, AttributableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
-      _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(AttributableClass)).call.apply(_getPrototypeOf2, [this].concat(args)));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function AttributableClass() {var _this;_classCallCheck(this, AttributableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
+      _this = _super.call.apply(_super, [this].concat(args));
 
       var klass = _this.constructor;
 
@@ -344,76 +485,85 @@ function Attributable(Class) {var
           }
         }
       });return _this;
-    }_createClass(AttributableClass, [{ key: "$blank", value: function $blank(
+    }_createClass(AttributableClass, [{ key: "$attrs", get:
 
+      function get() {
+        // XXX: $attrs and $$attrs will be confusing...
+        return this.$$attrs;
+      }, set:
 
+      function set(attrs) {var _this2 = this;
+        // TODO: remove old code
+        // return _.merge(this.$$attrs, attrs)
 
+        // set props, one-by-one, using setter method
+        var sanitizedAttrs = _.pick(attrs, this.constructor.$attrs);
+        _.each(sanitizedAttrs, function (value, name) {
+          _this2[name] = value;
+        });
+      }
 
+      // TODO: remove it?
+    }, { key: "$props", get: function get() {var _this3 = this;
+        var instance = this;
+        var proto = Object.getPrototypeOf(this);
+        var propNames = _.chain(Object.getOwnPropertyNames(proto)).
+        concat(Object.getOwnPropertyNames(instance)).
+        filter(function (name) {return !(_.includes(['constructor'], name) || _.startsWith(name, '$'));}).
+        uniq().
+        value().
+        sort();
 
+        return _.reduce(propNames, function (props, propName) {
+          props[propName] = _this3[propName];
+          return props;
+        }, {});
+      } }, { key: "$blank", value:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      attrNameOrPath) {
+      function $blank(attrNameOrPath) {
         return _.blank(this.$get(attrNameOrPath));
-      } }, { key: "$enumValue", value: function $enumValue(
+      } }, { key: "$enumValue", value:
 
-      enumName) {
+      function $enumValue(enumName) {
         return this.constructor.$enums[enumName].value(this[enumName]);
-      } }, { key: "$get", value: function $get(
+      } }, { key: "$get", value:
 
-      attrNameOrPath) {
+      function $get(attrNameOrPath) {
         return _.get(this, attrNameOrPath);
-      } }, { key: "$has", value: function $has(
+      } }, { key: "$has", value:
 
-      attrNameOrPath) {
+      function $has(attrNameOrPath) {
         // TODO: should it be _.hasIn(), to include inherited properties?
         // XXX: lodash _.has and _.hasIn actually _execute_ the method/property to check for its exitence.
         // It can have side effects!
         return _.has(this, attrNameOrPath);
-      } }, { key: "$pick", value: function $pick()
+      } }, { key: "$pick", value:
 
-      {for (var _len2 = arguments.length, attrNamesOrPathes = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {attrNamesOrPathes[_key2] = arguments[_key2];}
+      function $pick() {for (var _len2 = arguments.length, attrNamesOrPathes = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {attrNamesOrPathes[_key2] = arguments[_key2];}
         return _.pick.apply(_, [this].concat(attrNamesOrPathes));
-      } }, { key: "$present", value: function $present(
+      } }, { key: "$present", value:
 
-      attrNameOrPath) {
+      function $present(attrNameOrPath) {
         return _.present(this.$get(attrNameOrPath));
-      } }, { key: "$set", value: function $set(
+      } }, { key: "$set", value:
 
-      attrNameOrPath, value) {
+      function $set(attrNameOrPath, value) {
         return _.set(this, attrNameOrPath, value);
-      } }, { key: "$attrs", get: function get() {// XXX: $attrs and $$attrs will be confusing...
-        return this.$$attrs;}, set: function set(attrs) {var _this2 = this; // TODO: remove old code
-        // return _.merge(this.$$attrs, attrs)
-        // set props, one-by-one, using setter method
-        var sanitizedAttrs = _.pick(attrs, this.constructor.$attrs);_.each(sanitizedAttrs, function (value, name) {_this2[name] = value;});} // TODO: remove it?
-    }, { key: "$props", get: function get() {var _this3 = this;var instance = this;var proto = Object.getPrototypeOf(this);var propNames = _.chain(Object.getOwnPropertyNames(proto)).concat(Object.getOwnPropertyNames(instance)).filter(function (name) {return !(_.includes(['constructor'], name) || _.startsWith(name, '$'));}).uniq().value().sort();return _.reduce(propNames, function (props, propName) {props[propName] = _this3[propName];return props;}, {});} }]);return AttributableClass;}(Class);return AttributableClass;}
+      } }], [{ key: "$enums", get: // lazy evaluated $enums, using @caiena/enum
+      function get() {// avoiding static property inheritance
+        // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
+        if (!this.hasOwnProperty('$$enums')) {this.$$enums = _.reduce(this.enums, function (result, enumeration, enumName) {// transform to Enum instance, if needed
+            result[enumName] = enumeration instanceof Enum ? enumeration : new Enum(enumeration);return result;}, {});}return this.$$enums;} // lazy evaluated $attrs
+      // for now we're only keeping the API consistent, adding a '$methodName' getter
+      // TODO: define types and create "intelligent" setters? (with constraints)
+    }, { key: "$attrs", get: function get() {// avoiding static property inheritance
+        // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
+        if (!this.hasOwnProperty('$$attrs')) {this.$$attrs = _.clone(this.attrs);}return this.$$attrs;} // lazy evaluated $virtuals
+      // for now we're only keeping the API consistent, adding a '$methodName' getter
+      // TODO: define types and create "intelligent" setters? (with constraints)
+    }, { key: "$virtuals", get: function get() {// avoiding static property inheritance
+        // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
+        if (!this.hasOwnProperty('$$virtuals')) {this.$$virtuals = _.clone(this.virtuals);}return this.$$virtuals;} }]);return AttributableClass;}(Class);return AttributableClass;}
 
 function belongsTo(instance, relationName, config) {var _ref = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},_ref$get = _ref.get,get = _ref$get === void 0 ? null : _ref$get,_ref$set = _ref.set,set = _ref$set === void 0 ? null : _ref$set;
   if (!get) {
@@ -556,7 +706,7 @@ function hasMany(instance, relationName, config) {var _ref3 = arguments.length >
 }
 
 
-function defineRelation(instance, relationName, config) {var _ref4 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},get = _ref4.get,set = _ref4.set;
+function defineRelation(instance, relationName, config) {var _ref4 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};_ref4.get;_ref4.set;
   switch (config.type) {
     case 'belongsTo':return belongsTo.apply(void 0, arguments);
     case 'hasMany':return hasMany.apply(void 0, arguments);
@@ -571,25 +721,25 @@ function defineRelation(instance, relationName, config) {var _ref4 = arguments.l
 
 function Relatable(Class) {var
 
-  RelatableClass = /*#__PURE__*/function (_Class) {_inherits(RelatableClass, _Class);_createClass(RelatableClass, null, [{ key: "$relations",
-
-      // lazy evaluated $relations
-      get: function get() {
-        // avoiding static property inheritance
-        // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
-        if (!this.hasOwnProperty('$$relations')) {
-          this.$$relations = this.$$relations || _.reduce(this.relations, function (result, config, name) {
-            result[name] = config;
-            return result;
-          }, {});
-        }
-
-        return this.$$relations;
-      } }]);
+  RelatableClass = /*#__PURE__*/function (_Class) {_inherits(RelatableClass, _Class);var _super = _createSuper(RelatableClass);
 
 
-    function RelatableClass() {var _getPrototypeOf2;var _this;_classCallCheck(this, RelatableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
-      _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(RelatableClass)).call.apply(_getPrototypeOf2, [this].concat(args)));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function RelatableClass() {var _this;_classCallCheck(this, RelatableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
+      _this = _super.call.apply(_super, [this].concat(args));
 
       var klass = _this.constructor;
 
@@ -610,33 +760,33 @@ function Relatable(Class) {var
           }
         }
       });return _this;
-    }_createClass(RelatableClass, [{ key: "$relations", get: function get()
+    }_createClass(RelatableClass, [{ key: "$relations", get:
 
-      {
+      function get() {
         // XXX: $relations and $$relations will be confusing...
         return this.$$relations;
-      } }]);return RelatableClass;}(Class);
-
-
-  return RelatableClass;
+      } }], [{ key: "$relations", get: // lazy evaluated $relations
+      function get() {// avoiding static property inheritance
+        // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
+        if (!this.hasOwnProperty('$$relations')) {this.$$relations = this.$$relations || _.reduce(this.relations, function (result, config, name) {result[name] = config;return result;}, {});}return this.$$relations;} }]);return RelatableClass;}(Class);return RelatableClass;
 }
 
 function Translatable(Class) {var
-  TranslatableClass = /*#__PURE__*/function (_Class) {_inherits(TranslatableClass, _Class);function TranslatableClass() {_classCallCheck(this, TranslatableClass);return _possibleConstructorReturn(this, _getPrototypeOf(TranslatableClass).apply(this, arguments));}_createClass(TranslatableClass, null, [{ key: "$tModelName", value: function $tModelName()
+  TranslatableClass = /*#__PURE__*/function (_Class) {_inherits(TranslatableClass, _Class);var _super = _createSuper(TranslatableClass);function TranslatableClass() {_classCallCheck(this, TranslatableClass);return _super.apply(this, arguments);}_createClass(TranslatableClass, null, [{ key: "i18nScope", get:
+      function get() {
+        return "models.".concat(this.$modelName);
+      } }, { key: "$tModelName", value:
 
-
-
-
-      {var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref$count = _ref.count,count = _ref$count === void 0 ? 1 : _ref$count;
+      function $tModelName() {var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref$count = _ref.count,count = _ref$count === void 0 ? 1 : _ref$count;
         return i18n.t(this.i18nScope, { count: count });
-      } }, { key: "$tAttr", value: function $tAttr(
+      } }, { key: "$tAttr", value:
 
-      attrName) {var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      function $tAttr(attrName) {var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         var scope = "".concat(this.i18nScope, ".attributes");
         return i18n.t(attrName, _.defaults({}, options, { scope: scope }));
-      } }, { key: "$tEnum", value: function $tEnum(
+      } }, { key: "$tEnum", value:
 
-      enumName) {var enumValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      function $tEnum(enumName) {var enumValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
         var scope = this.i18nScope;
         var key = null;
 
@@ -659,7 +809,7 @@ function Translatable(Class) {var
       //  // use $l('date', attrName)
       //  // or  $l('time', attrName)
       // }
-    }, { key: "i18nScope", get: function get() {return "models.".concat(this.$modelName);} }]);return TranslatableClass;}(Class);
+    }]);return TranslatableClass;}(Class);
 
   return TranslatableClass;
 }
@@ -746,9 +896,9 @@ function transformErrors(i18nScope, errors) {
   var transformedErrors = {};
 
   for (var attr in errors) {
-    transformedErrors[attr] = [];var _iteratorNormalCompletion = true;var _didIteratorError = false;var _iteratorError = undefined;try {
+    transformedErrors[attr] = [];var _iterator = _createForOfIteratorHelper(
 
-      for (var _iterator = errors[attr][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {var error = _step.value;
+    errors[attr]),_step;try {for (_iterator.s(); !(_step = _iterator.n()).done;) {var error = _step.value;
         var code = error.validator;
         var message = _.get(error, 'options.message') ||
         i18n.t("errors.".concat(code), {
@@ -763,7 +913,7 @@ function transformErrors(i18nScope, errors) {
           code: code,
           message: message });
 
-      }} catch (err) {_didIteratorError = true;_iteratorError = err;} finally {try {if (!_iteratorNormalCompletion && _iterator.return != null) {_iterator.return();}} finally {if (_didIteratorError) {throw _iteratorError;}}}
+      }} catch (err) {_iterator.e(err);} finally {_iterator.f();}
   }
 
   return transformedErrors;
@@ -812,12 +962,16 @@ function _validate(instance) {
 
 function Validatable(Class) {var
 
-  ValidatableClass = /*#__PURE__*/function (_Class) {_inherits(ValidatableClass, _Class);
+  ValidatableClass = /*#__PURE__*/function (_Class) {_inherits(ValidatableClass, _Class);var _super = _createSuper(ValidatableClass);
 
-    function ValidatableClass() {var _getPrototypeOf2;var _this;_classCallCheck(this, ValidatableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
-      _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(ValidatableClass)).call.apply(_getPrototypeOf2, [this].concat(args)));
+    function ValidatableClass() {var _this;_classCallCheck(this, ValidatableClass);for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {args[_key] = arguments[_key];}
+      _this = _super.call.apply(_super, [this].concat(args));
       defineInternalProp(_assertThisInitialized(_this), '$$errors', {});return _this;
-    }_createClass(ValidatableClass, [{ key: "$validate", value: function $validate() {var _ref,_ref$relations,relations,instance,promises,relationNames,_relations,responses,hasError,_args = arguments;return regeneratorRuntime.async(function $validate$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:_ref = _args.length > 0 && _args[0] !== undefined ? _args[0] :
+    }_createClass(ValidatableClass, [{ key: "$errors", get:
+
+      function get() {
+        return this.$$errors;
+      } }, { key: "$validate", value: function () {var _$validate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(
 
 
 
@@ -829,41 +983,37 @@ function Validatable(Class) {var
 
 
 
+        function _callee() {var _ref,_ref$relations,relations,instance,promises,relationNames,_relations,responses,hasError,_args = arguments;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:_ref = _args.length > 0 && _args[0] !== undefined ? _args[0] : {}, _ref$relations = _ref.relations, relations = _ref$relations === void 0 ? false : _ref$relations;
+                  instance = this;
+                  promises = [];
+
+                  promises.push(_validate(instance));
+
+                  if (relations) {
+                    relationNames = Object.keys(instance.$relations);
+                    _relations = _.pickBy(instance, function (relationData, relationName) {
+                      return relationNames.includes(relationName) && _.present(relationData);
+                    });
+
+                    _.each(_relations, function (relationData, _relationName) {
+
+                      if (Array.isArray(relationData)) {
+                        relationData.forEach(function (relatedInstance) {return promises.push(_validate(relatedInstance));});
+
+                      } else {
+                        promises.push(_validate(relationData));
+                      }
+                    });
+                  }_context.prev = 5;_context.next = 8;return (
 
 
+                    Promise.all(promises));case 8:responses = _context.sent;
+                  hasError = responses.includes(false);return _context.abrupt("return",
+
+                  hasError ? Promise.resolve(false) : Promise.resolve(true));case 13:_context.prev = 13;_context.t0 = _context["catch"](5);return _context.abrupt("return",
 
 
-                {}, _ref$relations = _ref.relations, relations = _ref$relations === void 0 ? false : _ref$relations;
-                instance = this;
-                promises = [];
-
-                promises.push(_validate(instance));
-
-                if (relations) {
-                  relationNames = Object.keys(instance.$relations);
-                  _relations = _.pickBy(instance, function (relationData, relationName) {
-                    return relationNames.includes(relationName) && _.present(relationData);
-                  });
-
-                  _.each(_relations, function (relationData, _relationName) {
-
-                    if (Array.isArray(relationData)) {
-                      relationData.forEach(function (relatedInstance) {return promises.push(_validate(relatedInstance));});
-
-                    } else {
-                      promises.push(_validate(relationData));
-                    }
-                  });
-                }_context.prev = 5;_context.next = 8;return regeneratorRuntime.awrap(
-
-
-                Promise.all(promises));case 8:responses = _context.sent;
-                hasError = responses.includes(false);return _context.abrupt("return",
-
-                hasError ? Promise.resolve(false) : Promise.resolve(true));case 13:_context.prev = 13;_context.t0 = _context["catch"](5);return _context.abrupt("return",
-
-
-                Promise.reject(_context.t0));case 16:case "end":return _context.stop();}}}, null, this, [[5, 13]]);} }, { key: "$errors", get: function get() {return this.$$errors;} }], [{ key: "$constraints", get: function get() {// avoiding static property inheritance
+                  Promise.reject(_context.t0));case 16:case "end":return _context.stop();}}}, _callee, this, [[5, 13]]);}));function $validate() {return _$validate.apply(this, arguments);}return $validate;}() }], [{ key: "$constraints", get: function get() {// avoiding static property inheritance
         // @see http://thecodebarbarian.com/static-properties-in-javascript-with-inheritance.html
         if (!this.hasOwnProperty('$$constraints')) {this.$$constraints = _.clone(this.constraints);}return this.$$constraints;} }]);return ValidatableClass;}(Class);
 
@@ -888,26 +1038,23 @@ function _serialize(value) {
   return value;
 }var
 
-Base = /*#__PURE__*/function () {function Base() {_classCallCheck(this, Base);}_createClass(Base, null, [{ key: "$lookupModel", value: function $lookupModel(
+Base = /*#__PURE__*/function () {function Base() {_classCallCheck(this, Base);}_createClass(Base, null, [{ key: "$modelNameAdapter", get:
+    function get() {return _.camelize;} }, { key: "$modelName", get:
+    function get() {return this.$modelNameAdapter(this.name);} }, { key: "attrs", get:
 
+    function get() {return [];} }, { key: "enums", get:
+    function get() {return {};} }, { key: "virtuals", get:
+    function get() {return [];} }, { key: "$lookupModel", value:
 
-
-
-
-
-
-    name) {
+    function $lookupModel(name) {
       throw new Error('Model.$lookupModel(name) is not implemented.');
-    } }, { key: "$modelNameAdapter", get: function get() {return _.camelize;} }, { key: "$modelName", get: function get() {return this.$modelNameAdapter(this.name);} }, { key: "attrs", get: function get() {return [];} }, { key: "enums", get: function get() {return {};} }, { key: "virtuals", get: function get() {return [];} }]);return Base;}();var
+    } }]);return Base;}();var Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);var _super = _createSuper(Model);
+  // allow programmatically checking if it's a model class
 
-
-Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Model, null, [{ key: "$$model", get: function get()
-    {return true;} // allow programmatically checking if it's a model class
-
-    // using "props" as name to make it explicit that we'll set any enumerable "property" in the instance
-    // (JavaScript land - getOwnPropertyDescriptor() and prototype)
-  }]);function Model() {var _this2, _this3;var _this;var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},_ref$undefs = _ref.undefs,undefs = _ref$undefs === void 0 ? true : _ref$undefs;_classCallCheck(this, Model);
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Model).call(this));
+  // using "props" as name to make it explicit that we'll set any enumerable "property" in the instance
+  // (JavaScript land - getOwnPropertyDescriptor() and prototype)
+  function Model() {var _this2, _this3;var _this;var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},_ref$undefs = _ref.undefs,undefs = _ref$undefs === void 0 ? true : _ref$undefs;_classCallCheck(this, Model);
+    _this = _super.call(this);
 
     (_this2 = _this).$beforeInit.apply(_this2, arguments); // hook for user land
 
@@ -933,17 +1080,17 @@ Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Mo
     });
 
     (_this3 = _this).$afterInit.apply(_this3, arguments); // hook for user land
-    return _this;}_createClass(Model, [{ key: "$beforeInit", value: function $beforeInit()
+    return _this;}_createClass(Model, [{ key: "$beforeInit", value:
 
-    {
+    function $beforeInit() {
       // override it in subclasses
-    } }, { key: "$afterInit", value: function $afterInit()
+    } }, { key: "$afterInit", value:
 
-    {
+    function $afterInit() {
       // override it in subclasses
-    } }, { key: "toJSON", value: function toJSON()
+    } }, { key: "toJSON", value:
 
-    {var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref2$pick = _ref2.pick,pick = _ref2$pick === void 0 ? [] : _ref2$pick,_ref2$include = _ref2.include,include = _ref2$include === void 0 ? [] : _ref2$include,_ref2$omit = _ref2.omit,omit = _ref2$omit === void 0 ? [] : _ref2$omit,_ref2$virtuals = _ref2.virtuals,virtuals = _ref2$virtuals === void 0 ? false : _ref2$virtuals,_ref2$relations = _ref2.relations,relations = _ref2$relations === void 0 ? false : _ref2$relations,_ref2$undefs = _ref2.undefs,undefs = _ref2$undefs === void 0 ? false : _ref2$undefs;
+    function toJSON() {var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},_ref2$pick = _ref2.pick,pick = _ref2$pick === void 0 ? [] : _ref2$pick,_ref2$include = _ref2.include,include = _ref2$include === void 0 ? [] : _ref2$include,_ref2$omit = _ref2.omit,omit = _ref2$omit === void 0 ? [] : _ref2$omit,_ref2$virtuals = _ref2.virtuals,virtuals = _ref2$virtuals === void 0 ? false : _ref2$virtuals,_ref2$relations = _ref2.relations,relations = _ref2$relations === void 0 ? false : _ref2$relations,_ref2$undefs = _ref2.undefs,undefs = _ref2$undefs === void 0 ? false : _ref2$undefs;
       var json = _.clone(this.$attrs);
 
 
@@ -980,16 +1127,16 @@ Model = /*#__PURE__*/function (_mixin) {_inherits(Model, _mixin);_createClass(Mo
 
 
       return json;
-    } }, { key: "$serialize", value: function $serialize()
+    } }, { key: "$serialize", value:
 
-    {
+    function $serialize() {
       return this.toJSON.apply(this, arguments);
-    } }]);return Model;}(mixin(Base, [Attributable, Relatable, Translatable, Validatable]));
+    } }], [{ key: "$$model", get: function get() {return true;} }]);return Model;}(mixin(Base, [Attributable, Relatable, Translatable, Validatable]));
 
 function Decorator(ModelClass) {var
 
-  DecoratedClass = /*#__PURE__*/function (_ModelClass) {_inherits(DecoratedClass, _ModelClass);_createClass(DecoratedClass, null, [{ key: "$modelClass", get: function get()
-      {return ModelClass;} }]);
+  DecoratedClass = /*#__PURE__*/function (_ModelClass) {_inherits(DecoratedClass, _ModelClass);var _super = _createSuper(DecoratedClass);
+
 
     function DecoratedClass(object) {_classCallCheck(this, DecoratedClass);
       var _object = object instanceof Model ? object : new ModelClass(object);
@@ -997,9 +1144,9 @@ function Decorator(ModelClass) {var
       // sanity check
       if (_object.hasOwnProperty('$object')) {
         throw new Error('Decorated object cannot have a property named "$object"');
-      }return _possibleConstructorReturn(this, _getPrototypeOf(DecoratedClass).call(this, _objectSpread({
+      }return _super.call(this, _objectSpread2({
 
-        $object: _object }, _object.$props)));
+        $object: _object }, _object.$props));
     }
 
     // hook to define $object before constructing the model instance
@@ -1007,7 +1154,7 @@ function Decorator(ModelClass) {var
         this.$object = props.$object;
 
         _get(_getPrototypeOf(DecoratedClass.prototype), "$beforeInit", this).call(this, props, opts);
-      } }]);return DecoratedClass;}(ModelClass);
+      } }], [{ key: "$modelClass", get: function get() {return ModelClass;} }]);return DecoratedClass;}(ModelClass);
 
 
   return DecoratedClass;
@@ -1023,3 +1170,4 @@ _.each(contents, function (content, _id) {
 });
 
 export { Decorator, Model, mixin, translations };
+//# sourceMappingURL=model.esm.js.map
