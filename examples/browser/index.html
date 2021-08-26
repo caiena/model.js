@@ -16,14 +16,33 @@
 </head>
 
 <body>
-  <script src="lodash-ext.umd.js"></script>
+  <!--
+    requires global @caiena/lodash-ext
+    loading directly from github. @see https://stackoverflow.com/a/18049842
+    - http://raw.githubusercontent.com/<username>/<repo>/<branch>/path/to/file.js
+    - becomes http://cdn.jsdelivr.net/gh/<username>/<repo>/path/to/file.js
+
+    <script src="https://raw.githubusercontent.com/caiena/lodash-ext/v0.11.1/dist/lodash-ext.umd.min.js"></script>
+  -->
+  <!-- <script src="http://cdn.jsdelivr.net/gh/caiena/lodash-ext@v0.11.1/dist/lodash-ext.umd.min.js"></script> -->
+  <script src="node_modules/@caiena/lodash-ext/dist/lodash-ext.umd.min.js"></script>
+  <script src="node_modules/@caiena/enum/dist/enum.umd.min.js"></script>
+  <script src="node_modules/@caiena/i18n/dist/i18n.umd.min.js"></script>
+  <script src="node_modules/moment/moment.js"></script>
+  <script src="node_modules/validate.js/validate.min.js"></script>
+  <script src="model.umd.js"></script>
   <script>
-      var p = document.createElement('p');
-      var content = Object.keys(_).sort().join(', ')
+    // available as global "model"
+    var pre = document.createElement("pre");
+    var content = Object.keys(model).sort().join(", ")
 
-      p.innerHTML = content
+    pre.innerHTML = content
 
-      document.body.appendChild(p)
+    var translations = model.translations
+    var translationsStr = JSON.stringify(translations, null, "  ")
+    pre.innerHTML += `\n\n translations: ${translationsStr}`
+
+    document.body.appendChild(pre)
   </script>
 </body>
 </html>
