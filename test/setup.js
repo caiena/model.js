@@ -1,8 +1,5 @@
 process.env.NODE_ENV = 'test'
 
-import 'core-js/stable'
-import 'regenerator-runtime/runtime'
-
 // Setting up the context with test libraries
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
