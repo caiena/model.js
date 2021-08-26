@@ -28,19 +28,19 @@ growl: false
 inline-diffs: false
 # needs to be used with grep or fgrep
 # invert: false
-package: './package.json'
+package: "./package.json"
 recursive: true
 reporter: spec
 # reporter-option:
 #   - foo=bar
 #   - baz=quux
 require:
-  - '@babel/register'
+  - "@babel/register"
   - test/setup
 retries: 1
 slow: 75
 sort: false
-# XXX: we're not using the positional arguments, since package.json scripts already define it for 'test:all'
+# XXX: we're not using the positional arguments, since package.json scripts already define it for "test:all"
 # spec: test/**/*.spec.js     # the positional arguments!
 # v8-stack-trace-limit: 100   # V8 flags are prepended with "v8-"
 timeout: false
