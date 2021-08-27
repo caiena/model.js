@@ -40,7 +40,6 @@ const plugins = [
 ]
 
 const external = [
-  "@caiena/enum",
   "@caiena/i18n",
   "@caiena/lodash-ext",
   "moment",
@@ -48,7 +47,6 @@ const external = [
 ]
 
 const globals = {
-  "@caiena/enum":       "Enum",
   "@caiena/i18n":       "i18n",
   "@caiena/lodash-ext": "_",
   "moment":             "moment",
